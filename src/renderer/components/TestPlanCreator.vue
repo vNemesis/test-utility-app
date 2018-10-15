@@ -70,6 +70,8 @@
       <a @click="addTestItem()" class="text-success"><font-awesome-icon icon="plus" size="2x" /></a>
     </div>
   </div>
+  <div class="row">
+  </div>
 </div>
 </template>
 
@@ -109,6 +111,7 @@ export default {
   },
 
   methods: {
+
     goBack () {
       window.history.length > 1
         ? this.$router.go(-1)

@@ -14,7 +14,7 @@
       </select>
     </td>
     <td class="align-middle">
-      <textarea type="text" v-model="testdata.testPurpose" class="form-control" rows="2"></textarea>
+      <textarea :id="'editor' + testdata.id" type="text" v-model="testdata.testPurpose" class="form-control" rows="2"></textarea>
     </td>
     <td class="align-middle">
       <textarea type="text" v-model="testdata.gherkin" class="form-control" rows="2"></textarea>
@@ -37,6 +37,7 @@
 <script>
   export default {
     name: 'test-item',
+    components: { },
 
     props: ['testdata'],
 

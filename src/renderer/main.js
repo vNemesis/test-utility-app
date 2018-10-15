@@ -33,6 +33,7 @@ Vue.use(Vuesax)
 // Components
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.component('test-item', './components/TestItem.vue')
+Vue.component('jira-wiki-editor', './components/JiraWikiEditor.vue')
 
 /* eslint-disable no-new */
 new Vue({
