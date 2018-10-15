@@ -2,7 +2,7 @@
   "name": "test-plan-utility",
   "version": "0.0.1",
   "author": "HarmanU <uppalhrs@aston.ac.uk>",
-  "description": "An electron-vue project",
+  "description": "Electron Vue App for Rimilia Test Plans",
   "license": null,
   "main": "./dist/electron/main.js",
   "scripts": {
@@ -19,7 +19,7 @@
     "postinstall": "npm run lint:fix"
   },
   "build": {
-    "productName": "test-plan-utility",
+    "productName": "Test Plan Utility",
     "appId": "com.shockwaveinteractive.test-plan-utility",
     "directories": {
       "output": "build"
