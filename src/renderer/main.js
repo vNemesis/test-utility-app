@@ -1,5 +1,8 @@
 import Vue from 'vue'
 import Vuesax from 'vuesax'
+import Vuex from 'vuex'
+import 'es6-promise/auto'
+
 import axios from 'axios'
 
 import App from './App'
@@ -11,10 +14,10 @@ import 'vuesax/dist/vuesax.css'
 
 // Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faBook, faBug, faPlus, faTrash, faClipboardList, faHome, faEllipsisH } from '@fortawesome/free-solid-svg-icons'
+import { faBook, faBug, faPlus, faTrash, faClipboardList, faHome, faEllipsisH, faEdit } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faBook, faBug, faPlus, faTrash, faClipboardList, faHome, faEllipsisH)
+library.add(faBook, faBug, faPlus, faTrash, faClipboardList, faHome, faEllipsisH, faEdit)
 
 const {dialog, shell} = require('electron').remote
 var fs = require('fs')
@@ -29,16 +32,32 @@ Vue.config.productionTip = false
 
 // Plugins
 Vue.use(Vuesax)
+Vue.use(Vuex)
 
 // Components
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.component('test-item', './components/TestItem.vue')
 Vue.component('jira-wiki-editor', './components/JiraWikiEditor.vue')
 
+const store = new Vuex.Store({
+  state: {
+    displayEditor: false
+  },
+  mutations: {
+    show (displayEditor) {
+      displayEditor = true
+    },
+    hide (displayEditor) {
+      displayEditor = false
+    }
+  }
+})
+
 /* eslint-disable no-new */
 new Vue({
   components: { App },
   router,
+  store,
   template: '<App/>',
 
   methods: {

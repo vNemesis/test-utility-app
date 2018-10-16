@@ -13,6 +13,7 @@
     </td>
     <td class="align-middle">
       <vs-textarea :id="'editor' + testdata.id" v-model="testdata.testPurpose" rows="4" placeholder="Enter a description of the test"/>
+      <!-- <font-awesome-icon icon="edit" @click="openEditor" /> -->
     </td>
     <td class="align-middle">
       <vs-textarea v-model="testdata.gherkin" rows="4" placeholder="Gherkin code for test"/>
@@ -29,9 +30,10 @@
 </template>
 
 <script>
+  import JiraWikiEditor from './JiraWikiEditor'
   export default {
     name: 'test-item',
-    components: { },
+    components: { JiraWikiEditor },
 
     props: ['testdata'],
 
@@ -51,11 +53,12 @@
     },
 
     methods: {
+      saveText (text) {
+        this.testdata.testPurpose = text
+      }
     }
   }
 </script>
 
 <style>
-  /* @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
-  @import '../../../node_modules/bootstrap/dist/css/bootstrap.css'; */
 </style>
