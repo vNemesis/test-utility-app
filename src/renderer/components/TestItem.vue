@@ -4,29 +4,23 @@
       {{ testdata.id }}
     </td>
     <td class="align-middle">
-      <input type="text" v-model="testdata.testName" class="form-control" >
+      <vs-textarea v-model="testdata.testName" rows="4" placeholder="Test Name (Summary)"/>
     </td>
     <td class="align-middle">
-      <select type="text" v-model="testdata.testType" class="form-control" >
-        <option value="">Select a Type</option>
-        <option value="API">API</option>
-        <option value="UI">UI</option>
-      </select>
+      <vs-select v-model="testdata.testType" class="w-100">
+        <vs-select-item :key="index" :vs-value="item" :vs-text="item" v-for="(item,index) in types" />
+      </vs-select>
     </td>
     <td class="align-middle">
-      <textarea :id="'editor' + testdata.id" type="text" v-model="testdata.testPurpose" class="form-control" rows="2"></textarea>
+      <vs-textarea :id="'editor' + testdata.id" v-model="testdata.testPurpose" rows="4" placeholder="Enter a description of the test"/>
     </td>
     <td class="align-middle">
-      <textarea type="text" v-model="testdata.gherkin" class="form-control" rows="2"></textarea>
+      <vs-textarea v-model="testdata.gherkin" rows="4" placeholder="Gherkin code for test"/>
     </td>
     <td class="align-middle">
-      <select type="text" v-model="testdata.priority" class="form-control" >
-        <option value="">Select a Type</option>
-        <option value="Trivial">Trivial</option>
-        <option value="Minor">Minor</option>
-        <option value="Major">Major</option>
-        <option value="Critical">Critical</option>
-      </select>
+      <vs-select label="Priority" v-model="testdata.priority" class="w-100">
+        <vs-select-item :key="index" :vs-value="item" :vs-text="item" v-for="(item,index) in priorities" />
+      </vs-select>
     </td>
     <td class="align-middle">
       <a @click="$emit('remove-self')" class="text-danger"><font-awesome-icon icon="trash" size="lg" /></a>
@@ -43,6 +37,16 @@
 
     data: function () {
       return {
+        types: {
+          API: 'API',
+          UI: 'UI'
+        },
+        priorities: {
+          Trivial: 'Trivial',
+          Minor: 'Minor',
+          Major: 'Major',
+          Critical: 'Critical'
+        }
       }
     },
 

@@ -39,31 +39,31 @@
         popupSettings: false,
         disableNewLine: false,
         headings: {
-        H1: '.h1',
-        H2: '.h2',
-        H3: '.h3',
-        H4: '.h4',
-        H5: '.h5',
-        H6: '.h6'
+          H1: '.h1',
+          H2: '.h2',
+          H3: '.h3',
+          H4: '.h4',
+          H5: '.h5',
+          H6: '.h6'
         }
       }
     },
 
     methods: {
-        insertAtCaret (text) {
-            if (!this.disableNewLine) {
-                text = '\n' + text
-            }
-            var elementID = 'editor'
-            var element = document.getElementById(elementID)
-            var caretPos = element.selectionStart
-            var caretEnd = element.selectionEnd
-            var textAreaTxt = this.testdata.testPurpose
-            this.testItems[(this.editor.id - 1)].testPurpose = textAreaTxt.substring(0, caretPos) + text + textAreaTxt.substring(caretEnd)
-
-            element.selectionStart = caretPos + text.length
-            element.selectionEnd = caretPos + text.length
+      insertAtCaret (text) {
+        if (!this.disableNewLine) {
+          text = '\n' + text
         }
+        var elementID = 'editor'
+        var element = document.getElementById(elementID)
+        var caretPos = element.selectionStart
+        var caretEnd = element.selectionEnd
+        var textAreaTxt = this.testdata.testPurpose
+        this.testItems[(this.editor.id - 1)].testPurpose = textAreaTxt.substring(0, caretPos) + text + textAreaTxt.substring(caretEnd)
+
+        element.selectionStart = caretPos + text.length
+        element.selectionEnd = caretPos + text.length
+      }
     }
   }
 </script>

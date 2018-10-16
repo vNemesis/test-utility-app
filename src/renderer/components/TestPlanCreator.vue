@@ -51,13 +51,13 @@
       <div class="table-responsive">
         <table class="table mt-2">
           <thead>
-            <th>Number</th>
-            <th>Test Name</th>
-            <th>Test Type</th>
-            <th>Test Purpose</th>
-            <th>Gherkin</th>
-            <th>Priority</th>
-            <th></th>
+            <th width="5%">Number</th>
+            <th width="20%">Test Name</th>
+            <th width="10%">Test Type</th>
+            <th width="25%">Test Purpose</th>
+            <th width="25%">Gherkin</th>
+            <th width="10%">Priority</th>
+            <th width="5%"></th>
           </thead>
           <tbody>
               <tr is="test-item" v-for="(test, index) in testItems" :key="test.id" v-bind:testdata="test" v-on:remove-self="removeTestItem(index)"></tr>
@@ -153,7 +153,14 @@ export default {
     },
 
     exportToJson () {
-      let jsonContent = JSON.stringify(this.testItems)
+      let plan = {
+        testItems: this.testItems,
+        jiraTask: this.jiraTask,
+        assignee: this.assignee,
+        app: this.app
+      }
+
+      let jsonContent = JSON.stringify(plan)
       this.$root.exportFile(`Test Plan ${this.jiraTask}.json`, jsonContent)
     },
 
@@ -189,8 +196,14 @@ export default {
               position: 'top-center',
               time: 4000
             })
-            console.log(data)
-            this.testItems = JSON.parse(data)
+            let parsedData = JSON.parse(data)
+
+            console.log(parsedData)
+
+            this.testItems = parsedData.testItems
+            this.jiraTask = parsedData.jiraTask
+            this.assignee = parsedData.assignee
+            this.app = parsedData.app
           }
         })
       })

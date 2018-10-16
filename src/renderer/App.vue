@@ -16,8 +16,12 @@
           Test Plan Creator
         </vs-sidebar-item>
 
-        <div class="footer-sidebar" slot="footer">
-          <vs-button vs-icon="settings" color="primary" vs-type="border"></vs-button>
+        <vs-sidebar-item index="3" icon="settings" @click="navigate('/settings')">
+          Settings
+        </vs-sidebar-item>
+
+        <div class="footer-sidebar ml-1" slot="footer">
+          <div>v{{ version }}</div>
         </div>
       </vs-sidebar>
     </div>
@@ -50,12 +54,14 @@
 </template>
 
 <script>
+  const appVersion = window.require('electron').remote.app.getVersion()
   export default {
     name: 'test-plan-utility',
     data: () => ({
       activeItem: 3,
       name: 'Test Plan Utility',
-      active: false
+      active: false,
+      version: appVersion
     }),
 
     methods: {
