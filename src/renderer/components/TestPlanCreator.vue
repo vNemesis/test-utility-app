@@ -1,34 +1,38 @@
 <template>
 <div>
   <div class="row mt-5">
-    <div class="col-md-12 text-center">
+    <div class="col-md-12">
+      <h1>Test Plan Creator</h1>
+      <vs-select vs-autocomplete vs-label="Load plan" v-model="planID">
+        <vs-select-item :key="index" :vs-value="index" :vs-text="index" v-for="(item,index) in allTestPlans" />
+      </vs-select>
+
+      <br>
 
       <div class="row">
-        <div class="col-md-6 text-left">
-          <h1>Test Plan Creator</h1>
-        </div>
-        <div class="col-md-6 text-right">
+        <div class="col-sm-12">
           <vs-button @click="generateJiraTable()" color="rgb(26, 155, 252)" vs-type="filled">Generate Jira Table</vs-button>
 
           <!-- Export -->
-          <vs-dropdown class="text-left">
-            <vs-button vs-type="gradient">Export</vs-button>
+          <vs-dropdown>
+            <vs-button vs-type="gradient">Import / Export</vs-button>
             <vs-dropdown-menu>
               <vs-dropdown-item @click="exportToCSV()">
                 Export to CSV
               </vs-dropdown-item>
-              <vs-dropdown-item @click="exportToJson()">
-                Export to JSON
+              <vs-dropdown-item vs-divider @click="exportToJson()">
+                Export JSON
+              </vs-dropdown-item>
+              <vs-dropdown-item @click="importFromJson()">
+                Import JSON
               </vs-dropdown-item>
             </vs-dropdown-menu>
           </vs-dropdown>
           <!-- Export -->
-          <vs-button @click="importFromJson()" vs-type="filled" color="rgb(26, 155, 252)">Import (JSON)</vs-button>
 
+          <vs-button @click="save()" vs-type="filled" color="rgb(26, 155, 252)">Save Test Plan</vs-button>
         </div>
       </div>
-      
-
 
       <hr>
 
@@ -89,6 +93,7 @@ export default {
 
   data: function () {
     return {
+      planID: '',
       jiraTask: '',
       assignee: '',
       app: '',
@@ -107,6 +112,18 @@ export default {
         {text: 'Cash', value: 'Cash'},
         {text: 'Collect', value: 'Collect'}
       ]
+    }
+  },
+
+  computed: {
+    allTestPlans () {
+      return this.$root.getTestPlans()
+    }
+  },
+
+  watch: {
+    planID (val) {
+      this.load(val)
     }
   },
 
@@ -168,6 +185,39 @@ export default {
 
       let jsonContent = JSON.stringify(plan)
       this.$root.exportFile(`Test Plan ${this.jiraTask}.json`, jsonContent)
+    },
+
+    save () {
+      let plan = {
+        testItems: this.testItems,
+        jiraTask: this.jiraTask,
+        assignee: this.assignee,
+        app: this.app
+      }
+
+      let jsonContent = JSON.stringify(plan)
+      this.$root.saveTestPlan(`${this.jiraTask}`, jsonContent)
+
+      this.$vs.notify({
+        title: 'Plan Saved',
+        text: `Plan was saved successfully`,
+        color: 'success',
+        icon: 'publish',
+        position: 'top-center',
+        time: 4000
+      })
+    },
+    load (key) {
+      let parsedData = JSON.parse(this.$root.getTestPlan(key))
+
+      if (parsedData === {}) {
+        return
+      }
+
+      this.testItems = parsedData.testItems
+      this.jiraTask = parsedData.jiraTask
+      this.assignee = parsedData.assignee
+      this.app = parsedData.app
     },
 
     importFromJson () {

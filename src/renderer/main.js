@@ -25,6 +25,7 @@ var fs = require('fs')
 window.$ = require('jquery')
 window.popper = require('popper.js')
 window.Bootstrap = require('bootstrap')
+const username = require('username')
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
@@ -34,9 +35,16 @@ Vue.config.productionTip = false
 const EStore = require('electron-store')
 const appStore = new EStore({
   defaults: {
-    autoLine: false,
-    defaultAssignee: ''
+    settings: {
+      autoLine: false,
+      defaultAssignee: '',
+      atlassianKey: ''
+    }
   }
+})
+
+const testPlanStore = new EStore({
+  name: 'testPlans'
 })
 
 // Vue Plugins
@@ -52,28 +60,29 @@ const store = new Vuex.Store({
   state: {
     settings: {
       autoLine: false,
-      defaultAssignee: ''
+      defaultAssignee: '',
+      atlassianKey: ''
     },
-    changingConfig: false
+    changingConfig: false,
+    username: username.sync()
   },
   mutations: {
-    setSettingAutoLine (state, bool) {
-      state.settings.autoLine = bool
-    },
-    setSettingDefaultAssignee (state, path) {
-      state.settings.defaultAssignee = path
+    setSettings (state, newSettings) {
+      state.settings = newSettings
     },
     setChangeConfig (state, bool) {
       state.changingConfig = bool
       if (!bool) {
-        appStore.store = state.settings
+        appStore.set('settings', state.settings)
+        console.log(appStore.store.settings)
+        console.log(state.settings)
       }
     }
   }
 })
 
 // Load Settings
-store.state.settings = appStore.store
+store.state.settings = appStore.store.settings
 
 /* eslint-disable no-new */
 new Vue({
@@ -83,6 +92,15 @@ new Vue({
   template: '<App/>',
 
   methods: {
+    saveTestPlan (id, content) {
+      testPlanStore.set(id, content)
+    },
+    getTestPlans () {
+      return testPlanStore.store
+    },
+    getTestPlan (key) {
+      return testPlanStore.get(key, {})
+    },
     /**
      * Will begin the download of a file
      * @param {string} filename name of file

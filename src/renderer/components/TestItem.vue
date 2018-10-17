@@ -4,7 +4,7 @@
       {{ testdata.id }}
     </td>
     <td class="align-middle">
-      <vs-textarea v-model="testdata.testName" rows="4" placeholder="Test Name (Summary)"/>
+      <textarea v-model="testdata.testName" class="form-control" style="height: 100px;" placeholder="Test Name (Summary)"></textarea>
     </td>
     <td class="align-middle">
       <vs-select v-model="testdata.testType" class="w-100">
@@ -12,13 +12,24 @@
       </vs-select>
     </td>
     <td class="align-middle">
-      <!-- <vs-textarea :id="'editor' + testdata.id" v-model="testdata.testPurpose" rows="4" placeholder="Enter a description of the test"/> -->
-      <!-- <textarea :id="'editor' + testdata.id" v-model="testdata.testPurpose"></textarea> -->
-      <jira-wiki-editor v-model="testdata.testPurpose"></jira-wiki-editor>
-      <!-- <font-awesome-icon icon="edit" @click="openEditor" /> -->
+      <div ref="toolbar" v-if="toggleEditor">
+
+          <!-- Headings -->
+          <vs-dropdown >
+            <button class="btn-sm btn-info" href="#">H</button>
+            <vs-dropdown-menu>
+                <vs-dropdown-item v-for="(heading, key) in editor.headings" v-bind:key="key" @click="insertAtCaret(heading)">
+                {{key}}
+                </vs-dropdown-item>
+            </vs-dropdown-menu>
+          </vs-dropdown>
+          <!-- Headings -->
+
+      </div>  
+      <textarea ref="textbox" class="form-control" style="height: 100px;" v-model="testdata.testPurpose" @focus="toggleEditor = true" @blur="toggleEditor = false"></textarea>
     </td>
     <td class="align-middle">
-      <textarea v-model="testdata.gherkin" class="form-control" style="border-color: rgba(0,0,0,0.1); height: 100px;" placeholder="Gherkin code for test"></textarea>
+      <textarea v-model="testdata.gherkin" class="form-control" style="height: 100px;" placeholder="Gherkin code for test"></textarea>
     </td>
     <td class="align-middle">
       <vs-select label="Priority" v-model="testdata.priority" class="w-100">
@@ -51,13 +62,34 @@
           Major: 'Major',
           Critical: 'Critical'
         },
-        temp: this.testdata.testPurpose
+        toggleEditor: false,
+        editor: {
+          headings: {
+            H1: '.h1',
+            H2: '.h2',
+            H3: '.h3',
+            H4: '.h4',
+            H5: '.h5',
+            H6: '.h6'
+          }
+        }
       }
     },
 
     methods: {
-      saveText (text) {
-        this.testdata.testPurpose = text
+      insertAtCaret (formatting) {
+        if (this.$store.state.settings.autoLine) {
+          formatting = '\n' + formatting
+        }
+        var element = this.$refs.textbox
+        var caretPos = element.selectionStart
+        var caretEnd = element.selectionEnd
+        var textAreaTxt = this.$refs.textbox.value
+        this.$refs.textbox.value = textAreaTxt.substring(0, caretPos) + formatting + textAreaTxt.substring(caretEnd)
+
+        element.selectionStart = caretPos + formatting.length
+        element.selectionEnd = caretPos + formatting.length
+        this.updateText()
       }
     }
   }

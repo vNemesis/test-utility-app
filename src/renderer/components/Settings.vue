@@ -8,15 +8,27 @@
       <vs-tab vs-label="General">
         <!-- General Settings -->
         <div class="row justify-content-center">
-          <div class="col-sm-12">
+          <div class="col-sm-6">
 
-            <!-- App Directory -->
+            <!-- Default Assignee -->
             <div class="row justify-content-center">
               <div class="col-sm-12">
-                <vs-input id="autoNewLine" v-model="defaultAssignee" vs-label="Default Assignee" @input="isTyping = true" class="w-100"/>
+                <vs-input id="autoNewLine" v-model="settings.defaultAssignee" vs-label="Default Assignee" @input="isTyping = true" class="w-100"/>
               </div>
             </div>
-            <!-- App Directory -->
+            <!-- Default Assignee -->
+
+          </div>
+          <div class="col-sm-6">
+            
+            <!-- Atlassian Key -->
+            <div class="row justify-content-center">
+              <div class="col-sm-12">
+                <vs-input id="autoNewLine" v-model="settings.atlassianKey" vs-label="Atlassian Personal Access Token"
+                @input="isTyping = true" class="w-100" vs-description-text="This is stored in plain text, use at own risk. Make sure to only give Read Permission"/>
+              </div>
+            </div>
+            <!-- Atlassian Key -->
 
           </div>
         </div>
@@ -31,7 +43,7 @@
             <div class="row justify-content-center">
               <div class="col-sm-12">
                 <label for="autoNewLine">Auto new line</label>
-                <vs-switch id="autoNewLine" v-model="autoLine" @input="isTyping = true">
+                <vs-switch id="autoNewLine" v-model="settings.autoLine" @input="isTyping = true">
                     <span slot="on">On</span>
                     <span slot="off">Off</span>
                 </vs-switch>
@@ -65,32 +77,25 @@
 <script>
   import _ from 'lodash'
   // import axios from 'axios'
-  const appVersion = window.require('electron').remote.app.getVersion()
   export default {
     name: 'landing-page',
 
     data: function () {
       return {
-        latestRelease: '',
-        appVersion: appVersion
+        latestRelease: ''
       }
     },
 
     computed: {
-      autoLine: {
-        get () {
-          return this.$store.state.settings.autoLine
-        },
-        set (value) {
-          this.$store.commit('setSettingAutoLine', value)
-        }
+      appVersion () {
+        return window.require('electron').remote.app.getVersion()
       },
-      defaultAssignee: {
+      settings: {
         get () {
-          return this.$store.state.settings.defaultAssignee
+          return this.$store.state.settings
         },
         set (value) {
-          this.$store.commit('setSettingDefaultAssignee', value)
+          this.$store.commit('setSettings', value)
         }
       },
       isTyping: {
@@ -116,12 +121,12 @@
     },
 
     watch: {
-      autoLine: _.debounce(function () {
-        this.isTyping = false
-      }, 2000),
-      defaultAssignee: _.debounce(function () {
-        this.isTyping = false
-      }, 2000),
+      settings: {
+        handler: _.debounce(function () {
+          this.isTyping = false
+        }, 2000),
+        deep: true
+      },
       isTyping (val) {
         if (!val) {
           this.$vs.notify({

@@ -3,8 +3,6 @@
   <div ref="toolbar" v-if="showEditor">
   </div>
 
-  <vs-collapse>
-    <vs-collapse-item>
       <vs-dropdown >
         <button class="btn-sm btn-info" href="#">H</button>
         <vs-dropdown-menu>
@@ -13,9 +11,7 @@
             </vs-dropdown-item>
         </vs-dropdown-menu>
       </vs-dropdown>
-    </vs-collapse-item>
-  </vs-collapse>
-
+      
   <textarea ref="textbox" class="form-control" style="border-color: rgba(0,0,0,0.1); height: 100px;" :value="propText" @input="updateText()"></textarea>
 </div>
 </template>
@@ -49,11 +45,10 @@
 
     methods: {
       insertAtCaret (formatting) {
-        if (!this.disableNewLine) {
+        if (this.$store.state.settings.autoLine) {
           formatting = '\n' + formatting
         }
-        var elementID = 'editor'
-        var element = document.getElementById(elementID)
+        var element = this.$refs.textbox
         var caretPos = element.selectionStart
         var caretEnd = element.selectionEnd
         var textAreaTxt = this.$refs.textbox.value

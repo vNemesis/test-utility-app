@@ -54,15 +54,19 @@
 </template>
 
 <script>
-  const appVersion = window.require('electron').remote.app.getVersion()
   export default {
     name: 'test-plan-utility',
     data: () => ({
       activeItem: 3,
       name: 'Test Plan Utility',
-      active: false,
-      version: appVersion
+      active: false
     }),
+
+    computed: {
+      version () {
+        return window.require('electron').remote.app.getVersion()
+      }
+    },
 
     methods: {
       onOpenMenu () {
