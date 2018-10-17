@@ -8,6 +8,7 @@ import axios from 'axios'
 import App from './App'
 import router from './router'
 
+// Styles
 import 'bootstrap/dist/css/bootstrap.css'
 import 'material-icons/iconfont/material-icons.css'
 import 'vuesax/dist/vuesax.css'
@@ -16,12 +17,11 @@ import 'vuesax/dist/vuesax.css'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faBook, faBug, faPlus, faTrash, faClipboardList, faHome, faEllipsisH, faEdit } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
 library.add(faBook, faBug, faPlus, faTrash, faClipboardList, faHome, faEllipsisH, faEdit)
 
+// Load Plugins
 const {dialog, shell} = require('electron').remote
 var fs = require('fs')
-
 window.$ = require('jquery')
 window.popper = require('popper.js')
 window.Bootstrap = require('bootstrap')
@@ -30,28 +30,50 @@ if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
 
-// Plugins
+// Config Storage
+const EStore = require('electron-store')
+const appStore = new EStore({
+  defaults: {
+    autoLine: false,
+    defaultAssignee: ''
+  }
+})
+
+// Vue Plugins
 Vue.use(Vuesax)
 Vue.use(Vuex)
 
-// Components
+// Vue Components
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.component('test-item', './components/TestItem.vue')
 Vue.component('jira-wiki-editor', './components/JiraWikiEditor.vue')
 
 const store = new Vuex.Store({
   state: {
-    displayEditor: false
+    settings: {
+      autoLine: false,
+      defaultAssignee: ''
+    },
+    changingConfig: false
   },
   mutations: {
-    show (displayEditor) {
-      displayEditor = true
+    setSettingAutoLine (state, bool) {
+      state.settings.autoLine = bool
     },
-    hide (displayEditor) {
-      displayEditor = false
+    setSettingDefaultAssignee (state, path) {
+      state.settings.defaultAssignee = path
+    },
+    setChangeConfig (state, bool) {
+      state.changingConfig = bool
+      if (!bool) {
+        appStore.store = state.settings
+      }
     }
   }
 })
+
+// Load Settings
+store.state.settings = appStore.store
 
 /* eslint-disable no-new */
 new Vue({

@@ -1,29 +1,22 @@
 <template>
 <div>
-    <vs-dropdown >
-    <button class="btn-sm btn-info" href="#">H</button>
-    <vs-dropdown-menu>
-        <vs-dropdown-item v-for="(heading, key) in headings" v-bind:key="key" @click="insertAtCaret(heading)">
-        {{key}}
-        </vs-dropdown-item>
-    </vs-dropdown-menu>
-    </vs-dropdown>
-    <button class="btn-sm btn-info" @click="popupSettings = true">Settings</button>
+  <div ref="toolbar" v-if="showEditor">
+  </div>
 
-    <textarea id="editor" v-model="textEdited" class="form-control" rows="6"></textarea>
+  <vs-collapse>
+    <vs-collapse-item>
+      <vs-dropdown >
+        <button class="btn-sm btn-info" href="#">H</button>
+        <vs-dropdown-menu>
+            <vs-dropdown-item v-for="(heading, key) in headings" v-bind:key="key" @click="insertAtCaret(heading)">
+            {{key}}
+            </vs-dropdown-item>
+        </vs-dropdown-menu>
+      </vs-dropdown>
+    </vs-collapse-item>
+  </vs-collapse>
 
-    <vs-popup class="holamundo"  title="Settings" :active.sync="popupSettings">
-    <div class="form-row">
-        <div class="col-sm-3">
-        Auto new line
-        <vs-switch v-model="disableNewLine">
-            <span slot="on">On</span>
-            <span slot="off">Off</span>
-        </vs-switch>
-        </div>
-    </div>
-    </vs-popup>
-    <button class="btn-sm btn-info" @click="$emit('save-text', newText)">Save</button>
+  <textarea ref="textbox" class="form-control" style="border-color: rgba(0,0,0,0.1); height: 100px;" :value="propText" @input="updateText()"></textarea>
 </div>
 </template>
 
@@ -35,9 +28,7 @@
 
     data: function () {
       return {
-        newText: '',
         showEditor: false,
-        popupSettings: false,
         disableNewLine: false,
         headings: {
           H1: '.h1',
@@ -51,15 +42,8 @@
     },
 
     computed: {
-      textEdited: {
-        // getter
-        get: function () {
-          return this.text
-        },
-        // setter
-        set: function (newValue) {
-          this.newText = newValue
-        }
+      propText () {
+        return this.text
       }
     },
 
@@ -72,11 +56,15 @@
         var element = document.getElementById(elementID)
         var caretPos = element.selectionStart
         var caretEnd = element.selectionEnd
-        var textAreaTxt = this.textEdited
-        this.textEdited = textAreaTxt.substring(0, caretPos) + formatting + textAreaTxt.substring(caretEnd)
+        var textAreaTxt = this.$refs.textbox.value
+        this.$refs.textbox.value = textAreaTxt.substring(0, caretPos) + formatting + textAreaTxt.substring(caretEnd)
 
         element.selectionStart = caretPos + formatting.length
         element.selectionEnd = caretPos + formatting.length
+        this.updateText()
+      },
+      updateText () {
+        this.$emit('input', `${this.$refs.textbox.value}`)
       }
     }
   }

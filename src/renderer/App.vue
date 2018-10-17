@@ -2,7 +2,7 @@
   <div id="app">
     <!-- Side Menu -->
     <div id="parentx">
-      <vs-sidebar id="sidemenu" parent="#parentx" default-index="1"  color="primary" class="sidebarx" spacer v-model="active">
+      <vs-sidebar ref="sidemenu" parent="#parentx" default-index="1"  color="primary" class="sidebarx" spacer v-model="active">
 
         <div class="header-sidebar" slot="header">
           {{name}}
@@ -42,7 +42,7 @@
     </vs-navbar>
 
     <!-- Content -->
-    <div class="container-fluid" :class="active ? 'padding' : ''">
+    <div class="container-fluid">
       <div class="row">
         <div class="col-sm-12">
           <router-view v-on:open-menu="onOpenMenu" v-on:open-url="onOpenUrl"></router-view>
@@ -72,7 +72,15 @@
         this.$electron.shell.openExternal(link)
       },
       navigate (path) {
-        this.$router.push({ path: path })
+        if (this.$route.path === '/testplancreator') {
+          if (confirm('Any unsaved changes will be lost. Please export your test plan if you wish to save it.')) {
+            this.$router.push({ path: path })
+          } else {
+            this.$refs.sidemenu.currentIndex = 2
+          }
+        } else {
+          this.$router.push({ path: path })
+        }
       }
     },
     watch: {

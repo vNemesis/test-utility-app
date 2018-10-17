@@ -110,6 +110,12 @@ export default {
     }
   },
 
+  mounted () {
+    if (this.assignee === '' && this.$store.state.settings.defaultAssignee !== '') {
+      this.assignee = this.$store.state.settings.defaultAssignee
+    }
+  },
+
   methods: {
 
     goBack () {

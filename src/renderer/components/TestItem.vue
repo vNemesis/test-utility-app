@@ -12,11 +12,13 @@
       </vs-select>
     </td>
     <td class="align-middle">
-      <vs-textarea :id="'editor' + testdata.id" v-model="testdata.testPurpose" rows="4" placeholder="Enter a description of the test"/>
+      <!-- <vs-textarea :id="'editor' + testdata.id" v-model="testdata.testPurpose" rows="4" placeholder="Enter a description of the test"/> -->
+      <!-- <textarea :id="'editor' + testdata.id" v-model="testdata.testPurpose"></textarea> -->
+      <jira-wiki-editor v-model="testdata.testPurpose"></jira-wiki-editor>
       <!-- <font-awesome-icon icon="edit" @click="openEditor" /> -->
     </td>
     <td class="align-middle">
-      <vs-textarea v-model="testdata.gherkin" rows="4" placeholder="Gherkin code for test"/>
+      <textarea v-model="testdata.gherkin" class="form-control" style="border-color: rgba(0,0,0,0.1); height: 100px;" placeholder="Gherkin code for test"></textarea>
     </td>
     <td class="align-middle">
       <vs-select label="Priority" v-model="testdata.priority" class="w-100">
@@ -48,7 +50,8 @@
           Minor: 'Minor',
           Major: 'Major',
           Critical: 'Critical'
-        }
+        },
+        temp: this.testdata.testPurpose
       }
     },
 
