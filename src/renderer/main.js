@@ -15,9 +15,9 @@ import 'vuesax/dist/vuesax.css'
 
 // Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faBook, faBug, faPlus, faTrash, faClipboardList, faHome, faEllipsisH, faEdit } from '@fortawesome/free-solid-svg-icons'
+import { faBook, faBug, faPlus, faTrash, faClipboardList, faHome, faEllipsisH, faListUl, faListOl } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-library.add(faBook, faBug, faPlus, faTrash, faClipboardList, faHome, faEllipsisH, faEdit)
+library.add(faBook, faBug, faPlus, faTrash, faClipboardList, faHome, faEllipsisH, faListUl, faListOl)
 
 // Load Plugins
 const {dialog, shell} = require('electron').remote
@@ -37,6 +37,7 @@ const appStore = new EStore({
   defaults: {
     settings: {
       autoLine: false,
+      showEditor: true,
       defaultAssignee: '',
       atlassianKey: ''
     }
@@ -60,6 +61,7 @@ const store = new Vuex.Store({
   state: {
     settings: {
       autoLine: false,
+      showEditor: true,
       defaultAssignee: '',
       atlassianKey: ''
     },
@@ -74,8 +76,6 @@ const store = new Vuex.Store({
       state.changingConfig = bool
       if (!bool) {
         appStore.set('settings', state.settings)
-        console.log(appStore.store.settings)
-        console.log(state.settings)
       }
     }
   }

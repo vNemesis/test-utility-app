@@ -39,9 +39,15 @@
         <div class="row">
           <div class="col-sm-6">
 
-            <!-- Auto Line -->
+            <!-- Toggles -->
             <div class="row justify-content-center">
               <div class="col-sm-12">
+                <label for="autoNewLine">Show editor when selecting text box</label>
+                <vs-switch id="showEditor" v-model="settings.showEditor" @input="isTyping = true">
+                    <span slot="on">Yes</span>
+                    <span slot="off">No</span>
+                </vs-switch>
+
                 <label for="autoNewLine">Auto new line</label>
                 <vs-switch id="autoNewLine" v-model="settings.autoLine" @input="isTyping = true">
                     <span slot="on">On</span>
@@ -49,7 +55,7 @@
                 </vs-switch>
               </div>
             </div>
-            <!-- Auto Line -->
+            <!-- Toggles -->
 
           </div>
           <div class="col-sm-6">
@@ -63,6 +69,7 @@
           <div class="col-sm-12">
             <h1 class="mt-3">Info</h1>
             <p>Version: {{ appVersion }}</p>
+            <button @click="getLatestRelease">test</button>
           </div>
         </div>
         <!-- Info -->
@@ -76,7 +83,7 @@
 
 <script>
   import _ from 'lodash'
-  // import axios from 'axios'
+  import axios from 'axios'
   export default {
     name: 'landing-page',
 
@@ -109,14 +116,14 @@
     },
 
     methods: {
-      latestReleaseNotif () {
-        // axios({
-        //   method: 'get',
-        //   url: '',
-        // })
-        //   .then(Response => {
-        //     this.latestRelease = Response.data.name
-        //   })
+      getLatestRelease () {
+        axios({
+          method: 'get',
+          url: 'http://localhost:5555'
+        })
+          .then(Response => {
+            this.latestRelease = Response.data.name
+          })
       }
     },
 
