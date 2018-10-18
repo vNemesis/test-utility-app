@@ -1,25 +1,6 @@
-# test-plan-utility
+# Test Utility App
 
-> An electron-vue project
+> An electron-vue App to aid the CI team at Rimilia
 
-#### Build Setup
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:9080
-npm run dev
-
-# build electron application for production
-npm run build
-
-
-# lint all JS/Vue component files in `src/`
-npm run lint
-
-```
-
----
-
-This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue)@[88c386d](https://github.com/SimulatedGREG/electron-vue/tree/88c386d59c5f0b17046afc6adc7fa1170e85c6b8) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about the original structure can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
+### Info
+You may clone this project and play around with it if you wish, Please bear in min it was designed to be used at Rimilia Holding Ltd. (Not affiliated with the company itself). Some of the menus / links are very specific to that enviroment so if you wish to use this please change them.
