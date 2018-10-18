@@ -68,8 +68,9 @@
         <div class="row justify-content-center">
           <div class="col-sm-12">
             <h1 class="mt-3">Info</h1>
-            <p>Version: {{ appVersion }}</p>
-            <button @click="getLatestRelease">test</button>
+            <p>Current Version: {{ appVersion }}</p>
+            <p>Latest Version: {{ latestRelease }}</p>
+            <button @click="getLatestRelease" class="btn btn-primary">Check for Update</button>
           </div>
         </div>
         <!-- Info -->
@@ -84,6 +85,7 @@
 <script>
   import _ from 'lodash'
   import axios from 'axios'
+  var log = require('electron-log')
   export default {
     name: 'landing-page',
 
@@ -119,10 +121,13 @@
       getLatestRelease () {
         axios({
           method: 'get',
-          url: 'http://localhost:5555'
+          url: 'https://api.github.com/repos/HarmanU/test-utility-app/releases/latest'
         })
           .then(Response => {
             this.latestRelease = Response.data.name
+          })
+          .catch(Response => {
+            log.info(Response.data)
           })
       }
     },

@@ -21,6 +21,7 @@ library.add(faBook, faBug, faPlus, faTrash, faClipboardList, faHome, faEllipsisH
 
 // Load Plugins
 const {dialog, shell} = require('electron').remote
+var log = require('electron-log')
 var fs = require('fs')
 window.$ = require('jquery')
 window.popper = require('popper.js')
@@ -83,6 +84,7 @@ const store = new Vuex.Store({
 
 // Load Settings
 store.state.settings = appStore.store.settings
+log.warn(`Settings Loaded: ${store.state.settings}`)
 
 /* eslint-disable no-new */
 new Vue({
