@@ -1,21 +1,20 @@
 <template>
 <div>
   <div class="row mt-5">
-    <div class="col-md-12">
+    <div class="col-md-12 text-center">
       <h1>Test Plan Creator</h1>
-      <vs-select vs-autocomplete vs-label="Load plan" v-model="planID">
-        <vs-select-item :key="index" :vs-value="index" :vs-text="index" v-for="(item,index) in allTestPlans" />
-      </vs-select>
+
 
       <br>
 
       <div class="row">
         <div class="col-sm-12">
           <vs-button @click="generateJiraTable()" color="rgb(26, 155, 252)" vs-type="filled">Generate Jira Table</vs-button>
-
-          <!-- Export -->
+          <!-- Export / Import -->
           <vs-dropdown>
-            <vs-button vs-type="gradient">Import / Export</vs-button>
+            <vs-tooltip text="Export/Import the test plan to/from outside of the application">
+              <vs-button vs-type="gradient">Import / Export</vs-button>
+            </vs-tooltip>
             <vs-dropdown-menu>
               <vs-dropdown-item @click="exportToCSV()">
                 Export to CSV
@@ -28,9 +27,23 @@
               </vs-dropdown-item>
             </vs-dropdown-menu>
           </vs-dropdown>
-          <!-- Export -->
+          <!-- Export / Import -->
 
-          <vs-button @click="save()" vs-type="filled" color="rgb(26, 155, 252)">Save Test Plan</vs-button>
+          <!-- Application Save / Load -->
+          <vs-dropdown>
+            <vs-tooltip text="Save/Load test plan in the application">
+              <vs-button vs-type="gradient">Save / Load</vs-button>
+            </vs-tooltip>
+            <vs-dropdown-menu>
+              <vs-dropdown-item @click="save()">
+                Save Test Plan
+              </vs-dropdown-item>
+              <vs-dropdown-item @click="activePromptLoadPlan = true">
+                Load Test Plan
+              </vs-dropdown-item>
+            </vs-dropdown-menu>
+          </vs-dropdown>
+          <!-- Application Save / Load -->
         </div>
       </div>
 
@@ -57,10 +70,10 @@
           <thead>
             <th width="5%">Number</th>
             <th width="20%">Test Name</th>
-            <th width="10%">Test Type</th>
-            <th width="25%">Test Purpose</th>
+            <th width="7.5%">Test Type</th>
+            <th width="30%">Test Purpose</th>
             <th width="25%">Gherkin</th>
-            <th width="10%">Priority</th>
+            <th width="7.5%">Priority</th>
             <th width="5%"></th>
           </thead>
           <tbody>
@@ -74,7 +87,17 @@
       <a @click="addTestItem()" class="text-success"><font-awesome-icon icon="plus" size="2x" /></a>
     </div>
   </div>
-  <div class="row">
+  <div id="globals">
+     <vs-popup title="Load Test Plan" :active.sync="activePromptLoadPlan">
+        <div class="row justify-content-center">
+          <div class="col-sm-12">
+            <vs-select vs-label="Select a test plan to load" vs-autocomplete v-model="planID" :vs-danger="LoadPlanWarning" vs-danger-text="Please select a test plan" class="w-100">
+              <vs-select-item :key="index" :vs-value="index" :vs-text="index" v-for="(item,index) in allTestPlans" />
+            </vs-select>
+            <vs-button @click="load(planID)" color="primary" vs-type="border">Load Test Plan</vs-button>
+          </div>
+       </div>
+      </vs-popup>
   </div>
 </div>
 </template>
@@ -111,19 +134,15 @@ export default {
       appOptions: [
         {text: 'Cash', value: 'Cash'},
         {text: 'Collect', value: 'Collect'}
-      ]
+      ],
+      activePromptLoadPlan: false,
+      LoadPlanWarning: false
     }
   },
 
   computed: {
     allTestPlans () {
       return this.$root.getTestPlans()
-    }
-  },
-
-  watch: {
-    planID (val) {
-      this.load(val)
     }
   },
 
@@ -208,6 +227,11 @@ export default {
       })
     },
     load (key) {
+      if (key === '') {
+        this.LoadPlanWarning = true
+        return
+      }
+
       let parsedData = JSON.parse(this.$root.getTestPlan(key))
 
       if (parsedData === {}) {
@@ -218,6 +242,9 @@ export default {
       this.jiraTask = parsedData.jiraTask
       this.assignee = parsedData.assignee
       this.app = parsedData.app
+
+      this.LoadPlanWarning = false
+      this.activePromptLoadPlan = false
     },
 
     importFromJson () {

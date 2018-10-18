@@ -50,6 +50,12 @@
       </div>
     </div>
     <!-- Content -->
+
+    <!-- Globals -->
+    <div>
+
+    </div>
+    <!-- Globals -->
   </div>
 </template>
 
