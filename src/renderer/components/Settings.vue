@@ -21,14 +21,14 @@
           </div>
           <div class="col-sm-6">
             
-            <!-- Atlassian Key -->
+            <!-- defaultPlanExportDir -->
             <div class="row justify-content-center">
               <div class="col-sm-12">
-                <vs-input id="autoNewLine" v-model="settings.atlassianKey" vs-label="Atlassian Personal Access Token"
-                @input="isTyping = true" class="w-100" vs-description-text="This is stored in plain text, use at own risk. Make sure to only give Read Permission"/>
+                <vs-input id="autoNewLine" v-model="settings.defaultPlanExportDir" vs-label="Default Export Location"
+                @input="isTyping = true" class="w-100" vs-description-text="Set a defualt location for your test plan exports"/>
               </div>
             </div>
-            <!-- Atlassian Key -->
+            <!-- defaultPlanExportDir -->
 
           </div>
         </div>
@@ -69,8 +69,9 @@
           <div class="col-sm-12">
             <h1 class="mt-3">Info</h1>
             <p>Current Version: {{ appVersion }}</p>
-            <p>Latest Version: {{ latestRelease }}</p>
-            <button @click="getLatestRelease" class="btn btn-primary">Check for Update</button>
+            <p>Latest Version: <span id="span-with-loading" class="vs-con-loading__container">{{ latestRelease }}</span></p>
+            <vs-button ref="getLatestButton" @click="getLatestRelease" vs-type="line" vs-color="primary">Check for Update</vs-button>
+            <vs-button v-if="releaseFound" @click="openUrl(releaseUrl)" vs-type="line" >Release Page</vs-button>
           </div>
         </div>
         <!-- Info -->
@@ -91,7 +92,9 @@
 
     data: function () {
       return {
-        latestRelease: ''
+        latestRelease: '',
+        releaseFound: false,
+        releaseUrl: ''
       }
     },
 
@@ -118,13 +121,25 @@
     },
 
     methods: {
+      openUrl (link) {
+        this.$electron.shell.openExternal(link)
+      },
       getLatestRelease () {
+        this.$vs.loading({
+          background: 'primary',
+          color: '#000',
+          container: '#span-with-loading',
+          scale: 0.45
+        })
         axios({
           method: 'get',
           url: 'https://api.github.com/repos/HarmanU/test-utility-app/releases/latest'
         })
           .then(Response => {
-            this.latestRelease = Response.data.name
+            this.latestRelease = Response.data.tag_name
+            this.releaseUrl = Response.data.html_url
+            this.releaseFound = true
+            this.$vs.loading.close('#span-with-loading > .con-vs-loading')
           })
           .catch(Response => {
             log.info(Response.data)
