@@ -4,6 +4,9 @@
       {{ testdata.id }}
     </td>
     <td class="align-middle">
+      <vs-input placeholder="Placeholder" v-model="testdata.jiraTaskId"/>
+    </td>
+    <td class="align-middle">
       <textarea v-model="testdata.testName" class="form-control" style="height: 100px;" placeholder="Test Name (Summary)"></textarea>
     </td>
     <td class="align-middle">
