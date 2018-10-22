@@ -40,7 +40,7 @@ const appStore = new EStore({
       autoLine: false,
       showEditor: true,
       defaultAssignee: '',
-      defaultPlanExportDir: ''
+      atlassianKey: ''
     }
   }
 })
@@ -64,7 +64,7 @@ const store = new Vuex.Store({
       autoLine: false,
       showEditor: true,
       defaultAssignee: '',
-      defaultPlanExportDir: ''
+      atlassianKey: ''
     },
     changingConfig: false,
     username: username.sync()
@@ -110,7 +110,7 @@ new Vue({
      */
     exportFile (filename, content) {
       dialog.showSaveDialog({
-        defaultPath: appStore.get('settings.defaultPlanExportDir') === '' ? filename : appStore.get('settings.defaultPlanExportDir') + filename
+        defaultPath: filename
       }, (fileName) => {
         if (fileName === undefined) {
           console.log("You didn't save the file")

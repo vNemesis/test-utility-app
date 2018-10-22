@@ -19,6 +19,9 @@
               <vs-dropdown-item @click="exportToCSV()">
                 Export to CSV
               </vs-dropdown-item>
+              <vs-dropdown-item @click="importFromCSV()">
+                Import CSV
+              </vs-dropdown-item>
               <vs-dropdown-item vs-divider @click="exportToJson()">
                 Export JSON
               </vs-dropdown-item>
@@ -121,6 +124,7 @@
 <script>
 import TestItem from './TestItem'
 import { HotTable } from '@handsontable/vue'
+import Papa from 'papaparse'
 
 const {dialog} = require('electron').remote
 var fs = require('fs')
@@ -307,12 +311,64 @@ export default {
             })
             let parsedData = JSON.parse(data)
 
-            console.log(parsedData)
-
             this.testItems = parsedData.testItems
             this.jiraTask = parsedData.jiraTask
             this.assignee = parsedData.assignee
             this.app = parsedData.app
+          }
+        })
+      })
+    },
+
+    importFromCSV () {
+      dialog.showOpenDialog({
+        filters: [
+          { name: 'CSV File', extensions: ['csv'] }
+        ]
+      },
+      (fileName) => {
+        // fileNames is an array that contains all the selected
+        if (fileName === undefined) {
+          console.log('No file selected')
+          return
+        }
+
+        fs.readFile(fileName[0], 'utf-8', (err, data) => {
+          if (err) {
+            this.$vs.notify({
+              title: 'Error!',
+              text: `An error ocurred creating the file: ${err.message}`,
+              color: 'danger',
+              icon: 'error_outline',
+              position: 'top-center',
+              time: 4000
+            })
+          } else {
+            this.$vs.notify({
+              title: 'File Imported!',
+              text: `File "${fileName[0]}" was imported successfully`,
+              color: 'success',
+              icon: 'publish',
+              position: 'top-center',
+              time: 4000
+            })
+            let parsedData = Papa.parse(data).data
+
+            console.log(parsedData)
+
+            for (let index = 1; index < parsedData.length; index++) {
+              let testItem = {
+                id: this.testItems.length + 1,
+                jiraTaskId: parsedData[index][2],
+                testType: 'API',
+                testName: parsedData[index][0],
+                testPurpose: parsedData[index][1],
+                gherkin: '',
+                priority: parsedData[index][5]
+              }
+
+              this.testItems.push(testItem)
+            }
           }
         })
       })
