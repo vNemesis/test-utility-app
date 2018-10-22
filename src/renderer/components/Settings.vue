@@ -68,7 +68,7 @@
         <div class="row justify-content-center">
           <div class="col-sm-12">
             <h1 class="mt-3">Info</h1>
-            <p>Current Version: {{ appVersion }}</p>
+            <p>Installed Version: {{ appVersion }}</p>
             <p>Latest Version: <span id="span-with-loading" class="vs-con-loading__container">{{ latestRelease }}</span></p>
             <vs-button ref="getLatestButton" @click="getLatestRelease" vs-type="line" vs-color="primary">Check for Update</vs-button>
             <vs-button v-if="releaseFound" @click="openUrl(releaseUrl)" vs-type="line" >Release Page</vs-button>
