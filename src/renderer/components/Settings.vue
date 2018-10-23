@@ -88,7 +88,7 @@
   import axios from 'axios'
   var log = require('electron-log')
   export default {
-    name: 'landing-page',
+    name: 'settings',
 
     data: function () {
       return {
