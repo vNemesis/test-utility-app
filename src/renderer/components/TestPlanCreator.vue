@@ -1,6 +1,6 @@
 <template>
 <div>
-  <div class="row mt-5">
+  <div class="row my-5">
     <div class="col-md-12 text-center">
       <h1>Test Plan Creator</h1>
 
@@ -10,7 +10,7 @@
       <div class="row">
         <div class="col-sm-12">
 
-          <vs-tabs :color="tabColour" vs-alignment="fixed">
+          <vs-tabs :color="tabColour" vs-alignment="center">
             <!-- Generation -->
             <vs-tab @click="tabColour = 'rgb(125, 219, 167)'" vs-label="Generate">
               <p>Format plan for different applications</p>
@@ -40,9 +40,7 @@
         </div>
       </div>
 
-      <hr>
-
-      <div class="row justify-content-center mt-2">
+      <div class="row justify-content-center mt-5">
         <div class="col-md-4">
           <vs-select vs-autocomplete placeholder="Search and select" vs-label="Application" vs-label-placeholder="vs-Autocomplete" class="w-100" v-model="app">
             <vs-select-item :key="index" :vs-value="item.value" :vs-text="item.text" v-for="(item,index) in appOptions" />
@@ -58,6 +56,22 @@
 
       <br>
 
+      <div class="row">
+        <div class="col-md-12 text-right">
+          <!-- Table Options -->
+          <vs-dropdown vs-custom-content vs-trigger-click>
+            <a class="a-icon" href.prevent>
+              <font-awesome-icon icon="ellipsis-h" size="lg"/>
+            </a>
+            <vs-dropdown-menu>
+              <label for="">Ordering</label>
+              <vs-switch v-model="order"/>
+            </vs-dropdown-menu>
+          </vs-dropdown>
+          <!-- Table Options -->
+        </div>
+      </div>
+
       <div class="table-responsive">
         <table class="table mt-2">
           <thead>
@@ -71,16 +85,16 @@
             <th width="2.5%"></th>
           </thead>
           <tbody>
-              <tr is="test-item" v-for="(test, index) in testItems" :key="test.id" v-bind:testdata="test" v-on:remove-self="removeTestItem(index)"></tr>
+              <tr is="test-item" v-for="(test, index) in testItems" :key="test.id"
+              v-bind:testdata="test" v-bind:totalNumberOfTestItems="testItems.length" v-bind:order="order"
+              v-on:remove-self="removeTestItem(index)" v-on:move-up="moveTestItem(index, index - 1)" v-on:move-down="moveTestItem(index, index + 1)" ></tr>
           </tbody>
         </table>
       </div>
-
-      <hr>
-
-      <a @click="addTestItem()" class="text-success"><font-awesome-icon icon="plus" size="2x" /></a>
+      <a @click="addTestItem()" class="text-white btn-block btn-success py-2"><font-awesome-icon icon="plus" size="2x" /></a>
     </div>
   </div>
+
   <div id="globals">
      <vs-popup title="Load Test Plan" :active.sync="activePromptLoadPlan">
         <div class="row justify-content-center">
@@ -105,6 +119,7 @@
        </div>
       </vs-popup>
   </div>
+
 </div>
 </template>
 
@@ -153,7 +168,8 @@ export default {
         colHeaders: ['Jira ID', 'Test Type', 'Test Name', 'Test Purpose'],
         rowHeaders: true
       },
-      tabColour: 'rgb(125, 219, 167)'
+      tabColour: 'rgb(125, 219, 167)',
+      order: false
     }
   },
 
@@ -175,6 +191,13 @@ export default {
       window.history.length > 1
         ? this.$router.go(-1)
         : this.$router.push('/')
+    },
+
+    moveTestItem (from, to) {
+      this.testItems.splice(to, 0, this.testItems.splice(from, 1)[0])
+      for (let i = 0; i < this.testItems.length; i++) {
+        this.testItems[i].id = i + 1
+      }
     },
 
     addTestItem () {

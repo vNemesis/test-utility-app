@@ -1,7 +1,9 @@
 <template>
 <tr>
     <td class="align-middle">
+      <font-awesome-icon icon="arrow-up" size="2x" v-if="canMoveUp" @click="$emit('move-up')" class="sorting-buttons"/>
       {{ testdata.id }}
+      <font-awesome-icon icon="arrow-down" size="2x" v-if="canMoveDown" @click="$emit('move-down')" class="sorting-buttons"/>
     </td>
     <td class="align-middle">
       <vs-input placeholder="Placeholder" v-model="testdata.jiraTaskId"/>
@@ -77,7 +79,7 @@
     name: 'test-item',
     components: { JiraWikiEditor },
 
-    props: ['testdata'],
+    props: ['testdata', 'totalNumberOfTestItems', 'order'],
 
     data: function () {
       return {
@@ -123,6 +125,12 @@
         set (value) {
           this.editorState = value
         }
+      },
+      canMoveUp () {
+        return (this.testdata.id !== 1 && this.order === true)
+      },
+      canMoveDown () {
+        return (this.testdata.id !== this.totalNumberOfTestItems && this.order === true)
       }
     },
 
@@ -191,5 +199,12 @@
 
 .border-left-dark {
     border-left-color: black !important;
+}
+
+.sorting-buttons {
+  background-color: rgb(31,116,255);
+  color: white;
+  border-radius: 5px;
+  padding: 4px;
 }
 </style>

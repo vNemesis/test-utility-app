@@ -16,9 +16,9 @@
           Test Plan Creator
         </vs-sidebar-item>
 
-        <vs-sidebar-item index="3" icon="poll" @click="navigate('/testdatacreator')">
+        <!-- <vs-sidebar-item index="3" icon="poll" @click="navigate('/testdatacreator')">
           Test Data Creator
-        </vs-sidebar-item>
+        </vs-sidebar-item> -->
 
         <vs-sidebar-item index="4" icon="settings" @click="navigate('/settings')">
           Settings

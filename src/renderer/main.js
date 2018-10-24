@@ -15,9 +15,9 @@ import 'vuesax/dist/vuesax.css'
 
 // Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faBook, faBug, faPlus, faTrash, faClipboardList, faHome, faEllipsisH, faListUl, faListOl } from '@fortawesome/free-solid-svg-icons'
+import { faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-library.add(faBook, faBug, faPlus, faTrash, faClipboardList, faHome, faEllipsisH, faListUl, faListOl)
+library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp)
 
 // Load Plugins
 const {dialog, shell} = require('electron').remote
