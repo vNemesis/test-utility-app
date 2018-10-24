@@ -9,47 +9,34 @@
 
       <div class="row">
         <div class="col-sm-12">
-          <vs-button @click="generateJiraTable()" color="rgb(26, 155, 252)" vs-type="filled">Generate Jira Table</vs-button>
-          <!-- Export / Import -->
-          <vs-dropdown>
-            <vs-tooltip text="Export/Import the test plan to/from outside of the application">
-              <vs-button vs-type="gradient">Import / Export</vs-button>
-            </vs-tooltip>
-            <vs-dropdown-menu>
-              <vs-dropdown-item @click="exportToCSV()">
-                Export to CSV
-              </vs-dropdown-item>
-              <vs-dropdown-item @click="importFromCSV()">
-                Import CSV
-              </vs-dropdown-item>
-              <vs-dropdown-item vs-divider @click="exportToJson()">
-                Export JSON
-              </vs-dropdown-item>
-              <vs-dropdown-item @click="importFromJson()">
-                Import JSON
-              </vs-dropdown-item>
-              <vs-dropdown-item vs-divider @click="activePromptImportFromExcel = true">
-                Import from Excel Clipboard
-              </vs-dropdown-item>
-            </vs-dropdown-menu>
-          </vs-dropdown>
-          <!-- Export / Import -->
 
-          <!-- Application Save / Load -->
-          <vs-dropdown>
-            <vs-tooltip text="Save/Load test plan in the application">
-              <vs-button vs-type="gradient">Save / Load</vs-button>
-            </vs-tooltip>
-            <vs-dropdown-menu>
-              <vs-dropdown-item @click="save()">
-                Save Test Plan
-              </vs-dropdown-item>
-              <vs-dropdown-item @click="activePromptLoadPlan = true">
-                Load Test Plan
-              </vs-dropdown-item>
-            </vs-dropdown-menu>
-          </vs-dropdown>
-          <!-- Application Save / Load -->
+          <vs-tabs :color="tabColour" vs-alignment="fixed">
+            <!-- Generation -->
+            <vs-tab @click="tabColour = 'rgb(125, 219, 167)'" vs-label="Generate">
+              <p>Format plan for different applications</p>
+              <vs-button vs-type="line" :color="tabColour" @click="generateJiraTable()">Generate Jira Table</vs-button>
+              <vs-button vs-type="line" :color="tabColour" @click="generateSpecflow()">Generate Specflow Scenarios</vs-button>
+            </vs-tab>
+            <!-- Generation -->
+            <!-- Export / Import -->
+            <vs-tab @click="tabColour = 'rgb(120, 157, 232)'" vs-label="Import | Export">
+              <p>Export/Import the test plan to/from outside of the application</p>
+              <vs-button vs-type="line" :color="tabColour" @click="exportToCSV()">Export to CSV</vs-button>
+              <vs-button vs-type="line" :color="tabColour" @click="importFromCSV()">Import CSV</vs-button>
+              |
+              <vs-button vs-type="line" :color="tabColour" @click="exportToJson()">Export JSON</vs-button>
+              <vs-button vs-type="line" :color="tabColour" @click="importFromJson()">Import JSON</vs-button>
+              |
+              <vs-button vs-type="line" :color="tabColour" @click="activePromptImportFromExcel = true">Import from Excel Clipboard</vs-button>
+            </vs-tab>
+            <!-- Export / Import -->
+            <vs-tab @click="tabColour = 'rgb(204, 98, 0)'" vs-label="Save | Load">
+              <p>Save/Load test plan in the application</p>
+              <vs-button vs-type="line" :color="tabColour" @click="save()">Save Test Plan</vs-button>
+              <vs-button vs-type="line" :color="tabColour" @click="activePromptLoadPlan = true">Load Test Plan</vs-button>
+            </vs-tab>
+            <!-- Application Save / Load -->
+          </vs-tabs>
         </div>
       </div>
 
@@ -165,7 +152,8 @@ export default {
         startCols: 4,
         colHeaders: ['Jira ID', 'Test Type', 'Test Name', 'Test Purpose'],
         rowHeaders: true
-      }
+      },
+      tabColour: 'rgb(125, 219, 167)'
     }
   },
 
@@ -413,6 +401,23 @@ export default {
         text: 'Jira Table has been copied to your clipboard',
         color: 'success',
         icon: 'publish',
+        position: 'top-center',
+        time: 4000
+      })
+    },
+
+    generateSpecflow () {
+      let Specflow = ''
+
+      this.testItems.forEach(element => {
+        Specflow += `Scenario: ${element.testName}\r\n`
+      })
+      clipboard.writeText(Specflow)
+      this.$vs.notify({
+        title: 'Copied to clipboard',
+        text: 'SpecFlow scenario definitions have been copied to your clipboard',
+        color: 'success',
+        icon: 'assignment',
         position: 'top-center',
         time: 4000
       })
