@@ -108,8 +108,12 @@ new Vue({
      * @param {string} filename name of file
      * @param {string} content content of file
      */
-    exportFile (filename, content) {
+    exportFile (filename, content, extensionName, extension) {
       dialog.showSaveDialog({
+        filters: [{
+          name: extensionName,
+          extensions: [extension]
+        }],
         defaultPath: filename
       }, (fileName) => {
         if (fileName === undefined) {

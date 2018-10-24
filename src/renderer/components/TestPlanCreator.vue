@@ -221,7 +221,7 @@ export default {
 
       // this.csvEncodedUri = encodeURI(csvContent)
 
-      this.$root.exportFile(`Jira Issue Import ${this.jiraTask}.csv`, csvContent)
+      this.$root.exportFile(`Jira Issue Import ${this.jiraTask}.csv`, csvContent, 'CSV File', 'csv')
     },
 
     exportToJson () {
@@ -233,7 +233,7 @@ export default {
       }
 
       let jsonContent = JSON.stringify(plan)
-      this.$root.exportFile(`Test Plan ${this.jiraTask}.json`, jsonContent)
+      this.$root.exportFile(`Test Plan ${this.jiraTask}.json`, jsonContent, 'JSON File', 'json')
     },
 
     save () {
