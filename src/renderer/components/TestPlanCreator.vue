@@ -405,7 +405,7 @@ export default {
       jiraTable += '||JIRA Issue ID||Type||Test Name||Test Purpose||\r\n'
 
       this.testItems.forEach(element => {
-        jiraTable += `|[${element.jiraTaskID}]|${element.testType}|${element.testName}|${element.testPurpose}|\r\n`
+        jiraTable += `|[${element.jiraTaskId}]|${element.testType}|${element.testName}|${element.testPurpose}|\r\n`
       })
       clipboard.writeText(jiraTable)
       this.$vs.notify({
