@@ -23,7 +23,7 @@ Contributor N/A.
 
 Attribution Copyright Notice: You must include attribution to the URL and Original developer in your application. This may be in the terms / readme or in the application it self.
 
-Attribution Phrase (not exceeding 10 words): _______________________
+Attribution Phrase: "By"
 
 Attribution URL: https://github.com/HarmanU/test-utility-app
 
