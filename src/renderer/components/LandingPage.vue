@@ -108,8 +108,7 @@
           textInvalid: false,
           urlInvalid: false
         },
-        quickLinks: [
-        ]
+        localQuickLinks: []
       }
     },
 
@@ -119,6 +118,15 @@
         let releaseVersion = this.latestRelease.substring(1).replace(/\./g, '')
 
         return releaseVersion > appVersion
+      },
+      quickLinks: {
+        get () {
+          return this.$store.state.quickLinks
+        },
+        set (value) {
+          console.log(value)
+          this.$store.commit('setQuickLinks', value)
+        }
       }
     },
 
@@ -141,20 +149,20 @@
         }
 
         if (valid) {
-          this.quickLinks.push({
+          this.localQuickLinks.push({
             text: this.newLink.text,
             url: this.newLink.url
           })
+
+          this.quickLinks = this.localQuickLinks
           this.newLink.text = ''
           this.newLink.url = ''
         }
       },
 
       removeLink (index) {
-        this.quickLinks.splice(index, 1)
-        for (let i = 0; i < this.quickLinks.length; i++) {
-          this.quickLinks[i].id = i + 1
-        }
+        this.localQuickLinks.splice(index, 1)
+        this.quickLinks = this.localQuickLinks
       },
       getLatestReleaseBody () {
         this.$vs.loading({
@@ -180,6 +188,7 @@
 
     mounted () {
       this.getLatestReleaseBody()
+      this.localQuickLinks = this.quickLinks
     }
   }
 </script>

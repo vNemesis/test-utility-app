@@ -18,6 +18,16 @@
             </div>
             <!-- Default Assignee -->
 
+            <!-- Notification Position -->
+            <div class="row justify-content-center mt-2">
+              <div class="col-sm-12">
+                <vs-select label="Notification Location" vs-label="Notification Position" class="w-100" v-model="settings.notifPos" @input="isTyping = true">
+                  <vs-select-item :key="index" :vs-value="item" :vs-text="index" v-for="(item,index) in notifPosOptions" />
+                </vs-select>
+              </div>
+            </div>
+            <!-- Notification Position -->
+
           </div>
           <div class="col-sm-6">
             
@@ -94,7 +104,15 @@
       return {
         latestRelease: '',
         releaseFound: false,
-        releaseUrl: ''
+        releaseUrl: '',
+        notifPosOptions: {
+          'Top left': 'top-left',
+          'Top middle': 'top-center',
+          'Top right': 'top-right',
+          'Bottom Left': 'bottom-left',
+          'Bottom middle': 'bottom-center',
+          'Bottom right': 'bottom-right'
+        }
       }
     },
 
@@ -160,7 +178,7 @@
             title: 'Settings Saved',
             color: 'success',
             icon: 'save',
-            position: 'top-center',
+            position: this.$store.state.settings.notifPos,
             time: 3000
           })
         }

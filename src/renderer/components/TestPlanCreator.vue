@@ -41,16 +41,19 @@
       </div>
 
       <div class="row justify-content-center mt-5">
-        <div class="col-md-4">
-          <vs-select vs-autocomplete placeholder="Search and select" vs-label="Application" vs-label-placeholder="vs-Autocomplete" class="w-100" v-model="app">
+        <div class="col-md-3">
+          <vs-select vs-autocomplete placeholder="Search and select" vs-label="Application" vs-label-placeholder="vs-Autocomplete" :vs-danger="validation.application" vs-danger-text="Please select an application" class="w-100" v-model="app">
             <vs-select-item :key="index" :vs-value="item.value" :vs-text="item.text" v-for="(item,index) in appOptions" />
           </vs-select>
         </div>
-        <div class="col-md-4">
-          <vs-input vs-label="Assignee" placeholder="User.Name" v-model="assignee" class="w-100"/>
+        <div class="col-md-3">
+          <vs-input vs-label="Assignee" placeholder="User.Name" :vs-danger="validation.assignee" vs-danger-text="Assignee cannot be empty" v-model="assignee" class="w-100"/>
         </div>
-        <div class="col-md-4">
-          <vs-input vs-label="Jira Task (Parent Task ID)" placeholder="AZCI-XXX" v-model="jiraTask" class="w-100"/>
+        <div class="col-md-3">
+          <vs-input vs-label="Jira Task (Parent Task ID)" placeholder="AZCI-XXX" :vs-danger="validation.jiraTask" vs-danger-text="Jira Task cannot be empty" v-model="jiraTask" class="w-100"/>
+        </div>
+        <div class="col-md-3">
+          <vs-input vs-label="Plan Description" placeholder="Area" v-model="planDesc" class="w-100"/>
         </div>
       </div>
 
@@ -100,9 +103,10 @@
         <div class="row justify-content-center">
           <div class="col-sm-12">
             <vs-select vs-label="Select a test plan to load" vs-autocomplete v-model="planID" :vs-danger="LoadPlanWarning" vs-danger-text="Please select a test plan" class="w-100">
-              <vs-select-item :key="index" :vs-value="index" :vs-text="index" v-for="(item,index) in allTestPlans" />
+              <vs-select-item :key="index" :vs-value="index" :vs-text="`${index} - ${item.planDesc}`" v-for="(item,index) in allTestPlans" />
             </vs-select>
             <vs-button @click="load(planID)" color="primary" vs-type="border">Load Test Plan</vs-button>
+            <vs-button @click="deletePlan(planID)" color="danger" vs-type="border">Delete</vs-button>
           </div>
        </div>
       </vs-popup>
@@ -141,6 +145,7 @@ export default {
     return {
       planID: '',
       jiraTask: '',
+      planDesc: '',
       assignee: '',
       app: '',
       testItems: [
@@ -154,20 +159,28 @@ export default {
           priority: 'Trivial'
         }
       ],
-      csvEncodedUri: '',
       appOptions: [
         {text: 'Cash', value: 'Cash'},
         {text: 'Collect', value: 'Collect'}
       ],
+      // Validation
+      validation: {
+        jiraTask: true,
+        assignee: true,
+        application: true
+      },
+      // Popups
       activePromptLoadPlan: false,
       LoadPlanWarning: false,
       activePromptImportFromExcel: false,
+      // HotTable
       hotTableSettings: {
         startRows: 5,
         startCols: 4,
         colHeaders: ['Jira ID', 'Test Type', 'Test Name', 'Test Purpose'],
         rowHeaders: true
       },
+      // Menu
       tabColour: 'rgb(125, 219, 167)',
       order: false
     }
@@ -182,6 +195,35 @@ export default {
   mounted () {
     if (this.assignee === '' && this.$store.state.settings.defaultAssignee !== '') {
       this.assignee = this.$store.state.settings.defaultAssignee
+    }
+  },
+
+  watch: {
+    jiraTask (val) {
+      if (val === '') {
+        // Set this to true to show error message
+        this.validation.jiraTask = true
+      } else {
+        this.validation.jiraTask = false
+      }
+    },
+
+    assignee (val) {
+      if (val === '') {
+        // Set this to true to show error message
+        this.validation.assignee = true
+      } else {
+        this.validation.assignee = false
+      }
+    },
+
+    app (val) {
+      if (val === '') {
+        // Set this to true to show error message
+        this.validation.application = true
+      } else {
+        this.validation.application = false
+      }
     }
   },
 
@@ -230,8 +272,6 @@ export default {
         csvContent += row + '\r\n'
       })
 
-      // this.csvEncodedUri = encodeURI(csvContent)
-
       this.$root.exportFile(`Jira Issue Import ${this.jiraTask}.csv`, csvContent, 'CSV File', 'csv')
     },
 
@@ -239,6 +279,7 @@ export default {
       let plan = {
         testItems: this.testItems,
         jiraTask: this.jiraTask,
+        planDesc: this.planDesc,
         assignee: this.assignee,
         app: this.app
       }
@@ -255,25 +296,32 @@ export default {
         app: this.app
       }
 
-      let jsonContent = JSON.stringify(plan)
-      this.$root.saveTestPlan(`${this.jiraTask}`, jsonContent)
+      if (!(this.validation.jiraTask || this.validation.assignee || this.validation.application)) {
+        let jsonContent = {
+          data: JSON.stringify(plan),
+          planDesc: this.planDesc
+        }
+        this.$root.saveTestPlan(`${this.jiraTask}`, jsonContent)
 
-      this.$vs.notify({
-        title: 'Plan Saved',
-        text: `Plan was saved successfully`,
-        color: 'success',
-        icon: 'publish',
-        position: 'top-center',
-        time: 4000
-      })
+        this.allTestPlans[this.jiraTask] = jsonContent
+
+        this.$vs.notify({
+          title: 'Plan Saved',
+          text: `Plan ${this.jiraTask} was saved successfully`,
+          color: 'success',
+          icon: 'publish',
+          position: this.$store.state.settings.notifPos,
+          time: 4000
+        })
+      }
     },
     load (key) {
       if (key === '') {
         this.LoadPlanWarning = true
         return
       }
-
-      let parsedData = JSON.parse(this.$root.getTestPlan(key))
+      let plan = this.$root.getTestPlan(key)
+      let parsedData = JSON.parse(plan.data)
 
       if (parsedData === {}) {
         return
@@ -281,8 +329,33 @@ export default {
 
       this.testItems = parsedData.testItems
       this.jiraTask = parsedData.jiraTask
+      this.planDesc = plan.planDesc
       this.assignee = parsedData.assignee
       this.app = parsedData.app
+
+      this.LoadPlanWarning = false
+      this.activePromptLoadPlan = false
+    },
+    deletePlan (key) {
+      if (key === '') {
+        this.LoadPlanWarning = true
+        return
+      }
+
+      this.$root.deleteTestPlan(key)
+
+      delete this.allTestPlans[key]
+
+      this.planID = ''
+
+      this.$vs.notify({
+        title: 'Plan deleted',
+        text: `Plan "${key}" was deleted successfully`,
+        color: 'success',
+        icon: 'delete_forever',
+        position: this.$store.state.settings.notifPos,
+        time: 4000
+      })
 
       this.LoadPlanWarning = false
       this.activePromptLoadPlan = false
@@ -308,7 +381,7 @@ export default {
               text: `An error ocurred creating the file: ${err.message}`,
               color: 'danger',
               icon: 'error_outline',
-              position: 'top-center',
+              position: this.$store.state.settings.notifPos,
               time: 4000
             })
           } else {
@@ -317,13 +390,14 @@ export default {
               text: `File "${fileName[0]}" was imported successfully`,
               color: 'success',
               icon: 'publish',
-              position: 'top-center',
+              position: this.$store.state.settings.notifPos,
               time: 4000
             })
             let parsedData = JSON.parse(data)
 
             this.testItems = parsedData.testItems
             this.jiraTask = parsedData.jiraTask
+            this.planDesc = parsedData.planDesc
             this.assignee = parsedData.assignee
             this.app = parsedData.app
           }
@@ -351,7 +425,7 @@ export default {
               text: `An error ocurred creating the file: ${err.message}`,
               color: 'danger',
               icon: 'error_outline',
-              position: 'top-center',
+              position: this.$store.state.settings.notifPos,
               time: 4000
             })
           } else {
@@ -360,7 +434,7 @@ export default {
               text: `File "${fileName[0]}" was imported successfully`,
               color: 'success',
               icon: 'publish',
-              position: 'top-center',
+              position: this.$store.state.settings.notifPos,
               time: 4000
             })
             let parsedData = Papa.parse(data).data
@@ -404,7 +478,7 @@ export default {
         text: 'A Test Plan has been created from your excel data',
         color: 'success',
         icon: 'publish',
-        position: 'top-center',
+        position: this.$store.state.settings.notifPos,
         time: 4000
       })
 
@@ -424,7 +498,7 @@ export default {
         text: 'Jira Table has been copied to your clipboard',
         color: 'success',
         icon: 'publish',
-        position: 'top-center',
+        position: this.$store.state.settings.notifPos,
         time: 4000
       })
     },
@@ -441,7 +515,7 @@ export default {
         text: 'SpecFlow scenario definitions have been copied to your clipboard',
         color: 'success',
         icon: 'assignment',
-        position: 'top-center',
+        position: this.$store.state.settings.notifPos,
         time: 4000
       })
     }
