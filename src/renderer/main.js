@@ -15,9 +15,9 @@ import 'vuesax/dist/vuesax.css'
 
 // Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons'
+import { faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp)
+library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit)
 
 // Load Plugins
 const {dialog, shell} = require('electron').remote
@@ -40,8 +40,10 @@ const appStore = new EStore({
       autoLine: false,
       showEditor: true,
       defaultAssignee: '',
-      atlassianKey: ''
-    }
+      defaultPlanExportDir: '',
+      notifPos: 'bottom-right'
+    },
+    quickLinks: [{ text: 'Example Bookmark', url: 'www.google.co.uk' }]
   }
 })
 
@@ -64,14 +66,20 @@ const store = new Vuex.Store({
       autoLine: false,
       showEditor: true,
       defaultAssignee: '',
-      atlassianKey: ''
+      defaultPlanExportDir: '',
+      notifPos: 'bottom-right'
     },
     changingConfig: false,
-    username: username.sync()
+    username: username.sync(),
+    quickLinks: []
   },
   mutations: {
     setSettings (state, newSettings) {
       state.settings = newSettings
+    },
+    setQuickLinks (state, newQuickLinks) {
+      state.quickLinks = newQuickLinks
+      appStore.set('quickLinks', state.quickLinks)
     },
     setChangeConfig (state, bool) {
       state.changingConfig = bool
@@ -84,6 +92,7 @@ const store = new Vuex.Store({
 
 // Load Settings
 store.state.settings = appStore.store.settings
+store.state.quickLinks = appStore.store.quickLinks
 log.warn(`Settings Loaded: ${store.state.settings}`)
 
 /* eslint-disable no-new */
@@ -102,6 +111,9 @@ new Vue({
     },
     getTestPlan (key) {
       return testPlanStore.get(key, {})
+    },
+    deleteTestPlan (key) {
+      return testPlanStore.delete(key)
     },
     /**
      * Will begin the download of a file
@@ -129,7 +141,7 @@ new Vue({
               text: `An error ocurred creating the file: ${err.message}`,
               color: 'danger',
               icon: 'error_outline',
-              position: 'top-center',
+              position: appStore.settings.notifPos,
               time: 4000
             })
           } else {
@@ -138,7 +150,7 @@ new Vue({
               text: `File "${filename}" was exported successfully`,
               color: 'success',
               icon: 'save',
-              position: 'top-center',
+              position: appStore.settings.notifPos,
               time: 10000
             })
             setTimeout(shell.showItemInFolder(fileName), 3000)

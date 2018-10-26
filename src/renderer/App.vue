@@ -121,4 +121,10 @@
 .nav-bar-link {
   font-size: 16px !important;
 }
+
+.nabarx {
+  /* position: fixed !important; */
+  /* background-color: white !important; */
+  /* z-index: -1; */
+}
 </style>
