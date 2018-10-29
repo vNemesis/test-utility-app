@@ -6,7 +6,7 @@
       <font-awesome-icon icon="arrow-down" size="2x" v-if="canMoveDown" @click="$emit('move-down')" class="sorting-buttons"/>
     </td>
     <td class="align-middle">
-      <vs-input placeholder="Placeholder" v-model="testdata.jiraTaskId"/>
+      <vs-input placeholder="AZCI-XXX" v-model="testdata.jiraTaskId"/>
     </td>
     <td class="align-middle">
       <textarea v-model="testdata.testName" class="form-control" style="height: 100px;" placeholder="Test Name (Summary)"></textarea>
@@ -85,7 +85,13 @@
       </vs-select>
     </td>
     <td class="align-middle">
-      <a @click="$emit('remove-self')" class="text-danger"><font-awesome-icon icon="trash" size="lg" /></a>
+      <vs-tooltip text="Duplicate">
+        <a @click="$emit('duplicate')" class="text-primary"><font-awesome-icon icon="clone" size="lg" /></a>
+      </vs-tooltip>
+      <hr>
+      <vs-tooltip text="Delete">
+        <a @click="$emit('remove-self')" class="text-danger"><font-awesome-icon icon="trash" size="lg" /></a>
+      </vs-tooltip>
     </td>
 </tr>
 </template>

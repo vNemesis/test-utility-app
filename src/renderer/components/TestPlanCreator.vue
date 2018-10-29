@@ -1,6 +1,7 @@
 <template>
 <div>
-  <div class="row my-5">
+  <vs-progress indeterminate color="success" v-if="autoSaving"></vs-progress>
+  <div class="row" :class="autoSaving ? 'my-4' : 'my-5'">
     <div class="col-md-12 text-center">
       <h1>Test Plan Creator</h1>
 
@@ -12,7 +13,7 @@
 
           <vs-tabs :color="tabColour" vs-alignment="center">
             <!-- Generation -->
-            <vs-tab @click="tabColour = 'rgb(125, 219, 167)'" vs-label="Generate">
+            <vs-tab @click="tabColour = 'rgb(100, 175, 134)'" vs-label="Generate">
               <p>Format plan for different applications</p>
               <vs-button vs-type="line" :color="tabColour" @click="generateJiraTable()">Generate Jira Table</vs-button>
               <vs-button vs-type="line" :color="tabColour" @click="generateSpecflow('api')">Generate API Specflow Scenarios</vs-button>
@@ -67,21 +68,33 @@
             <a class="a-icon" href.prevent>
               <font-awesome-icon icon="ellipsis-h" size="lg"/>
             </a>
-            <vs-dropdown-menu>
-              <vs-dropdown-item>
-                <label for="order">Order</label>
-                <vs-switch id="order" v-model="order">
-                  <span slot="on">On</span>
-                  <span slot="off">Off</span>
-                </vs-switch>
+            <vs-dropdown-menu style="width: 15%;">
+
+              <div class="row">
+                <div class="col-sm-6">
+                  Order Items
+                </div>
+                <div class="col-sm-3">
+                  <vs-switch id="order" v-model="order"></vs-switch>
+                </div>
+              </div>
+
+              <div class="row mt-2">
+                <div class="col-sm-6">
+                  Autosave
+                </div>
+                <div class="col-sm-3">
+                  <vs-switch id="autosave" v-model="autoSave">
+                    <span slot="on">On</span>
+                    <span slot="off">Off</span>
+                  </vs-switch>
+                </div>
+              </div>
+
+              <vs-dropdown-item @click="addItemsPopup.active = true" class="mt-2">
+                Add Test Items
               </vs-dropdown-item>
-              <vs-dropdown-item>
-                <label for="autosave">Autosave</label>
-                <vs-switch id="autosave" v-model="autoSave">
-                  <span slot="on">On</span>
-                  <span slot="off">Off</span>
-                </vs-switch>
-              </vs-dropdown-item>
+
             </vs-dropdown-menu>
           </vs-dropdown>
           <!-- Table Options -->
@@ -103,7 +116,8 @@
           <tbody>
               <tr is="test-item" v-for="(test, index) in testItems" :key="test.id"
               v-bind:testdata="test" v-bind:totalNumberOfTestItems="testItems.length" v-bind:order="order"
-              v-on:remove-self="removeTestItem(index)" v-on:move-up="moveTestItem(index, index - 1)" v-on:move-down="moveTestItem(index, index + 1)" v-on:show-preview="showPreview"></tr>
+              v-on:remove-self="removeTestItem(index)" v-on:move-up="moveTestItem(index, index - 1)" v-on:move-down="moveTestItem(index, index + 1)"
+              v-on:show-preview="showPreview" v-on:duplicate="addTestItem(test)"></tr>
           </tbody>
         </table>
       </div>
@@ -136,6 +150,37 @@
        </div>
       </vs-popup>
 
+      <!-- Add Items -->
+      <vs-popup title="Add Test Items" :active.sync="addItemsPopup.active">
+
+        <vs-input vs-label="Jira Subtask ID" placeholder="AZCI-XXX" v-model="addItemsPopup.item.jiraTaskId" class="mb-3"/>
+
+        <vs-textarea v-model="addItemsPopup.item.testName" label="Test Name (Summary)"/>
+
+        <vs-select vs-label="Type" v-model="addItemsPopup.item.testType" class="w-100 mb-3">
+          <vs-select-item :key="index" :vs-value="item" :vs-text="item" v-for="(item,index) in {API: 'API', UI: 'UI'}" />
+        </vs-select>
+
+        <vs-textarea v-model="addItemsPopup.item.testPurpose" label="Test Purpose"/>
+
+        <vs-textarea v-model="addItemsPopup.item.gherkin" label="Gherkin code for test"/>
+
+        <vs-select vs-label="Priority" v-model="addItemsPopup.item.priority" class="w-100 mb-3">
+          <vs-select-item :key="index" :vs-value="item" :vs-text="item" v-for="(item,index) in {Trivial: 'Trivial', Minor: 'Minor', Major: 'Major', Critical: 'Critical'}" />
+        </vs-select>
+
+        <div class="row">
+          <div class="col-sm-3">
+            <vs-button @click="bulkAdd()" color="primary" vs-type="border">Add Items</vs-button>
+          </div>
+          <div class="col-sm-9 text-center">
+            <small>Amount</small>
+            <vs-input-number v-model="addItemsPopup.amount" size="mini" min="1"/>
+          </div>
+        </div>
+      </vs-popup>
+      <!-- Add Items -->
+
       <!-- Preview -->
       <vs-popup title="Code Preview" :active.sync="previewPopup.active">
         <highlight-code class="text-left" :lang="previewPopup.syntax" :code="previewPopup.code"></highlight-code>
@@ -151,6 +196,7 @@ import TestItem from './TestItem'
 import { HotTable } from '@handsontable/vue'
 import Papa from 'papaparse'
 import _ from 'lodash'
+import $ from 'jquery'
 
 const {dialog} = require('electron').remote
 var fs = require('fs')
@@ -164,22 +210,13 @@ export default {
   data: function () {
     return {
       autoSave: false,
+      autoSaving: false,
       planID: '',
       jiraTask: '',
       planDesc: '',
       assignee: '',
       app: '',
-      testItems: [
-        {
-          id: 1,
-          jiraTaskId: 'AZCI-001',
-          testType: 'API',
-          testName: 'Example Name',
-          testPurpose: 'Example Purpose',
-          gherkin: 'Not Yet Implemented',
-          priority: 'Trivial'
-        }
-      ],
+      testItems: [],
       appOptions: [
         {text: 'Cash', value: 'Cash'},
         {text: 'Collect', value: 'Collect'}
@@ -193,6 +230,19 @@ export default {
       // Popups
       activePromptLoadPlan: false,
       LoadPlanWarning: false,
+      addItemsPopup: {
+        active: false,
+        item: {
+          id: 0,
+          jiraTaskId: '',
+          testType: '',
+          testName: '',
+          testPurpose: '',
+          gherkin: '',
+          priority: ''
+        },
+        amount: 1
+      },
       activePromptImportFromExcel: false,
       previewPopup: {
         active: false,
@@ -253,16 +303,22 @@ export default {
     },
 
     testItems: {
-      handler: _.debounce(function () {
+      handler: function () {
         if (this.autoSave) {
-          this.save()
+          this.autoSaveHandler()
+          this.autoSaving = true
         }
-      }, 30000),
+      },
       deep: true
     }
   },
 
   methods: {
+
+    autoSaveHandler: _.debounce(function () {
+      this.save()
+      this.autoSaving = false
+    }, 6000),
 
     goBack () {
       window.history.length > 1
@@ -278,17 +334,23 @@ export default {
       }
     },
 
-    addTestItem () {
-      this.testItems.push({
-        id: this.testItems.length + 1,
-        jiraTaskId: 'AZCI-XXX',
-        testType: '',
-        testName: '',
-        testPurpose: '',
-        gherkin: '',
-        priority: ''
+    addTestItem (testItem = null) {
+      if (testItem === null) {
+        this.testItems.push({
+          id: this.testItems.length + 1,
+          jiraTaskId: 'AZCI-XXX',
+          testType: '',
+          testName: '',
+          testPurpose: '',
+          gherkin: '',
+          priority: ''
+        }
+        )
+      } else {
+        let duplicate = $.extend(true, {}, testItem)
+        duplicate.id = this.testItems.length + 1
+        this.testItems.push(duplicate)
       }
-      )
     },
 
     removeTestItem (index) {
@@ -296,6 +358,23 @@ export default {
       for (let i = 0; i < this.testItems.length; i++) {
         this.testItems[i].id = i + 1
       }
+    },
+
+    bulkAdd () {
+      for (let i = 0; i < this.addItemsPopup.amount; ++i) {
+        this.addTestItem(this.addItemsPopup.item)
+      }
+
+      this.addItemsPopup.active = false
+
+      this.$vs.notify({
+        title: 'Items added',
+        text: 'Items added successfully',
+        color: 'success',
+        icon: 'publish',
+        position: this.$store.state.settings.notifPos,
+        time: 4000
+      })
     },
 
     // ----------------------------------------------- Export -----------------------------------------------
@@ -535,7 +614,7 @@ export default {
       jiraTable += '||JIRA Issue ID||Type||Test Name||Test Purpose||\r\n'
 
       this.testItems.forEach(element => {
-        if (this.$store.state.settings.planCreator.jiraNewLine) {
+        if (this.$store.state.settings.planeCreator.jiraNewLine) {
           while (element.testPurpose.length > 0) {
             formattedPurpose += element.testPurpose.substring(0, 50) + '\n'
             element.testPurpose = element.testPurpose.substring(50)
