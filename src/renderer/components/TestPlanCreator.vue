@@ -15,7 +15,8 @@
             <vs-tab @click="tabColour = 'rgb(125, 219, 167)'" vs-label="Generate">
               <p>Format plan for different applications</p>
               <vs-button vs-type="line" :color="tabColour" @click="generateJiraTable()">Generate Jira Table</vs-button>
-              <vs-button vs-type="line" :color="tabColour" @click="generateSpecflow()">Generate Specflow Scenarios</vs-button>
+              <vs-button vs-type="line" :color="tabColour" @click="generateSpecflow('api')">Generate API Specflow Scenarios</vs-button>
+              <vs-button vs-type="line" :color="tabColour" @click="generateSpecflow('ui')">Generate UI Specflow Scenarios</vs-button>
             </vs-tab>
             <!-- Generation -->
             <!-- Export / Import -->
@@ -67,8 +68,20 @@
               <font-awesome-icon icon="ellipsis-h" size="lg"/>
             </a>
             <vs-dropdown-menu>
-              <label for="">Ordering</label>
-              <vs-switch v-model="order"/>
+              <vs-dropdown-item>
+                <label for="order">Order</label>
+                <vs-switch id="order" v-model="order">
+                  <span slot="on">On</span>
+                  <span slot="off">Off</span>
+                </vs-switch>
+              </vs-dropdown-item>
+              <vs-dropdown-item>
+                <label for="autosave">Autosave</label>
+                <vs-switch id="autosave" v-model="autoSave">
+                  <span slot="on">On</span>
+                  <span slot="off">Off</span>
+                </vs-switch>
+              </vs-dropdown-item>
             </vs-dropdown-menu>
           </vs-dropdown>
           <!-- Table Options -->
@@ -90,7 +103,7 @@
           <tbody>
               <tr is="test-item" v-for="(test, index) in testItems" :key="test.id"
               v-bind:testdata="test" v-bind:totalNumberOfTestItems="testItems.length" v-bind:order="order"
-              v-on:remove-self="removeTestItem(index)" v-on:move-up="moveTestItem(index, index - 1)" v-on:move-down="moveTestItem(index, index + 1)" ></tr>
+              v-on:remove-self="removeTestItem(index)" v-on:move-up="moveTestItem(index, index - 1)" v-on:move-down="moveTestItem(index, index + 1)" v-on:show-preview="showPreview"></tr>
           </tbody>
         </table>
       </div>
@@ -122,6 +135,12 @@
           </div>
        </div>
       </vs-popup>
+
+      <!-- Preview -->
+      <vs-popup title="Code Preview" :active.sync="previewPopup.active">
+        <highlight-code class="text-left" :lang="previewPopup.syntax" :code="previewPopup.code"></highlight-code>
+      </vs-popup>
+      <!-- Preview -->
   </div>
 
 </div>
@@ -131,6 +150,7 @@
 import TestItem from './TestItem'
 import { HotTable } from '@handsontable/vue'
 import Papa from 'papaparse'
+import _ from 'lodash'
 
 const {dialog} = require('electron').remote
 var fs = require('fs')
@@ -143,6 +163,7 @@ export default {
 
   data: function () {
     return {
+      autoSave: false,
       planID: '',
       jiraTask: '',
       planDesc: '',
@@ -173,6 +194,11 @@ export default {
       activePromptLoadPlan: false,
       LoadPlanWarning: false,
       activePromptImportFromExcel: false,
+      previewPopup: {
+        active: false,
+        syntax: '',
+        code: ''
+      },
       // HotTable
       hotTableSettings: {
         startRows: 5,
@@ -224,6 +250,15 @@ export default {
       } else {
         this.validation.application = false
       }
+    },
+
+    testItems: {
+      handler: _.debounce(function () {
+        if (this.autoSave) {
+          this.save()
+        }
+      }, 30000),
+      deep: true
     }
   },
 
@@ -235,6 +270,7 @@ export default {
         : this.$router.push('/')
     },
 
+    // ----------------------------------------------- Test Items -----------------------------------------------
     moveTestItem (from, to) {
       this.testItems.splice(to, 0, this.testItems.splice(from, 1)[0])
       for (let i = 0; i < this.testItems.length; i++) {
@@ -262,6 +298,8 @@ export default {
       }
     },
 
+    // ----------------------------------------------- Export -----------------------------------------------
+
     exportToCSV () {
       let csvContent = ''
       csvContent += ['Test Name (Summary)', 'Test Purpose (Description)', 'Jira Task (Parent Id)', 'Issue Type', 'Assignee', 'Priority', 'Application'].join(',') + '\r\n'
@@ -287,6 +325,8 @@ export default {
       let jsonContent = JSON.stringify(plan)
       this.$root.exportFile(`Test Plan ${this.jiraTask}.json`, jsonContent, 'JSON File', 'json')
     },
+
+    // ----------------------------------------------- App Saving / Loading -----------------------------------------------
 
     save () {
       let plan = {
@@ -360,6 +400,8 @@ export default {
       this.LoadPlanWarning = false
       this.activePromptLoadPlan = false
     },
+
+    // ----------------------------------------------- Import -----------------------------------------------
 
     importFromJson () {
       dialog.showOpenDialog({
@@ -485,12 +527,24 @@ export default {
       this.activePromptImportFromExcel = false
     },
 
+    // ----------------------------------------------- Generate -----------------------------------------------
+
     generateJiraTable () {
       let jiraTable = ''
+      let formattedPurpose = ''
       jiraTable += '||JIRA Issue ID||Type||Test Name||Test Purpose||\r\n'
 
       this.testItems.forEach(element => {
-        jiraTable += `|[${element.jiraTaskId}]|${element.testType}|${element.testName}|${element.testPurpose}|\r\n`
+        if (this.$store.state.settings.planeCreator.jiraNewLine) {
+          while (element.testPurpose.length > 0) {
+            formattedPurpose += element.testPurpose.substring(0, 50) + '\n'
+            element.testPurpose = element.testPurpose.substring(50)
+          }
+        } else {
+          formattedPurpose = element.testPurpose
+        }
+
+        jiraTable += `|[${element.jiraTaskId}]|${element.testType}|${element.testName}|${formattedPurpose}|\r\n`
       })
       clipboard.writeText(jiraTable)
       this.$vs.notify({
@@ -503,21 +557,30 @@ export default {
       })
     },
 
-    generateSpecflow () {
+    generateSpecflow (type) {
       let Specflow = ''
 
       this.testItems.forEach(element => {
-        Specflow += `Scenario: ${element.testName}\r\n`
+        if (type.toLowerCase() === element.testType.toLowerCase()) {
+          Specflow += `Scenario: ${element.testName}\r\n`
+        }
       })
       clipboard.writeText(Specflow)
       this.$vs.notify({
         title: 'Copied to clipboard',
-        text: 'SpecFlow scenario definitions have been copied to your clipboard',
+        text: `SpecFlow ${type.toUpperCase()} scenario definitions have been copied to your clipboard`,
         color: 'success',
         icon: 'assignment',
         position: this.$store.state.settings.notifPos,
         time: 4000
       })
+    },
+    // ----------------------------------------------- Misc -----------------------------------------------
+
+    showPreview (object) {
+      this.previewPopup.active = true
+      this.previewPopup.syntax = object.syntax
+      this.previewPopup.code = object.code
     }
   }
 }
