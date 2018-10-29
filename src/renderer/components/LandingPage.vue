@@ -16,8 +16,8 @@
   <div class="row">
 
     <!-- Newsfeed -->
-    <div class="col-sm-8">
-      <h1 class="mt-3">Newsfeed</h1>
+    <div class="col-sm-7">
+      <h1 class="mt-3 title">Newsfeed</h1>
       <hr>
       <div id="div-with-loading" class="vs-con-loading__container text-left">
         <h4>Build Status: <img src="https://ci.appveyor.com/api/projects/status/da9tomaqs4tf119f?svg=true"/></h4>
@@ -29,10 +29,11 @@
 
 
     <!-- Quick Links -->
-    <div class="col-sm-4 text-center">
+    <div class="col-sm-5 text-center">
       <h1 class="mt-3">Quick Links</h1>
-      <hr>
-      <vs-switch class="mb-2" color="dark" vs-icon-on="border_color" vs-icon-off="remove_red_eye" v-model="editQuickLinks">
+      <vs-progress indeterminate color="success" v-if="isTyping" class="mb-2"></vs-progress>
+      <hr v-if="!isTyping">
+      <vs-switch ref="quickLinksEditSwitch" class="mb-2" color="dark" vs-icon-on="border_color" vs-icon-off="remove_red_eye" v-model="editQuickLinks">
         <span slot="on">Edit </span>
         <span slot="off">View </span>
       </vs-switch>
@@ -46,17 +47,20 @@
       <!-- View -->
 
       <!-- Edit -->
-      <div v-if="editQuickLinks == true" v-for="(link, index) in quickLinks" v-bind:key="index">
+      <div v-if="editQuickLinks == true" v-for="(link, index) in quickLinks" v-bind:key="link.id">
         <div class="row">
-          <div class="col-sm-5">
-            <vs-input class="w-100" vs-label-placeholder="Text" v-model="link.text"/>
+          <div class="col-sm-2 mt-3">
+            <button @click="moveLink(index, index - 1); isTyping = true" :disabled="index == 0"><font-awesome-icon icon="arrow-up" size="sm"/></button>
+            <button @click="moveLink(index, index + 1); isTyping = true" :disabled="index == (quickLinks.length - 1)"><font-awesome-icon icon="arrow-down" size="sm" /></button>
           </div>
-          <div class="col-sm-5">
-            <vs-input class="w-100" vs-label-placeholder="Url" v-model="link.url"/>
+          <div class="col-sm-4">
+            <vs-input class="w-100" vs-label-placeholder="Text" @input="isTyping = true" v-model="link.text"/>
+          </div>
+          <div class="col-sm-4">
+            <vs-input class="w-100" vs-label-placeholder="Url" @input="isTyping = true" v-model="link.url"/>
           </div>
           <div class="col-sm-2 mt-3">
-            <!-- <vs-button color="success" vs-type="filled" vs-icon="add" @click="addLink()"></vs-button> -->
-            <a @click="removeLink(index)" class="text-white btn btn-block btn-danger"><font-awesome-icon icon="trash" size="lg" /></a>
+            <a @click="removeLink(index); isTyping = true" class="text-white btn btn-block btn-danger"><font-awesome-icon icon="trash" size="lg" /></a>
           </div>
         </div>
       </div>
@@ -70,7 +74,6 @@
             <vs-input class="w-100" vs-label-placeholder="Url" :vs-danger="newLink.urlInvalid" vs-danger-text="Cannot be Empty" v-model="newLink.url"/>
           </div>
           <div class="col-sm-2 mt-3">
-            <!-- <vs-button color="success" vs-type="filled" vs-icon="add" @click="addLink()"></vs-button> -->
             <a @click="addLink()" class="text-white btn btn-block btn-success"><font-awesome-icon icon="plus" size="lg" /></a>
           </div>
       </div>
@@ -89,6 +92,7 @@
 
 <script>
   import axios from 'axios'
+  import _ from 'lodash'
   var log = require('electron-log')
   var showdown = require('showdown')
   var converter = new showdown.Converter()
@@ -103,6 +107,7 @@
         releaseUrl: '',
         editQuickLinks: false,
         newLink: {
+          id: 0,
           text: '',
           url: '',
           textInvalid: false,
@@ -124,13 +129,46 @@
           return this.$store.state.quickLinks
         },
         set (value) {
-          console.log(value)
           this.$store.commit('setQuickLinks', value)
+        }
+      },
+      isTyping: {
+        get () {
+          return this.$store.state.changingQuickLinks
+        },
+        set (value) {
+          this.$store.commit('setChangeQuickLinks', value)
+        }
+      }
+    },
+
+    watch: {
+      quickLinks: {
+        handler: _.debounce(function () {
+          this.isTyping = false
+        }, 2000),
+        deep: true
+      },
+      isTyping (val) {
+        if (!val) {
+          this.$vs.notify({
+            title: 'Changes Saved',
+            color: 'success',
+            icon: 'save',
+            position: this.$store.state.settings.notifPos,
+            time: 3000
+          })
         }
       }
     },
 
     methods: {
+      moveLink (from, to) {
+        this.quickLinks.splice(to, 0, this.quickLinks.splice(from, 1)[0])
+        for (let i = 0; i < this.quickLinks.length; i++) {
+          this.quickLinks[i].id = i + 1
+        }
+      },
       addLink () {
         let valid = true
 
@@ -150,6 +188,7 @@
 
         if (valid) {
           this.localQuickLinks.push({
+            id: this.localQuickLinks.length + 1,
             text: this.newLink.text,
             url: this.newLink.url
           })
@@ -194,5 +233,10 @@
 </script>
 
 <style>
-
+.sorting-buttons {
+  background-color: rgb(31,116,255);
+  color: white !important;
+  border-radius: 5px;
+  padding: 4px;
+}
 </style>

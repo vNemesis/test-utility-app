@@ -49,6 +49,7 @@
           <button type="button" class="btn btn-info" @click="insertAtCaret('*')"><font-awesome-icon icon="list-ul" size="lg"/></button>
           <button type="button" class="btn btn-info" @click="insertAtCaret('#')"><font-awesome-icon icon="list-ol" size="lg"/></button>
         </div>
+
         <div class="btn-group btn-group-sm" role="group" aria-label="Third group">
           <button type="button" class="btn btn-danger" @click="toggleEditor = false">X</button>
         </div>
@@ -57,11 +58,27 @@
       <textarea ref="textbox" class="form-control" style="height: 100px;" v-model="testdata.testPurpose" @focus="toggleEditor = true"></textarea>
 
     </td>
+
+    <!-- Gherkin -->
     <td class="align-middle">
+
+      <div class="btn-toolbar" role="toolbar" ref="toolbar" v-if="gherkinToolbar">
+        <div class="btn-group btn-group-sm mr-2" role="group" aria-label="First group">
+          <button type="button" class="btn btn-info" @click="$emit('show-preview', { syntax: 'gherkin', code: testdata.gherkin})">Preview</button>
+        </div>
+
+        <div class="btn-group btn-group-sm" role="group" aria-label="Third group">
+          <button type="button" class="btn btn-danger" @click="gherkinToolbar = false">X</button>
+        </div>
+      </div>
+
       <vs-tooltip text="Only paste Gherkin code. Formatting for Jira is done Automatically">
-        <textarea v-model="testdata.gherkin" class="form-control" style="height: 100px;" placeholder="Gherkin code for test"></textarea>
+        <textarea v-model="testdata.gherkin" class="form-control" style="height: 100px;" placeholder="Gherkin code for test" @focus="gherkinToolbar = true"></textarea>
       </vs-tooltip>
+
     </td>
+    <!-- Gherkin -->
+
     <td class="align-middle">
       <vs-select label="Priority" v-model="testdata.priority" class="w-100">
         <vs-select-item :key="index" :vs-value="item" :vs-text="item" v-for="(item,index) in priorities" />
@@ -83,6 +100,7 @@
 
     data: function () {
       return {
+        gherkinToolbar: false,
         types: {
           API: 'API',
           UI: 'UI'
@@ -118,7 +136,7 @@
     computed: {
       toggleEditor: {
         get () {
-          if (this.$store.state.settings.showEditor) {
+          if (this.$store.state.settings.editor.showEditor) {
             return this.editorState
           }
         },
@@ -136,7 +154,7 @@
 
     methods: {
       insertAtCaret (formatting) {
-        if (this.$store.state.settings.autoLine) {
+        if (this.$store.state.settings.editor.autoLine) {
           formatting = '\n' + formatting
         }
         var element = this.$refs.textbox
