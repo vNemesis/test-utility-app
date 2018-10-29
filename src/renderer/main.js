@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuesax from 'vuesax'
 import Vuex from 'vuex'
+import VueHighlightJS from 'vue-highlight.js'
 import 'es6-promise/auto'
 
 import axios from 'axios'
@@ -12,6 +13,7 @@ import router from './router'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'material-icons/iconfont/material-icons.css'
 import 'vuesax/dist/vuesax.css'
+import 'highlight.js/styles/default.css'
 
 // Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -37,10 +39,15 @@ const EStore = require('electron-store')
 const appStore = new EStore({
   defaults: {
     settings: {
-      autoLine: false,
-      showEditor: true,
-      defaultAssignee: '',
-      defaultPlanExportDir: '',
+      editor: {
+        autoLine: false,
+        showEditor: true
+      },
+      planCreator: {
+        defaultAssignee: '',
+        defaultPlanExportDir: '',
+        jiraNewLine: false
+      },
       notifPos: 'bottom-right'
     },
     quickLinks: [{ text: 'Example Bookmark', url: 'www.google.co.uk' }]
@@ -54,6 +61,7 @@ const testPlanStore = new EStore({
 // Vue Plugins
 Vue.use(Vuesax)
 Vue.use(Vuex)
+Vue.use(VueHighlightJS)
 
 // Vue Components
 Vue.component('font-awesome-icon', FontAwesomeIcon)
@@ -63,13 +71,19 @@ Vue.component('jira-wiki-editor', './components/JiraWikiEditor.vue')
 const store = new Vuex.Store({
   state: {
     settings: {
-      autoLine: false,
-      showEditor: true,
-      defaultAssignee: '',
-      defaultPlanExportDir: '',
+      editor: {
+        autoLine: false,
+        showEditor: true
+      },
+      planCreator: {
+        defaultAssignee: '',
+        defaultPlanExportDir: '',
+        jiraNewLine: false
+      },
       notifPos: 'bottom-right'
     },
     changingConfig: false,
+    changingQuickLinks: false,
     username: username.sync(),
     quickLinks: []
   },
@@ -79,12 +93,17 @@ const store = new Vuex.Store({
     },
     setQuickLinks (state, newQuickLinks) {
       state.quickLinks = newQuickLinks
-      appStore.set('quickLinks', state.quickLinks)
     },
     setChangeConfig (state, bool) {
       state.changingConfig = bool
       if (!bool) {
         appStore.set('settings', state.settings)
+      }
+    },
+    setChangeQuickLinks (state, bool) {
+      state.changingQuickLinks = bool
+      if (!bool) {
+        appStore.set('quickLinks', state.quickLinks)
       }
     }
   }

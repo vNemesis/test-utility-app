@@ -13,7 +13,7 @@
             <!-- Default Assignee -->
             <div class="row justify-content-center">
               <div class="col-sm-12">
-                <vs-input id="autoNewLine" v-model="settings.defaultAssignee" vs-label="Default Assignee" @input="isTyping = true" class="w-100"/>
+                <vs-input id="autoNewLine" v-model="settings.planCreator.defaultAssignee" vs-label="Default Assignee" @input="isTyping = true" class="w-100"/>
               </div>
             </div>
             <!-- Default Assignee -->
@@ -21,7 +21,7 @@
             <!-- Notification Position -->
             <div class="row justify-content-center mt-2">
               <div class="col-sm-12">
-                <vs-select label="Notification Location" vs-label="Notification Position" class="w-100" v-model="settings.notifPos" @input="isTyping = true">
+                <vs-select label="Notification Location" vs-label="Notification Position" class="w-100" v-model="settings.notifPos" @input="checkNotifPosChanged()">
                   <vs-select-item :key="index" :vs-value="item" :vs-text="index" v-for="(item,index) in notifPosOptions" />
                 </vs-select>
               </div>
@@ -34,11 +34,26 @@
             <!-- defaultPlanExportDir -->
             <div class="row justify-content-center">
               <div class="col-sm-12">
-                <vs-input id="autoNewLine" v-model="settings.defaultPlanExportDir" vs-label="Default Export Location"
+                <vs-input id="autoNewLine" v-model="settings.planCreator.defaultPlanExportDir" vs-label="Default Export Location"
                 @input="isTyping = true" class="w-100" vs-description-text="Set a defualt location for your test plan exports"/>
               </div>
             </div>
             <!-- defaultPlanExportDir -->
+
+          </div>
+        </div>
+
+        <h3 class="mt-4">Test Plan Creator</h3>        
+        <div class="row">
+          <div class="col-sm-12">
+
+            <!-- Jira Table Auto New Line -->
+            <label for="autoNewLine">Add a new line in the test purpose every 50 Characters when generating a Jira Table</label>
+            <vs-switch id="autoJiraNewLine" v-model="settings.planCreator.jiraNewLine" @input="isTyping = true">
+                <span slot="on">On</span>
+                <span slot="off">Off</span>
+            </vs-switch>
+            <!-- Jira Table Auto New Line -->
 
           </div>
         </div>
@@ -52,17 +67,18 @@
             <!-- Toggles -->
             <div class="row justify-content-center">
               <div class="col-sm-12">
-                <label for="autoNewLine">Show editor when selecting text box</label>
-                <vs-switch id="showEditor" v-model="settings.showEditor" @input="isTyping = true">
+                <label for="showEditor">Show editor when selecting text box</label>
+                <vs-switch id="showEditor" v-model="settings.editor.showEditor" @input="isTyping = true">
                     <span slot="on">Yes</span>
                     <span slot="off">No</span>
                 </vs-switch>
 
-                <label for="autoNewLine">Auto new line</label>
-                <vs-switch id="autoNewLine" v-model="settings.autoLine" @input="isTyping = true">
+                <label for="autoNewLine">Auto new line when inserting formatting</label>
+                <vs-switch id="autoNewLine" v-model="settings.editor.autoLine" @input="isTyping = true">
                     <span slot="on">On</span>
                     <span slot="off">Off</span>
                 </vs-switch>
+
               </div>
             </div>
             <!-- Toggles -->
@@ -112,8 +128,13 @@
           'Bottom Left': 'bottom-left',
           'Bottom middle': 'bottom-center',
           'Bottom right': 'bottom-right'
-        }
+        },
+        oldNotifPos: ''
       }
+    },
+
+    mounted () {
+      this.oldNotifPos = this.settings.notifPos
     },
 
     computed: {
@@ -162,6 +183,12 @@
           .catch(Response => {
             log.info(Response.data)
           })
+      },
+      checkNotifPosChanged () {
+        if (this.settings.notifPos !== this.oldNotifPos) {
+          this.isTyping = true
+          this.oldNotifPos = this.settings.notifPos
+        }
       }
     },
 
