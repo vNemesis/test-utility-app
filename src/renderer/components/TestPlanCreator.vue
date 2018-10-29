@@ -535,7 +535,7 @@ export default {
       jiraTable += '||JIRA Issue ID||Type||Test Name||Test Purpose||\r\n'
 
       this.testItems.forEach(element => {
-        if (this.$store.state.settings.planeCreator.jiraNewLine) {
+        if (this.$store.state.settings.planCreator.jiraNewLine) {
           while (element.testPurpose.length > 0) {
             formattedPurpose += element.testPurpose.substring(0, 50) + '\n'
             element.testPurpose = element.testPurpose.substring(50)
