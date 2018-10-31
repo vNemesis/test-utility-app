@@ -22,8 +22,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone)
 
 // Load Plugins
-const {dialog, shell} = require('electron').remote
-var log = require('electron-log')
+const {dialog, shell, app} = require('electron').remote
+var log = require('electron-log/main')
 var fs = require('fs')
 window.$ = require('jquery')
 window.popper = require('popper.js')
@@ -109,10 +109,25 @@ const store = new Vuex.Store({
   }
 })
 
+console.log = function () {
+  log.info(arguments)
+}
+
+console.error = function () {
+  log.error(arguments)
+}
+
+console.warn = function () {
+  log.warn(arguments)
+}
+
 // Load Settings
 store.state.settings = appStore.store.settings
 store.state.quickLinks = appStore.store.quickLinks
-log.warn(`Settings Loaded: ${store.state.settings}`)
+
+if ((fs.statSync(`${app.getPath('userData')}/log.log`).size / 1000000.0) > 4) {
+  fs.truncate(`${app.getPath('userData')}/log.log`, 0)
+}
 
 /* eslint-disable no-new */
 new Vue({
