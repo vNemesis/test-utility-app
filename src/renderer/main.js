@@ -122,6 +122,7 @@ console.warn = function () {
 }
 
 // Load Settings
+log.info('---------Loading Settings and saved data ---------')
 store.state.settings = appStore.store.settings
 store.state.quickLinks = appStore.store.quickLinks
 
