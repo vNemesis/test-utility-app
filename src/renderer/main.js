@@ -30,9 +30,17 @@ window.popper = require('popper.js')
 window.Bootstrap = require('bootstrap')
 const username = require('username')
 
+// Init
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
+
+// Will create log file if it doesn't exist
+fs.writeFile(`${app.getPath('userData')}/log.log`, '', { flag: 'wx' }, function (err) {
+  if (err) {
+  }
+}
+)
 
 // Config Storage
 const EStore = require('electron-store')
@@ -122,7 +130,6 @@ console.warn = function () {
 }
 
 // Load Settings
-log.info('---------Loading Settings and saved data ---------')
 store.state.settings = appStore.store.settings
 store.state.quickLinks = appStore.store.quickLinks
 
