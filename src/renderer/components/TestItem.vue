@@ -13,7 +13,7 @@
     </td>
     <td class="align-middle">
       <vs-select v-model="testdata.testType" class="w-100">
-        <vs-select-item :key="index" :vs-value="item" :vs-text="item" v-for="(item,index) in types" />
+        <vs-select-item :key="index" :value="item" :text="item" v-for="(item,index) in types" />
       </vs-select>
     </td>
     <td class="align-middle">
@@ -81,23 +81,41 @@
 
     <td class="align-middle">
       <vs-select label="Priority" v-model="testdata.priority" class="w-100">
-        <vs-select-item :key="index" :vs-value="item" :vs-text="item" v-for="(item,index) in priorities" />
+        <vs-select-item :key="index" :value="item" :text="item" v-for="(item,index) in priorities" />
       </vs-select>
     </td>
     <td class="align-middle">
-      <vs-tooltip text="Duplicate">
-        <a @click="$emit('duplicate')" class="text-primary"><font-awesome-icon icon="clone" size="lg" /></a>
-      </vs-tooltip>
-      <hr>
-      <vs-tooltip text="Delete">
-        <a @click="$emit('remove-self')" class="text-danger"><font-awesome-icon icon="trash" size="lg" /></a>
-      </vs-tooltip>
+      <vs-dropdown vs-custom-content vs-trigger-click>
+
+        <font-awesome-icon icon="ellipsis-h" size="lg" />
+
+        <vs-dropdown-menu style="width: 17.5%;">
+
+          <vs-dropdown-item @click="copySubTaskDesc()">
+            <font-awesome-icon icon="align-left" size="lg" class="text-primary"/>
+            <span class="float-right">Copy Sub-Task Description</span>
+          </vs-dropdown-item>
+
+          <vs-dropdown-item @click="$emit('duplicate')">
+            <font-awesome-icon icon="clone" size="lg" class="text-primary"/>
+            <span class="float-right">Duplicate</span>
+          </vs-dropdown-item>
+
+          <vs-dropdown-item divider @click="$emit('remove-self')">
+            <font-awesome-icon icon="trash" size="lg" class="text-danger"/>
+            <span class="float-right">Delete</span> 
+          </vs-dropdown-item>
+
+        </vs-dropdown-menu>
+
+      </vs-dropdown>
     </td>
 </tr>
 </template>
 
 <script>
   import JiraWikiEditor from './JiraWikiEditor'
+  const {clipboard} = require('electron')
   export default {
     name: 'test-item',
     components: { JiraWikiEditor },
@@ -201,6 +219,18 @@
         let evt = document.createEvent('HTMLEvents')
         evt.initEvent('input', false, true)
         element.dispatchEvent(evt)
+      },
+      copySubTaskDesc () {
+        let description = `Test Description: ${this.testdata.testPurpose} \r\n\r\nTest Type: ${this.testdata.testType} \r\n\r\n{code}\r\n${this.testdata.gherkin}\r\n{code}`
+        clipboard.writeText(description)
+        this.$vs.notify({
+          title: 'Copied to clipboard',
+          text: 'Sub-task Description has been copied to your clipboard',
+          color: 'success',
+          // icon: 'publish',
+          position: this.$store.state.settings.notifPos,
+          time: 4000
+        })
       }
     }
   }
