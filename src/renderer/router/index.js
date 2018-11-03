@@ -16,9 +16,9 @@ export default new Router({
       component: require('@/components/TestPlanCreator').default
     },
     {
-      path: '/testdatacreator',
-      name: 'test-data-creator',
-      component: require('@/components/TestDataCreator').default
+      path: '/formatter',
+      name: 'formatter',
+      component: require('@/components/Formatter').default
     },
     {
       path: '/settings',

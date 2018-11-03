@@ -16,9 +16,9 @@
           Test Plan Creator
         </vs-sidebar-item>
 
-        <!-- <vs-sidebar-item index="3" icon="poll" @click="navigate('/testdatacreator')">
-          Test Data Creator
-        </vs-sidebar-item> -->
+        <vs-sidebar-item index="3" icon="text_format" @click="navigate('/formatter')">
+          Formatter
+        </vs-sidebar-item>
 
         <vs-sidebar-item index="4" icon="settings" @click="navigate('/settings')">
           Settings
@@ -32,7 +32,7 @@
     <!-- Side Menu -->
 
     <vs-navbar type="gradient" v-model="activeItem" class="nabarx">
-      <vs-button @click="onOpenMenu" vs-type="flat" vs-radius="50%" vs-icon="menu">Menu</vs-button>
+      <vs-button @click="onOpenMenu" type="flat" vs-radius="50%"  icon="menu">Menu</vs-button>
 
       <vs-spacer></vs-spacer>
 
