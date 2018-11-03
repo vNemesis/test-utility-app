@@ -1,6 +1,6 @@
 {
   "name": "test-plan-utility",
-  "version": "0.6.2",
+  "version": "1.0.0",
   "author": "HarmanU <uppalhrs@aston.ac.uk>",
   "description": "Electron Vue App for Rimilia Test Plans",
   "license": null,
@@ -81,7 +81,7 @@
     "vue-electron": "^1.0.6",
     "vue-highlight.js": "^2.2.0",
     "vue-router": "^3.0.1",
-    "vuesax": "^3.5.0",
+    "vuesax": "^3.5.7",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
