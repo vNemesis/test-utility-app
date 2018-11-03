@@ -61,10 +61,10 @@
             <button @click="moveLink(index, index + 1); isTyping = true" :disabled="index == (quickLinks.length - 1)"><font-awesome-icon icon="arrow-down" size="sm" /></button>
           </div>
           <div class="col-sm-4">
-            <vs-input class="w-100" vs-label-placeholder="Text" @input="isTyping = true" v-model="link.text"/>
+            <vs-input class="w-100" label-placeholder="Text" @input="isTyping = true" v-model="link.text"/>
           </div>
           <div class="col-sm-4">
-            <vs-input class="w-100" vs-label-placeholder="Url" @input="isTyping = true" v-model="link.url"/>
+            <vs-input class="w-100" label-placeholder="Url" @input="isTyping = true" v-model="link.url"/>
           </div>
           <div class="col-sm-2 mt-3">
             <a @click="removeLink(index); isTyping = true" class="text-white btn btn-block btn-danger"><font-awesome-icon icon="trash" size="lg" /></a>
@@ -75,10 +75,10 @@
       <!-- Add new -->
       <div v-if="editQuickLinks == true" class="row">
           <div class="col-sm-5">
-            <vs-input class="w-100" vs-label-placeholder="Text" :vs-danger="newLink.textInvalid" vs-danger-text="Cannot be Empty" v-model="newLink.text"/>
+            <vs-input class="w-100" label-placeholder="Text" :vs-danger="newLink.textInvalid" vs-danger-text="Cannot be Empty" v-model="newLink.text"/>
           </div>
           <div class="col-sm-5">
-            <vs-input class="w-100" vs-label-placeholder="Url" :vs-danger="newLink.urlInvalid" vs-danger-text="Cannot be Empty" v-model="newLink.url"/>
+            <vs-input class="w-100" label-placeholder="Url" :vs-danger="newLink.urlInvalid" vs-danger-text="Cannot be Empty" v-model="newLink.url"/>
           </div>
           <div class="col-sm-2 mt-3">
             <a @click="addLink()" class="text-white btn btn-block btn-success"><font-awesome-icon icon="plus" size="lg" /></a>

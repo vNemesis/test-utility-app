@@ -8,12 +8,12 @@
       <vs-tab vs-label="General">
         <!-- General Settings -->
         <div class="row justify-content-center">
-          <div class="col-sm-6">
+          <div class="col-sm-6 mt-3">
 
             <!-- Default Assignee -->
             <div class="row justify-content-center">
               <div class="col-sm-12">
-                <vs-input id="autoNewLine" v-model="settings.planCreator.defaultAssignee" vs-label="Default Assignee" @input="isTyping = true" class="w-100"/>
+                <vs-input id="autoNewLine" v-model="settings.planCreator.defaultAssignee" label="Default Assignee" @input="isTyping = true" class="w-100"/>
               </div>
             </div>
             <!-- Default Assignee -->
@@ -21,21 +21,21 @@
             <!-- Notification Position -->
             <div class="row justify-content-center mt-2">
               <div class="col-sm-12">
-                <vs-select label="Notification Location" vs-label="Notification Position" class="w-100" v-model="settings.notifPos" @input="checkNotifPosChanged()">
-                  <vs-select-item :key="index" :vs-value="item" :vs-text="index" v-for="(item,index) in notifPosOptions" />
+                <vs-select label="Notification Position" class="w-100" v-model="settings.notifPos" @input="checkNotifPosChanged()">
+                  <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in notifPosOptions" />
                 </vs-select>
               </div>
             </div>
             <!-- Notification Position -->
 
           </div>
-          <div class="col-sm-6">
+          <div class="col-sm-6 mt-3">
             
             <!-- defaultPlanExportDir -->
             <div class="row justify-content-center">
               <div class="col-sm-12">
-                <vs-input id="autoNewLine" v-model="settings.planCreator.defaultPlanExportDir" vs-label="Default Export Location"
-                @input="isTyping = true" class="w-100" vs-description-text="Set a defualt location for your test plan exports"/>
+                <vs-input id="autoNewLine" v-model="settings.planCreator.defaultPlanExportDir" label="Default Export Location"
+                @input="isTyping = true" class="w-100" description-text="Set a defualt location for your test plan exports"/>
               </div>
             </div>
             <!-- defaultPlanExportDir -->
@@ -61,24 +61,29 @@
       </vs-tab>
       <vs-tab vs-label="Editor">
         <!-- Editor Settings -->
-        <div class="row">
-          <div class="col-sm-6">
+        <div class="row mt-3">
+          <div class="col-sm-12">
 
             <!-- Toggles -->
             <div class="row justify-content-center">
-              <div class="col-sm-12">
-                <label for="showEditor">Show editor when selecting text box</label>
-                <vs-switch id="showEditor" v-model="settings.editor.showEditor" @input="isTyping = true">
-                    <span slot="on">Yes</span>
-                    <span slot="off">No</span>
-                </vs-switch>
+              <div class="col-sm-6">
+                <vs-list>
+                  
+                  <vs-list-item title="Show Editor" subtitle="Show editor when editing test purpose">
+                    <vs-switch id="showEditor" v-model="settings.editor.showEditor" @input="isTyping = true">
+                      <span slot="on">Yes</span>
+                      <span slot="off">No</span>
+                    </vs-switch>
+                  </vs-list-item>
 
-                <label for="autoNewLine">Auto new line when inserting formatting</label>
-                <vs-switch id="autoNewLine" v-model="settings.editor.autoLine" @input="isTyping = true">
-                    <span slot="on">On</span>
-                    <span slot="off">Off</span>
-                </vs-switch>
+                  <vs-list-item title="Auto New Line" subtitle="Automatically add a new line when adding formatting into the editor">
+                    <vs-switch id="autoNewLine" v-model="settings.editor.autoLine" @input="isTyping = true">
+                      <span slot="on">On</span>
+                      <span slot="off">Off</span>
+                    </vs-switch>
+                  </vs-list-item>
 
+                </vs-list>
               </div>
             </div>
             <!-- Toggles -->
@@ -96,8 +101,8 @@
             <h1 class="mt-3">Info</h1>
             <p>Installed Version: {{ appVersion }}</p>
             <p>Latest Version: <span id="span-with-loading" class="vs-con-loading__container">{{ latestRelease }}</span></p>
-            <vs-button ref="getLatestButton" @click="getLatestRelease" vs-type="line" vs-color="primary">Check for Update</vs-button>
-            <vs-button v-if="releaseFound" @click="openUrl(releaseUrl)" vs-type="line" >Release Page</vs-button>
+            <vs-button ref="getLatestButton" @click="getLatestRelease" type="line" color="primary">Check for Update</vs-button>
+            <vs-button v-if="releaseFound" @click="openUrl(releaseUrl)" type="line" >Release Page</vs-button>
           </div>
         </div>
         <!-- Info -->
@@ -204,7 +209,7 @@
           this.$vs.notify({
             title: 'Settings Saved',
             color: 'success',
-            icon: 'save',
+            // icon: 'save',
             position: this.$store.state.settings.notifPos,
             time: 3000
           })

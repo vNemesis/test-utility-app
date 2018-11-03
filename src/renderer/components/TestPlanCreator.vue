@@ -12,106 +12,93 @@
         <div class="col-sm-12">
 
           <vs-tabs :color="tabColour" vs-alignment="center">
+            <!-- Application Save / Load -->
+            <vs-tab @click="tabColour = 'rgb(204, 98, 0)'" vs-label="Save | Load">
+              <p>Save/Load test plan in the application</p>
+              <vs-button type="line" :color="tabColour" @click="save()">Save Test Plan</vs-button>
+              <vs-button type="line" :color="tabColour" @click="activePromptLoadPlan = true">Load Test Plan</vs-button>
+            </vs-tab>
+            <!-- Application Save / Load -->
             <!-- Generation -->
             <vs-tab @click="tabColour = 'rgb(100, 175, 134)'" vs-label="Generate">
               <p>Format plan for different applications</p>
-              <vs-button vs-type="line" :color="tabColour" @click="generateJiraTable()">Generate Jira Table</vs-button>
-              <vs-button vs-type="line" :color="tabColour" @click="generateSpecflow('api')">Generate API Specflow Scenarios</vs-button>
-              <vs-button vs-type="line" :color="tabColour" @click="generateSpecflow('ui')">Generate UI Specflow Scenarios</vs-button>
+              <vs-button type="line" :color="tabColour" @click="generateJiraTable()">Generate Jira Table</vs-button>
+              <vs-button type="line" :color="tabColour" @click="generateSpecflow('api')">Generate API Specflow Scenarios</vs-button>
+              <vs-button type="line" :color="tabColour" @click="generateSpecflow('ui')">Generate UI Specflow Scenarios</vs-button>
             </vs-tab>
             <!-- Generation -->
             <!-- Export / Import -->
             <vs-tab @click="tabColour = 'rgb(120, 157, 232)'" vs-label="Import | Export">
               <p>Export/Import the test plan to/from outside of the application</p>
-              <vs-button vs-type="line" :color="tabColour" @click="exportToCSV()">Export to CSV</vs-button>
-              <vs-button vs-type="line" :color="tabColour" @click="importFromCSV()">Import CSV</vs-button>
+              <vs-button type="line" :color="tabColour" @click="exportToCSV()">Export to CSV</vs-button>
+              <vs-button type="line" :color="tabColour" @click="importFromCSV()">Import CSV</vs-button>
               |
-              <vs-button vs-type="line" :color="tabColour" @click="exportToJson()">Export JSON</vs-button>
-              <vs-button vs-type="line" :color="tabColour" @click="importFromJson()">Import JSON</vs-button>
+              <vs-button type="line" :color="tabColour" @click="exportToJson()">Export JSON</vs-button>
+              <vs-button type="line" :color="tabColour" @click="importFromJson()">Import JSON</vs-button>
               |
-              <vs-button vs-type="line" :color="tabColour" @click="activePromptImportFromExcel = true">Import from Excel Clipboard</vs-button>
+              <vs-button type="line" :color="tabColour" @click="activePromptImportFromExcel = true">Import from Excel Clipboard</vs-button>
             </vs-tab>
             <!-- Export / Import -->
-            <vs-tab @click="tabColour = 'rgb(204, 98, 0)'" vs-label="Save | Load">
-              <p>Save/Load test plan in the application</p>
-              <vs-button vs-type="line" :color="tabColour" @click="save()">Save Test Plan</vs-button>
-              <vs-button vs-type="line" :color="tabColour" @click="activePromptLoadPlan = true">Load Test Plan</vs-button>
-            </vs-tab>
-            <!-- Application Save / Load -->
           </vs-tabs>
         </div>
       </div>
 
       <div class="row justify-content-center mt-5">
         <div class="col-md-3">
-          <vs-select vs-autocomplete placeholder="Search and select" vs-label="Application" vs-label-placeholder="vs-Autocomplete" :vs-danger="validation.application" vs-danger-text="Please select an application" class="w-100" v-model="app">
-            <vs-select-item :key="index" :vs-value="item.value" :vs-text="item.text" v-for="(item,index) in appOptions" />
+          <vs-select autocomplete placeholder="Search and select" label="Application" label-placeholder="vs-Autocomplete" :danger="validation.application" danger-text="Please select an application" class="w-100" v-model="app">
+            <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item,index) in appOptions" />
           </vs-select>
         </div>
         <div class="col-md-3">
-          <vs-input vs-label="Assignee" placeholder="User.Name" :vs-danger="validation.assignee" vs-danger-text="Assignee cannot be empty" v-model="assignee" class="w-100"/>
+          <vs-input label="Assignee" placeholder="User.Name" :danger="validation.assignee" danger-text="Assignee cannot be empty" v-model="assignee" class="w-100"/>
         </div>
         <div class="col-md-3">
-          <vs-input vs-label="Jira Task (Parent Task ID)" placeholder="AZCI-XXX" :vs-danger="validation.jiraTask" vs-danger-text="Jira Task cannot be empty" v-model="jiraTask" class="w-100"/>
+          <vs-input label="Jira Task (Parent Task ID)" placeholder="AZCI-XXX" :danger="validation.jiraTask" danger-text="Jira Task cannot be empty" v-model="jiraTask" class="w-100"/>
         </div>
         <div class="col-md-3">
-          <vs-input vs-label="Plan Description" placeholder="Area" v-model="planDesc" class="w-100"/>
+          <vs-input label="Plan Description" placeholder="Area" v-model="planDesc" class="w-100"/>
         </div>
       </div>
 
       <br>
 
-      <div class="row">
-        <div class="col-md-12 text-right">
-          <!-- Table Options -->
-          <vs-dropdown vs-custom-content vs-trigger-click>
-            <a class="a-icon" href.prevent>
-              <font-awesome-icon icon="ellipsis-h" size="lg"/>
-            </a>
-            <vs-dropdown-menu style="width: 15%;">
-
-              <div class="row">
-                <div class="col-sm-6">
-                  Order Items
-                </div>
-                <div class="col-sm-3">
-                  <vs-switch id="order" v-model="order"></vs-switch>
-                </div>
-              </div>
-
-              <div class="row mt-2">
-                <div class="col-sm-6">
-                  Autosave
-                </div>
-                <div class="col-sm-3">
-                  <vs-switch id="autosave" v-model="autoSave">
-                    <span slot="on">On</span>
-                    <span slot="off">Off</span>
-                  </vs-switch>
-                </div>
-              </div>
-
-              <vs-dropdown-item @click="addItemsPopup.active = true" class="mt-2">
-                Add Test Items
-              </vs-dropdown-item>
-
-            </vs-dropdown-menu>
-          </vs-dropdown>
-          <!-- Table Options -->
+      <vs-collapse>
+      <vs-collapse-item icon-arrow="menu">
+        <div slot="header" class="text-right mr-4">
+          More
         </div>
-      </div>
+        <vs-row>
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+            Order Items 
+            <vs-switch id="order" v-model="order" class="center-item"></vs-switch>
+          </vs-col>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+            Autosave 
+            <vs-switch id="autosave" v-model="autoSave" class="center-item">
+              <span slot="on">On</span>
+              <span slot="off">Off</span>
+            </vs-switch>
+          </vs-col>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+            <vs-button type="flat" color="primary" @click="addItemsPopup.active = true">Add Test Items</vs-button>
+          </vs-col>
+        </vs-row>
+      </vs-collapse-item>
+      </vs-collapse>
 
       <div class="table-responsive">
         <table class="table mt-2">
           <thead>
             <th width="2.5%"></th>
-            <th width="5%">Jira Task ID</th>
+            <th width="2.5%">Jira Task ID</th>
             <th width="20%">Test Name</th>
             <th width="7.5%">Test Type</th>
             <th width="30%">Test Purpose</th>
             <th width="25%">Gherkin</th>
             <th width="7.5%">Priority</th>
-            <th width="2.5%"></th>
+            <th width="5%"></th>
           </thead>
           <tbody>
               <tr is="test-item" v-for="(test, index) in testItems" :key="test.id"
@@ -129,11 +116,11 @@
      <vs-popup title="Load Test Plan" :active.sync="activePromptLoadPlan">
         <div class="row justify-content-center">
           <div class="col-sm-12">
-            <vs-select vs-label="Select a test plan to load" vs-autocomplete v-model="planID" :vs-danger="LoadPlanWarning" vs-danger-text="Please select a test plan" class="w-100">
-              <vs-select-item :key="index" :vs-value="index" :vs-text="`${index} - ${item.planDesc}`" v-for="(item,index) in allTestPlans" />
+            <vs-select label="Select a test plan to load" vs-autocomplete v-model="planID" :danger="LoadPlanWarning" danger-text="Please select a test plan" class="w-100">
+              <vs-select-item :key="index" :value="index" :text="`${index} - ${item.planDesc}`" v-for="(item,index) in allTestPlans" />
             </vs-select>
-            <vs-button @click="load(planID)" color="primary" vs-type="border">Load Test Plan</vs-button>
-            <vs-button @click="deletePlan(planID)" color="danger" vs-type="border">Delete</vs-button>
+            <vs-button @click="load(planID)" color="primary" type="border">Load Test Plan</vs-button>
+            <vs-button @click="deletePlan(planID)" color="danger" type="border">Delete</vs-button>
           </div>
        </div>
       </vs-popup>
@@ -145,7 +132,7 @@
             <div id="hot-preview">
               <HotTable ref="excelTable" :settings="hotTableSettings"></HotTable>
             </div>
-            <vs-button @click="importFromExcelData()" color="primary" vs-type="border">Import</vs-button>
+            <vs-button @click="importFromExcelData()" color="primary" type="border">Import</vs-button>
           </div>
        </div>
       </vs-popup>
@@ -153,25 +140,25 @@
       <!-- Add Items -->
       <vs-popup title="Add Test Items" :active.sync="addItemsPopup.active">
 
-        <vs-input vs-label="Jira Subtask ID" placeholder="AZCI-XXX" v-model="addItemsPopup.item.jiraTaskId" class="mb-3"/>
+        <vs-input label="Jira Subtask ID" placeholder="AZCI-XXX" v-model="addItemsPopup.item.jiraTaskId" class="mb-3"/>
 
         <vs-textarea v-model="addItemsPopup.item.testName" label="Test Name (Summary)"/>
 
-        <vs-select vs-label="Type" v-model="addItemsPopup.item.testType" class="w-100 mb-3">
-          <vs-select-item :key="index" :vs-value="item" :vs-text="item" v-for="(item,index) in {API: 'API', UI: 'UI'}" />
+        <vs-select label="Type" v-model="addItemsPopup.item.testType" class="w-100 mb-3">
+          <vs-select-item :key="index" :value="item" :text="item" v-for="(item,index) in {API: 'API', UI: 'UI'}" />
         </vs-select>
 
         <vs-textarea v-model="addItemsPopup.item.testPurpose" label="Test Purpose"/>
 
         <vs-textarea v-model="addItemsPopup.item.gherkin" label="Gherkin code for test"/>
 
-        <vs-select vs-label="Priority" v-model="addItemsPopup.item.priority" class="w-100 mb-3">
-          <vs-select-item :key="index" :vs-value="item" :vs-text="item" v-for="(item,index) in {Trivial: 'Trivial', Minor: 'Minor', Major: 'Major', Critical: 'Critical'}" />
+        <vs-select label="Priority" v-model="addItemsPopup.item.priority" class="w-100 mb-3">
+          <vs-select-item :key="index" :value="item" :text="item" v-for="(item,index) in {Trivial: 'Trivial', Minor: 'Minor', Major: 'Major', Critical: 'Critical'}" />
         </vs-select>
 
         <div class="row">
           <div class="col-sm-3">
-            <vs-button @click="bulkAdd()" color="primary" vs-type="border">Add Items</vs-button>
+            <vs-button @click="bulkAdd()" color="primary" type="border">Add Items</vs-button>
           </div>
           <div class="col-sm-9 text-center">
             <small>Amount</small>
@@ -257,7 +244,7 @@ export default {
         rowHeaders: true
       },
       // Menu
-      tabColour: 'rgb(125, 219, 167)',
+      tabColour: 'rgb(204, 98, 0)',
       order: false
     }
   },
@@ -371,7 +358,7 @@ export default {
         title: 'Items added',
         text: 'Items added successfully',
         color: 'success',
-        icon: 'publish',
+        // icon: 'publish',
         position: this.$store.state.settings.notifPos,
         time: 4000
       })
@@ -428,7 +415,7 @@ export default {
           title: 'Plan Saved',
           text: `Plan ${this.jiraTask} was saved successfully`,
           color: 'success',
-          icon: 'publish',
+          // icon: 'publish',
           position: this.$store.state.settings.notifPos,
           time: 4000
         })
@@ -471,7 +458,7 @@ export default {
         title: 'Plan deleted',
         text: `Plan "${key}" was deleted successfully`,
         color: 'success',
-        icon: 'delete_forever',
+        // icon: 'delete_forever',
         position: this.$store.state.settings.notifPos,
         time: 4000
       })
@@ -491,7 +478,6 @@ export default {
       (fileName) => {
         // fileNames is an array that contains all the selected
         if (fileName === undefined) {
-          console.log('No file selected')
           return
         }
 
@@ -501,7 +487,7 @@ export default {
               title: 'Error!',
               text: `An error ocurred creating the file: ${err.message}`,
               color: 'danger',
-              icon: 'error_outline',
+              // icon: 'error_outline',
               position: this.$store.state.settings.notifPos,
               time: 4000
             })
@@ -510,7 +496,7 @@ export default {
               title: 'File Imported!',
               text: `File "${fileName[0]}" was imported successfully`,
               color: 'success',
-              icon: 'publish',
+              // icon: 'publish',
               position: this.$store.state.settings.notifPos,
               time: 4000
             })
@@ -535,7 +521,6 @@ export default {
       (fileName) => {
         // fileNames is an array that contains all the selected
         if (fileName === undefined) {
-          console.log('No file selected')
           return
         }
 
@@ -545,7 +530,7 @@ export default {
               title: 'Error!',
               text: `An error ocurred creating the file: ${err.message}`,
               color: 'danger',
-              icon: 'error_outline',
+              // icon: 'error_outline',
               position: this.$store.state.settings.notifPos,
               time: 4000
             })
@@ -554,13 +539,11 @@ export default {
               title: 'File Imported!',
               text: `File "${fileName[0]}" was imported successfully`,
               color: 'success',
-              icon: 'publish',
+              // icon: 'publish',
               position: this.$store.state.settings.notifPos,
               time: 4000
             })
             let parsedData = Papa.parse(data).data
-
-            console.log(parsedData)
 
             for (let index = 1; index < parsedData.length; index++) {
               let testItem = {
@@ -598,7 +581,7 @@ export default {
         title: 'Test Plan Imported',
         text: 'A Test Plan has been created from your excel data',
         color: 'success',
-        icon: 'publish',
+        // icon: 'publish',
         position: this.$store.state.settings.notifPos,
         time: 4000
       })
@@ -630,7 +613,7 @@ export default {
         title: 'Copied to clipboard',
         text: 'Jira Table has been copied to your clipboard',
         color: 'success',
-        icon: 'publish',
+        // icon: 'publish',
         position: this.$store.state.settings.notifPos,
         time: 4000
       })
@@ -649,7 +632,7 @@ export default {
         title: 'Copied to clipboard',
         text: `SpecFlow ${type.toUpperCase()} scenario definitions have been copied to your clipboard`,
         color: 'success',
-        icon: 'assignment',
+        // icon: 'assignment',
         position: this.$store.state.settings.notifPos,
         time: 4000
       })

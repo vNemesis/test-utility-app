@@ -17,9 +17,9 @@ import 'highlight.js/styles/default.css'
 
 // Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone } from '@fortawesome/free-solid-svg-icons'
+import { faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone, faAlignLeft } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone)
+library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone, faAlignLeft)
 
 // Load Plugins
 const {dialog, shell, app} = require('electron').remote
@@ -49,7 +49,7 @@ const appStore = new EStore({
     settings: {
       editor: {
         autoLine: false,
-        showEditor: true
+        showEditor: false
       },
       planCreator: {
         defaultAssignee: '',
@@ -81,7 +81,7 @@ const store = new Vuex.Store({
     settings: {
       editor: {
         autoLine: false,
-        showEditor: true
+        showEditor: false
       },
       planCreator: {
         defaultAssignee: '',
