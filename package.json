@@ -80,6 +80,7 @@
     "vue": "^2.5.16",
     "vue-electron": "^1.0.6",
     "vue-highlight.js": "^2.2.0",
+    "vue-paginate": "^3.6.0",
     "vue-router": "^3.0.1",
     "vuesax": "^3.5.7",
     "vuex": "^3.0.1"
@@ -131,7 +132,7 @@
     "mocha": "^5.2.0",
     "multispinner": "^0.2.1",
     "node-loader": "^0.6.0",
-    "node-sass": "^4.9.2",
+    "node-sass": "^4.10.0",
     "require-dir": "^1.0.0",
     "sass-loader": "^7.0.3",
     "spectron": "^3.8.0",

@@ -105,6 +105,12 @@
             <vs-button v-if="releaseFound" @click="openUrl(releaseUrl)" type="line" >Release Page</vs-button>
           </div>
         </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <vs-button @click="openConfig()">Open Config File</vs-button>
+          </div>
+        </div>
         <!-- Info -->
       </vs-tab>
       </vs-tabs>
@@ -194,6 +200,9 @@
           this.isTyping = true
           this.oldNotifPos = this.settings.notifPos
         }
+      },
+      openConfig () {
+        this.$root.openConfig()
       }
     },
 

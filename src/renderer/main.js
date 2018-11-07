@@ -3,6 +3,7 @@ import Vuesax from 'vuesax'
 import Vuex from 'vuex'
 import VueHighlightJS from 'vue-highlight.js'
 import 'es6-promise/auto'
+import VuePaginate from 'vue-paginate'
 
 import axios from 'axios'
 
@@ -58,7 +59,10 @@ const appStore = new EStore({
       },
       notifPos: 'bottom-right'
     },
-    quickLinks: [{ text: 'Example Bookmark', url: 'www.google.co.uk' }]
+    quickLinks: [
+      { text: 'Example Website Bookmark', url: 'www.google.co.uk' },
+      { text: 'Example Local Bookmark', url: 'c://' }
+    ]
   }
 })
 
@@ -70,6 +74,7 @@ const testPlanStore = new EStore({
 Vue.use(Vuesax)
 Vue.use(Vuex)
 Vue.use(VueHighlightJS)
+Vue.use(VuePaginate)
 
 // Vue Components
 Vue.component('font-awesome-icon', FontAwesomeIcon)
@@ -199,6 +204,9 @@ new Vue({
           }
         })
       })
+    },
+    openConfig () {
+      appStore.openInEditor()
     }
   }
 }).$mount('#app')
