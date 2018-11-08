@@ -94,7 +94,7 @@
         </div>
         <!-- Editor Settings -->
       </vs-tab>
-      <vs-tab vs-label="Info">
+      <vs-tab vs-label="Misc">
         <!-- Info -->
         <div class="row justify-content-center">
           <div class="col-sm-12">
@@ -108,7 +108,9 @@
 
         <div class="row">
           <div class="col-sm-12">
-            <vs-button @click="openConfig()">Open Config File</vs-button>
+            <h1 class="mt-3">Advanced</h1>
+            <vs-button type="line" @click="openConfig()">Open Config File</vs-button>
+            <vs-button type="line" color="danger" @click="resetSettings()">Reset Settings</vs-button>
           </div>
         </div>
         <!-- Info -->
@@ -203,6 +205,11 @@
       },
       openConfig () {
         this.$root.openConfig()
+      },
+      resetSettings () {
+        if (confirm('Are you sure you wish to reset your settings? The application will restart to apply the changes.')) {
+          this.$root.resetSettings()
+        }
       }
     },
 

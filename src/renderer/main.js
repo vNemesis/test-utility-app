@@ -207,6 +207,28 @@ new Vue({
     },
     openConfig () {
       appStore.openInEditor()
+    },
+    resetSettings () {
+      appStore.store = {
+        settings: {
+          editor: {
+            autoLine: false,
+            showEditor: false
+          },
+          planCreator: {
+            defaultAssignee: '',
+            defaultPlanExportDir: '',
+            jiraNewLine: false
+          },
+          notifPos: 'bottom-right'
+        },
+        quickLinks: [
+          { text: 'Example Website Bookmark', url: 'www.google.co.uk' },
+          { text: 'Example Local Bookmark', url: 'c://' }
+        ]
+      }
+      app.relaunch()
+      app.exit(0)
     }
   }
 }).$mount('#app')
