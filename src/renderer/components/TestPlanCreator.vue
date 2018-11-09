@@ -30,8 +30,8 @@
             <!-- Export / Import -->
             <vs-tab @click="tabColour = 'rgb(120, 157, 232)'" vs-label="Import | Export">
               <p>Export/Import the test plan to/from outside of the application</p>
-              <vs-button type="line" :color="tabColour" @click="exportToCSV()">Export to CSV</vs-button>
-              <vs-button type="line" :color="tabColour" @click="importFromCSV()">Import CSV</vs-button>
+              <vs-button type="line" :color="tabColour" @click="exportToJiraCSV()">Export to Jira CSV</vs-button>
+              <vs-button type="line" :color="tabColour" @click="importFromJiraCSV()">Import Jira CSV</vs-button>
               |
               <vs-button type="line" :color="tabColour" @click="exportToJson()">Export JSON</vs-button>
               <vs-button type="line" :color="tabColour" @click="importFromJson()">Import JSON</vs-button>
@@ -413,7 +413,7 @@ export default {
 
     // ----------------------------------------------- Export -----------------------------------------------
 
-    exportToCSV () {
+    exportToJiraCSV () {
       let csvContent = ''
       csvContent += ['Test Name (Summary)', 'Test Purpose (Description)', 'Jira Task (Parent Id)', 'Issue Type', 'Assignee', 'Priority', 'Application'].join(',') + '\r\n'
 
@@ -557,7 +557,7 @@ export default {
         })
       })
     },
-    importFromCSV () {
+    importFromJiraCSV () {
       dialog.showOpenDialog({
         filters: [
           { name: 'CSV File', extensions: ['csv'] }
@@ -591,13 +591,15 @@ export default {
             let parsedData = Papa.parse(data).data
 
             for (let index = 1; index < parsedData.length; index++) {
+              let testPurposeSplit = parsedData[index][1].split('\r\n\r\n')
+
               let testItem = {
                 id: this.testItems.length + 1,
                 jiraTaskId: parsedData[index][2],
-                testType: 'API',
+                testType: testPurposeSplit[1].substring(11).trim(),
                 testName: parsedData[index][0],
-                testPurpose: parsedData[index][1],
-                gherkin: '',
+                testPurpose: testPurposeSplit[0].substring(18).trim(),
+                gherkin: testPurposeSplit[2].split('{code}').join('').trim(),
                 priority: parsedData[index][5]
               }
 

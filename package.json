@@ -1,6 +1,6 @@
 {
   "name": "test-plan-utility",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": "HarmanU <uppalhrs@aston.ac.uk>",
   "description": "Electron Vue App for Rimilia Test Plans",
   "license": null,
