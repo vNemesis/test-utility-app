@@ -65,15 +65,15 @@
       <vs-collapse>
       <vs-collapse-item icon-arrow="menu">
         <div slot="header" class="text-right mr-4">
-          More
+          Options
         </div>
         <vs-row>
-          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
             Order Items 
             <vs-switch id="order" v-model="order" class="center-item"></vs-switch>
           </vs-col>
 
-          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
             Autosave 
             <vs-switch id="autosave" v-model="autoSave" class="center-item">
               <span slot="on">On</span>
@@ -81,8 +81,12 @@
             </vs-switch>
           </vs-col>
 
-          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
-            <vs-button type="flat" color="primary" @click="addItemsPopup.active = true">Add Test Items</vs-button>
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
+            <vs-button type="line" color="dark" @click="addItemsPopup.active = true">Bulk add test items</vs-button>
+          </vs-col>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
+            <vs-button type="line" color="dark" @click="bulkOpPopup.active = true">Bulk operations</vs-button>
           </vs-col>
         </vs-row>
       </vs-collapse-item>
@@ -168,6 +172,42 @@
       </vs-popup>
       <!-- Add Items -->
 
+      <!-- Bulk Op -->
+      <vs-popup title="Bulk Operations" :active.sync="bulkOpPopup.active">
+
+        <vs-row>
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="9">
+            <vs-input label="Start ID" placeholder="AZCI-123" :danger="!this.bulkOpPopup.changeJiraID.valid" danger-text="Jira ID format is invalid"
+              description-text="This will change all ticket id's to sequential id's starting from this one" v-model="bulkOpPopup.changeJiraID.startID"
+              class="mb-3 w-75"/>
+          </vs-col>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="flex-start" vs-w="3">
+            <vs-button @click="bulkChangeJiraIds()" color="primary" type="line" class="mt-4 w-100">Start</vs-button>
+          </vs-col>
+        </vs-row>
+
+        <vs-row>
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="9">
+            <vs-select label="Priority" v-model="bulkOpPopup.changePriorities.priority" class="w-75 mb-3"
+            :danger="!this.bulkOpPopup.changePriorities.valid" danger-text="Please Select a Priority" 
+            description-text="This will change all ticket priorities to the selected value">
+              <vs-select-item :key="index" :value="item" :text="item" v-for="(item,index) in {Trivial: 'Trivial', Minor: 'Minor', Major: 'Major', Critical: 'Critical'}" />
+            </vs-select>
+          </vs-col>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="flex-start" vs-w="3">
+            <vs-button @click="bulkChangePriorities()" color="primary" type="line" class="w-100 mt-4">Start</vs-button>
+          </vs-col>
+        </vs-row>
+
+
+
+
+
+      </vs-popup>
+      <!--  Bulk Op  -->
+
       <!-- Preview -->
       <vs-popup title="Code Preview" :active.sync="previewPopup.active">
         <highlight-code class="text-left" :lang="previewPopup.syntax" :code="previewPopup.code"></highlight-code>
@@ -229,6 +269,17 @@ export default {
           priority: ''
         },
         amount: 1
+      },
+      bulkOpPopup: {
+        active: false,
+        changeJiraID: {
+          startID: '',
+          valid: true
+        },
+        changePriorities: {
+          priority: '',
+          valid: true
+        }
       },
       activePromptImportFromExcel: false,
       previewPopup: {
@@ -306,7 +357,6 @@ export default {
       this.save()
       this.autoSaving = false
     }, 6000),
-
     goBack () {
       window.history.length > 1
         ? this.$router.go(-1)
@@ -320,7 +370,6 @@ export default {
         this.testItems[i].id = i + 1
       }
     },
-
     addTestItem (testItem = null) {
       if (testItem === null) {
         this.testItems.push({
@@ -339,14 +388,12 @@ export default {
         this.testItems.push(duplicate)
       }
     },
-
     removeTestItem (index) {
       this.testItems.splice(index, 1)
       for (let i = 0; i < this.testItems.length; i++) {
         this.testItems[i].id = i + 1
       }
     },
-
     bulkAdd () {
       for (let i = 0; i < this.addItemsPopup.amount; ++i) {
         this.addTestItem(this.addItemsPopup.item)
@@ -378,7 +425,6 @@ export default {
 
       this.$root.exportFile(`Jira Issue Import ${this.jiraTask}.csv`, csvContent, 'CSV File', 'csv')
     },
-
     exportToJson () {
       let plan = {
         testItems: this.testItems,
@@ -511,7 +557,6 @@ export default {
         })
       })
     },
-
     importFromCSV () {
       dialog.showOpenDialog({
         filters: [
@@ -562,7 +607,6 @@ export default {
         })
       })
     },
-
     importFromExcelData () {
       this.$refs.excelTable.hotInstance.getData().forEach(element => {
         this.testItems.push({
@@ -618,7 +662,6 @@ export default {
         time: 4000
       })
     },
-
     generateSpecflow (type) {
       let Specflow = ''
 
@@ -637,7 +680,95 @@ export default {
         time: 4000
       })
     },
-    // ----------------------------------------------- Misc -----------------------------------------------
+    // -------------------------------------------- Bulk Operations --------------------------------------------
+    bulkChangeJiraIds () {
+      let jiraIssuePattern = new RegExp('^((?!([A-Z0-9a-z]{1,10})-?$)[A-Z]{1}[A-Z0-9]+-\\d+)$')
+
+      if (jiraIssuePattern.test(this.bulkOpPopup.changeJiraID.startID)) {
+        this.bulkOpPopup.changeJiraID.valid = true
+
+        if (this.testItems.length === 0) {
+          this.$vs.notify({
+            title: 'Error',
+            text: 'You do not have any Tests to update',
+            color: 'danger',
+            position: this.$store.state.settings.notifPos,
+            time: 4000
+          })
+          this.bulkOpPopup.changeJiraID.startID = ''
+          this.bulkOpPopup.active = false
+          return
+        }
+
+        for (let index = 0; index < this.testItems.length; index++) {
+          let element = this.testItems[index]
+
+          try {
+            let id = parseInt(this.bulkOpPopup.changeJiraID.startID.match('([0-9]+\\d)'))
+
+            let projectKey = this.bulkOpPopup.changeJiraID.startID.match('([A-Z]{1,})')
+            console.log(projectKey)
+            element.jiraTaskId = (index === 0 ? `${projectKey[0]}-${id}` : `${projectKey[0]}-${id + index}`)
+          } catch (error) {
+            this.$vs.notify({
+              title: 'Error',
+              text: `Error occured: ${error}`,
+              color: 'error',
+              position: this.$store.state.settings.notifPos,
+              time: 4000
+            })
+          }
+        }
+        this.bulkOpPopup.changeJiraID.startID = ''
+        this.bulkOpPopup.active = false
+        this.$vs.notify({
+          title: 'Operation completed',
+          text: 'Bulk operation completed with no errors',
+          color: 'success',
+          position: this.$store.state.settings.notifPos,
+          time: 4000
+        })
+      } else {
+        this.bulkOpPopup.changeJiraID.valid = false
+      }
+    },
+    bulkChangePriorities () {
+      if (this.bulkOpPopup.changePriorities.priority !== '') {
+        this.bulkOpPopup.changePriorities.valid = true
+
+        if (this.testItems.length === 0) {
+          this.$vs.notify({
+            title: 'Error',
+            text: 'You do not have any Tests to update',
+            color: 'danger',
+            position: this.$store.state.settings.notifPos,
+            time: 4000
+          })
+          this.bulkOpPopup.changeJiraID.startID = ''
+          this.bulkOpPopup.active = false
+          return
+        }
+
+        for (let index = 0; index < this.testItems.length; index++) {
+          let element = this.testItems[index]
+          element.priority = this.bulkOpPopup.changePriorities.priority
+        }
+
+        this.bulkOpPopup.changePriorities.priority = ''
+        this.bulkOpPopup.active = false
+      } else {
+        this.bulkOpPopup.changeJiraID.valid = false
+      }
+      this.$vs.notify({
+        title: 'Operation completed',
+        text: 'Bulk operation completed with no errors',
+        color: 'success',
+        position: this.$store.state.settings.notifPos,
+        time: 4000
+      })
+    },
+
+    // -------------------------------------------------- Misc --------------------------------------------------
 
     showPreview (object) {
       this.previewPopup.active = true
@@ -650,4 +781,8 @@ export default {
 
 <style>
 @import url('../../../node_modules/handsontable/dist/handsontable.full.min.css');
+
+.open-item {
+  box-shadow: 0px 2px 15px 0px rgba(0,0,0,0.15) !important;
+}
 </style>
