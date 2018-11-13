@@ -645,7 +645,7 @@ export default {
       this.testItems.forEach(element => {
         if (this.$store.state.settings.planCreator.jiraNewLine) {
           while (element.testPurpose.length > 0) {
-            formattedPurpose += element.testPurpose.substring(0, 50) + '\n'
+            formattedPurpose += element.testPurpose.substring(0, this.$store.state.settings.planCreator.jiraNewLineAmount) + '\n'
             element.testPurpose = element.testPurpose.substring(50)
           }
         } else {

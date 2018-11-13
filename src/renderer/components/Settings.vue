@@ -1,87 +1,145 @@
 <template>
-<div class="container-fluid">
+<div class="container-fluid"> <!-- Master Container -->
   <vs-progress indeterminate color="success" v-if="isTyping"></vs-progress>
-  <div class="row" :class="!isTyping ? 'mt-4' : ''">
-    <div class="col-sm-12">
+  <div class="row" :class="!isTyping ? 'mt-4' : ''"> <!-- Master Row -->
+    <div class="col-sm-12"> <!-- Master Col -->
 
       <vs-tabs vs-position="top" vs-alignment="fixed">
+      <!-- General Tab -->
       <vs-tab vs-label="General">
-        <!-- General Settings -->
-        <div class="row justify-content-center">
-          <div class="col-sm-6 mt-3">
 
-            <!-- Default Assignee -->
-            <div class="row justify-content-center">
-              <div class="col-sm-12">
-                <vs-input id="autoNewLine" v-model="settings.planCreator.defaultAssignee" label="Default Assignee" @input="isTyping = true" class="w-100"/>
-              </div>
-            </div>
-            <!-- Default Assignee -->
-
-            <!-- Notification Position -->
-            <div class="row justify-content-center mt-2">
-              <div class="col-sm-12">
-                <vs-select label="Notification Position" class="w-100" v-model="settings.notifPos" @input="checkNotifPosChanged()">
-                  <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in notifPosOptions" />
-                </vs-select>
-              </div>
-            </div>
-            <!-- Notification Position -->
-
-          </div>
-          <div class="col-sm-6 mt-3">
-            
-            <!-- defaultPlanExportDir -->
-            <div class="row justify-content-center">
-              <div class="col-sm-12">
-                <vs-input id="autoNewLine" v-model="settings.planCreator.defaultPlanExportDir" label="Default Export Location"
-                @input="isTyping = true" class="w-100" description-text="Set a defualt location for your test plan exports"/>
-              </div>
-            </div>
-            <!-- defaultPlanExportDir -->
-
-          </div>
-        </div>
-
-        <h3 class="mt-4">Test Plan Creator</h3>        
         <div class="row">
           <div class="col-sm-12">
 
-            <!-- Jira Table Auto New Line -->
-            <label for="autoNewLine">Add a new line in the test purpose every 50 Characters when generating a Jira Table</label>
-            <vs-switch id="autoJiraNewLine" v-model="settings.planCreator.jiraNewLine" @input="isTyping = true">
-                <span slot="on">On</span>
-                <span slot="off">Off</span>
-            </vs-switch>
-            <!-- Jira Table Auto New Line -->
+            <!-- General Settings -->
+            <h3 class="mt-3">General</h3>
+            <div class="row">
+              <div class="col-sm-6">
+
+                <!-- Notification Position -->
+                <div class="row justify-content-center mt-2">
+                  <div class="col-sm-12">
+                    <vs-select label="Notification Position" class="w-100" v-model="settings.notifPos" @input="checkNotifPosChanged()">
+                      <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in notifPosOptions" />
+                    </vs-select>
+                  </div>
+                </div>
+                <!-- Notification Position -->
+
+                <div class="col-sm-6">
+
+                </div>
+
+              </div>
+            </div>
+            <!-- General Settings -->
+
+            <!-- Theme Settings -->
+            <h3 class="mt-4">Theme</h3>      
+            <div class="row">
+              <div class="col-sm-12">
+
+                <p>Application Main Theme</p>
+                <vs-row>
+                  <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="1" >
+                    <input id="primaryThemeColourPicker" type="color" v-model="settings.theme.primary" @input="isTyping = true"/>
+                  </vs-col>
+
+                  <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="3">
+                    <vs-input label="HEX" placeholder="#1f74ff" v-model="settings.theme.primary" @input="isTyping = true"
+                    :danger="this.validationErrors.themePrimary" danger-text="Incorrect Format"/>
+                  </vs-col>
+                </vs-row>
+
+                <p class="mt-3">Dark Mode (NYI)</p>
+                <vs-switch id="autoJiraNewLine" v-model="settings.theme.darkMode" @input="isTyping = true">
+                    <span slot="on">On</span>
+                    <span slot="off">Off</span>
+                </vs-switch>
+                
+              </div>
+            </div>
+            <!-- Theme Settings -->
 
           </div>
         </div>
-        <!-- General Settings -->
+
       </vs-tab>
-      <vs-tab vs-label="Editor">
-        <!-- Editor Settings -->
-        <div class="row mt-3">
+      <!-- General Tab -->
+
+      <!-- Test Plan Creator Tab -->
+      <vs-tab vs-label="Test Plan Creator">
+        <!-- Test Plan Creator Settings -->
+        <div class="row mt-5">
           <div class="col-sm-12">
 
-            <!-- Toggles -->
+            <!-- Other Settings -->
             <div class="row justify-content-center">
-              <div class="col-sm-6">
-                <vs-list>
-                  
-                  <vs-list-item title="Show Editor" subtitle="Show editor when editing test purpose">
-                    <vs-switch id="showEditor" v-model="settings.editor.showEditor" @input="isTyping = true">
-                      <span slot="on">Yes</span>
-                      <span slot="off">No</span>
-                    </vs-switch>
-                  </vs-list-item>
+              <div class="col-sm-8">
 
-                  <vs-list-item title="Auto New Line" subtitle="Automatically add a new line when adding formatting into the editor">
-                    <vs-switch id="autoNewLine" v-model="settings.editor.autoLine" @input="isTyping = true">
-                      <span slot="on">On</span>
-                      <span slot="off">Off</span>
-                    </vs-switch>
+                  <!-- Default Assignee -->
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <vs-input id="autoNewLine" v-model="settings.planCreator.defaultAssignee" label="Default Assignee" @input="isTyping = true" class="w-100"/>
+                    </div>
+                  </div>
+                  <!-- Default Assignee -->
+
+                  <!-- defaultPlanExportDir -->
+                  <div class="row mt-4">
+                    <div class="col-sm-12">
+                      <vs-input id="autoNewLine" v-model="settings.planCreator.defaultPlanExportDir" label="Default Export Location"
+                      @input="isTyping = true" class="w-100" description-text="Set a defualt location for your test plan exports"/>
+                    </div>
+                  </div>
+                  <!-- defaultPlanExportDir -->
+
+                </div>
+            </div>
+            <!-- Other Settings -->
+
+            <!-- Toggles -->
+            <div class="row justify-content-center mt-3">
+              <div class="col-sm-8">
+                <vs-list>
+
+                  <vs-list-header title="Editor"></vs-list-header>
+
+                  <span :class="!settings.editor.showEditor ? 'disabled':''">
+                    <vs-list-item title="Show Editor" subtitle="Show editor when editing test purpose">
+                      <vs-switch id="showEditor" v-model="settings.editor.showEditor" @input="isTyping = true">
+                        <span slot="on">Yes</span>
+                        <span slot="off">No</span>
+                      </vs-switch>
+                    </vs-list-item>
+
+                    <vs-list-item title="Auto New Line" subtitle="Automatically add a new line when adding formatting from the editor toolbar">
+                      <vs-switch id="autoNewLine" :disabled="!settings.editor.showEditor" v-model="settings.editor.autoLine" @input="isTyping = true">
+                        <span slot="on">On</span>
+                        <span slot="off">Off</span>
+                      </vs-switch>
+                    </vs-list-item>
+                  </span>
+
+                  <vs-list-header title="Generators"></vs-list-header>
+
+                  <!-- Jira Table Auto New Line -->
+                  <vs-list-item title="Jira Table New Line" subtitle="Add a new line in the test purpose every X Characters when generating a Jira Table"
+                  :class="!settings.planCreator.jiraNewLine ? 'disabled':''">
+                    <vs-row>
+                      <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="6" >
+                        <vs-input-number v-model="settings.planCreator.jiraNewLineAmount" :disabled="!settings.planCreator.jiraNewLine" @input="isTyping = true" class="mr-4"/>
+                      </vs-col>
+
+                      <vs-col vs-type="flex" vs-justify="flex-end" vs-align="center" vs-w="6">
+                        <vs-switch id="autoJiraNewLine" v-model="settings.planCreator.jiraNewLine" @input="isTyping = true">
+                            <span slot="on">On</span>
+                            <span slot="off">Off</span>
+                        </vs-switch>
+                      </vs-col>
+                    </vs-row>
                   </vs-list-item>
+                  <!-- Jira Table Auto New Line -->
 
                 </vs-list>
               </div>
@@ -89,11 +147,13 @@
             <!-- Toggles -->
 
           </div>
-          <div class="col-sm-6">
-          </div>
         </div>
-        <!-- Editor Settings -->
+        <!-- Test Plan Creator Settings -->
+
       </vs-tab>
+      <!-- Test Plan Creator Tab -->
+
+      <!-- Misc Tab -->
       <vs-tab vs-label="Misc">
         <!-- Info -->
         <div class="row justify-content-center">
@@ -115,11 +175,13 @@
         </div>
         <!-- Info -->
       </vs-tab>
+      <!-- Misc Tab -->
+
       </vs-tabs>
 
-    </div>
-  </div>
-</div>
+    </div> <!-- Master Col -->
+  </div> <!-- Master Row -->
+</div> <!-- Master Container -->
 </template>
 
 <script>
@@ -142,7 +204,10 @@
           'Bottom middle': 'bottom-center',
           'Bottom right': 'bottom-right'
         },
-        oldNotifPos: ''
+        oldNotifPos: '',
+        validationErrors: {
+          themePrimary: false
+        }
       }
     },
 
@@ -159,7 +224,10 @@
           return this.$store.state.settings
         },
         set (value) {
-          this.$store.commit('setSettings', value)
+          if (this.validationErrorsCount === 0) {
+            this.$store.commit('setSettings', value)
+            this.$root.refreshTheme()
+          }
         }
       },
       isTyping: {
@@ -169,6 +237,15 @@
         set (value) {
           this.$store.commit('setChangeConfig', value)
         }
+      },
+      validationErrorsCount () {
+        let count = 0
+        Object.values(this.validationErrors).forEach(value => {
+          if (value) {
+            count++
+          }
+        })
+        return count
       }
     },
 
@@ -220,15 +297,31 @@
         }, 2000),
         deep: true
       },
+      'settings.theme.primary' (val) {
+        if (/^#(([0-9a-fA-F]{2}){3}|([0-9a-fA-F]){3})$/.test(val)) {
+          this.validationErrors.themePrimary = false
+        } else {
+          this.validationErrors.themePrimary = true
+        }
+      },
       isTyping (val) {
         if (!val) {
-          this.$vs.notify({
-            title: 'Settings Saved',
-            color: 'success',
-            // icon: 'save',
-            position: this.$store.state.settings.notifPos,
-            time: 3000
-          })
+          if (this.validationErrorsCount === 0) {
+            this.$vs.notify({
+              title: 'Settings Saved',
+              color: 'success',
+              position: this.$store.state.settings.notifPos,
+              time: 3000
+            })
+          } else {
+            this.$vs.notify({
+              title: 'Error',
+              text: 'There are still validation errors, please resolves these to allow settings to save',
+              color: 'danger',
+              position: this.$store.state.settings.notifPos,
+              time: 5000
+            })
+          }
         }
       }
     }
@@ -236,5 +329,7 @@
 </script>
 
 <style>
-
+.disabled {
+  color: #d8d8d8;
+}
 </style>

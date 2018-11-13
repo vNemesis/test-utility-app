@@ -55,9 +55,14 @@ const appStore = new EStore({
       planCreator: {
         defaultAssignee: '',
         defaultPlanExportDir: '',
-        jiraNewLine: false
+        jiraNewLine: false,
+        jiraNewLineAmount: ''
       },
-      notifPos: 'bottom-right'
+      notifPos: 'bottom-right',
+      theme: {
+        primary: '#1f74ff',
+        darkMode: false
+      }
     },
     quickLinks: [
       { text: 'Example Website Bookmark', url: 'www.google.co.uk' },
@@ -71,7 +76,14 @@ const testPlanStore = new EStore({
 })
 
 // Vue Plugins
-Vue.use(Vuesax)
+Vue.use(Vuesax, {
+  theme: {
+    colors: {
+      primary: appStore.store.settings.theme.primary
+    }
+  }
+})
+
 Vue.use(Vuex)
 Vue.use(VueHighlightJS)
 Vue.use(VuePaginate)
@@ -91,9 +103,14 @@ const store = new Vuex.Store({
       planCreator: {
         defaultAssignee: '',
         defaultPlanExportDir: '',
-        jiraNewLine: false
+        jiraNewLine: false,
+        jiraNewLineAmount: ''
       },
-      notifPos: 'bottom-right'
+      notifPos: 'bottom-right',
+      theme: {
+        primary: '#1f74ff',
+        darkMode: false
+      }
     },
     changingConfig: false,
     changingQuickLinks: false,
@@ -176,7 +193,6 @@ new Vue({
         defaultPath: filename
       }, (fileName) => {
         if (fileName === undefined) {
-          console.log("You didn't save the file")
           return
         }
 
@@ -194,7 +210,7 @@ new Vue({
           } else {
             this.$vs.notify({
               title: 'File Exported!',
-              text: `File "${filename}" was exported successfully`,
+              text: `File '${filename}' was exported successfully`,
               color: 'success',
               icon: 'save',
               position: appStore.settings.notifPos,
@@ -218,9 +234,14 @@ new Vue({
           planCreator: {
             defaultAssignee: '',
             defaultPlanExportDir: '',
-            jiraNewLine: false
+            jiraNewLine: false,
+            jiraNewLineAmount: ''
           },
-          notifPos: 'bottom-right'
+          notifPos: 'bottom-right',
+          theme: {
+            primary: '#1f74ff',
+            darkMode: false
+          }
         },
         quickLinks: [
           { text: 'Example Website Bookmark', url: 'www.google.co.uk' },
@@ -229,6 +250,11 @@ new Vue({
       }
       app.relaunch()
       app.exit(0)
+    },
+    refreshTheme () {
+      this.$vs.theme({
+        primary: appStore.store.settings.theme.primary
+      })
     }
   }
 }).$mount('#app')

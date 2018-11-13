@@ -13,7 +13,7 @@
   <!-- Header Row -->
 
   <!-- Content -->
-  <div class="row">
+  <div class="row text-dark">
 
     <!-- Newsfeed -->
     <div class="col-sm-7">

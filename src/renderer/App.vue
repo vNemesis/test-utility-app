@@ -106,6 +106,10 @@
 </script>
 
 <style>
+.text-dark {
+  color: #212529 !important;
+}
+
 .footer-sidebar {
   display: flex;
   align-items: center;
