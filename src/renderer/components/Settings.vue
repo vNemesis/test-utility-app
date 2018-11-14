@@ -236,6 +236,9 @@
         },
         set (value) {
           this.$store.commit('setChangeConfig', value)
+          if (this.validationErrorsCount === 0) {
+            this.$root.refreshTheme()
+          }
         }
       },
       validationErrorsCount () {

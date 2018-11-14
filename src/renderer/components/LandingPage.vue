@@ -46,12 +46,21 @@
       </vs-switch>
 
       <!-- View -->
-      <div class="btn-group-vertical w-100">
-        <a class="text-white btn btn-block btn-primary" @click="this.$electron.shell.openExternal('https://rimilia.atlassian.net/projects/AZCI/issues?filter=myopenissues')"><font-awesome-icon icon="bug" size="lg"/> Jira</a>
-        <a class="text-white btn btn-block btn-primary mt-2" @click="this.$electron.shell.openExternal('https://rimilia.atlassian.net/wiki/spaces/AZURE/pages/454426652')"><font-awesome-icon icon="book" size="lg"/> CI Subspace</a>
-      </div>
+      <vs-button color="primary" type="filled" class="w-100" @click="this.$electron.shell.openExternal('https://rimilia.atlassian.net/projects/AZCI/issues?filter=myopenissues')">
+        <font-awesome-icon icon="book" size="lg"/>
+        CI Subspace
+       </vs-button>
+
+      <vs-button color="primary" type="filled" class="w-100 mt-2" @click="this.$electron.shell.openExternal('https://rimilia.atlassian.net/wiki/spaces/AZURE/pages/454426652')">
+        <font-awesome-icon icon="bug" size="lg"/>
+        Jira
+       </vs-button>
+
       <paginate name="quickLinks" :list="quickLinks" tag="div" :per="6">
-        <a class="text-white btn btn-block btn-info mt-2" v-if="editQuickLinks == false" v-for="(link, index) in paginated('quickLinks')" v-bind:key="index" @click="$electron.shell.openExternal(link.url)">{{link.text}}</a>
+
+        <vs-button color="#17a2b8" type="filled" class="w-100 mt-2" v-if="editQuickLinks == false" v-for="(link, index) in paginated('quickLinks')"
+        v-bind:key="index" @click="$electron.shell.openExternal(link.url)">{{link.text}}</vs-button>
+        
       </paginate>
       <paginate-links v-if="quickLinks.length > 6 && editQuickLinks == false" for="quickLinks" :show-step-links="true" :simple="{prev: '<< Back', next: 'Next >>'}" class="mt-2"></paginate-links>
       <!-- View -->

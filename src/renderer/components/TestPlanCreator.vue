@@ -123,6 +123,7 @@
             <vs-select label="Select a test plan to load" vs-autocomplete v-model="planID" :danger="LoadPlanWarning" danger-text="Please select a test plan" class="w-100">
               <vs-select-item :key="index" :value="index" :text="`${index} - ${item.planDesc}`" v-for="(item,index) in allTestPlans" />
             </vs-select>
+            <br>
             <vs-button @click="load(planID)" color="primary" type="border">Load Test Plan</vs-button>
             <vs-button @click="deletePlan(planID)" color="danger" type="border">Delete</vs-button>
           </div>
@@ -643,11 +644,24 @@ export default {
       jiraTable += '||JIRA Issue ID||Type||Test Name||Test Purpose||\r\n'
 
       this.testItems.forEach(element => {
+        // Going to add New lines
         if (this.$store.state.settings.planCreator.jiraNewLine) {
-          while (element.testPurpose.length > 0) {
-            formattedPurpose += element.testPurpose.substring(0, this.$store.state.settings.planCreator.jiraNewLineAmount) + '\n'
-            element.testPurpose = element.testPurpose.substring(50)
-          }
+          let words = element.testPurpose.split(' ')
+          let currentCharacterCount = 0
+          let newPurpose = ''
+          words.forEach(element => {
+            currentCharacterCount += element.length
+            if (currentCharacterCount > this.$store.state.settings.planCreator.jiraNewLineAmount) {
+              newPurpose += element + '\n'
+              currentCharacterCount = 0
+            } else {
+              newPurpose += element
+            }
+          })
+          formattedPurpose = newPurpose
+          // let regex = `.{1,${parseInt(this.$store.state.settings.planCreator.jiraNewLineAmount)}}`
+          // let re = new RegExp(regex, 'g')
+          // formattedPurpose = element.testPurpose.match(re).join('\n')
         } else {
           formattedPurpose = element.testPurpose
         }

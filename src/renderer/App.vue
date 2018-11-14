@@ -5,7 +5,11 @@
       <vs-sidebar ref="sidemenu" parent="#parentx" default-index="1"  color="primary" class="sidebarx" spacer v-model="active">
 
         <div class="header-sidebar" slot="header">
-          {{name}}
+          <h4>{{name}}</h4>
+
+          <div class="mt-2">
+            Welcome, {{ this.$store.state.username.replace('.', ' ') }}
+          </div>
         </div>
         
         <vs-sidebar-item index="1" icon="home" @click="navigate('/')">
