@@ -22,7 +22,9 @@
             <!-- Generation -->
             <vs-tab @click="tabColour = 'rgb(100, 175, 134)'" vs-label="Generate">
               <p>Format plan for different applications</p>
-              <vs-button type="line" :color="tabColour" @click="generateJiraTable()">Generate Jira Table</vs-button>
+              <vs-button type="line" :color="tabColour" @click="copyToClipboard(generateJiraTable(), 'Jira Table has been copied to your clipboard')">Generate Jira Table</vs-button>
+              <vs-button type="line" color="rgb(116, 204, 201)" @click="previewJiraTable()">Preview Jira Table</vs-button>
+              |
               <vs-button type="line" :color="tabColour" @click="generateSpecflow('api')">Generate API Specflow Scenarios</vs-button>
               <vs-button type="line" :color="tabColour" @click="generateSpecflow('ui')">Generate UI Specflow Scenarios</vs-button>
             </vs-tab>
@@ -214,6 +216,35 @@
         <highlight-code class="text-left" :lang="previewPopup.syntax" :code="previewPopup.code"></highlight-code>
       </vs-popup>
       <!-- Preview -->
+
+      <!-- Jira Preview -->
+      <vs-popup fullscreen title="Jira Table Preview" :active.sync="JiraPreviewPopup.active">
+            <div class="table-responsive">
+               <table class="table">
+                <thead>
+                  <tr>
+                    <td>
+                      Jira Issue ID
+                    </td>
+                    <td>
+                      Type
+                    </td>
+                    <td>
+                      Test Name  
+                    </td>
+                    <td>
+                      Test Purpose
+                    </td>
+                  </tr>
+                </thead>
+                <tbody v-html="JiraPreviewPopup.text">
+
+                </tbody>
+              </table>
+            </div>
+           
+      </vs-popup>
+      <!-- Jira Preview -->
   </div>
 
 </div>
@@ -287,6 +318,9 @@ export default {
         active: false,
         syntax: '',
         code: ''
+      },
+      JiraPreviewPopup: {
+        active: false
       },
       // HotTable
       hotTableSettings: {
@@ -419,8 +453,9 @@ export default {
       csvContent += ['Test Name (Summary)', 'Test Purpose (Description)', 'Jira Task (Parent Id)', 'Issue Type', 'Assignee', 'Priority', 'Application'].join(',') + '\r\n'
 
       this.testItems.forEach(element => {
+        let title = `"${element.testName}"`
         let description = `"Test Description: ${element.testPurpose} \r\n\r\nTest Type: ${element.testType} \r\n\r\n{code}\r\n${element.gherkin}\r\n{code}"`
-        let row = [element.testName, description, this.jiraTask, 'sub-task', this.assignee, element.priority, this.app].join(',')
+        let row = [title, description, this.jiraTask, 'sub-task', this.assignee, element.priority, this.app].join(',')
         csvContent += row + '\r\n'
       })
 
@@ -648,35 +683,23 @@ export default {
         if (this.$store.state.settings.planCreator.jiraNewLine) {
           let words = element.testPurpose.split(' ')
           let currentCharacterCount = 0
-          let newPurpose = ''
           words.forEach(element => {
             currentCharacterCount += element.length
             if (currentCharacterCount > this.$store.state.settings.planCreator.jiraNewLineAmount) {
-              newPurpose += element + '\n'
+              formattedPurpose += element + '\\\\'
               currentCharacterCount = 0
             } else {
-              newPurpose += element
+              formattedPurpose += element
             }
           })
-          formattedPurpose = newPurpose
-          // let regex = `.{1,${parseInt(this.$store.state.settings.planCreator.jiraNewLineAmount)}}`
-          // let re = new RegExp(regex, 'g')
-          // formattedPurpose = element.testPurpose.match(re).join('\n')
         } else {
           formattedPurpose = element.testPurpose
         }
 
         jiraTable += `|[${element.jiraTaskId}]|${element.testType}|${element.testName}|${formattedPurpose}|\r\n`
       })
-      clipboard.writeText(jiraTable)
-      this.$vs.notify({
-        title: 'Copied to clipboard',
-        text: 'Jira Table has been copied to your clipboard',
-        color: 'success',
-        // icon: 'publish',
-        position: this.$store.state.settings.notifPos,
-        time: 4000
-      })
+
+      return jiraTable
     },
     generateSpecflow (type) {
       let Specflow = ''
@@ -697,6 +720,7 @@ export default {
       })
     },
     // -------------------------------------------- Bulk Operations --------------------------------------------
+
     bulkChangeJiraIds () {
       let jiraIssuePattern = new RegExp('^((?!([A-Z0-9a-z]{1,10})-?$)[A-Z]{1}[A-Z0-9]+-\\d+)$')
 
@@ -786,6 +810,57 @@ export default {
 
     // -------------------------------------------------- Misc --------------------------------------------------
 
+    copyToClipboard (content, message) {
+      clipboard.writeText(content)
+      this.$vs.notify({
+        title: 'Copied to clipboard',
+        text: message,
+        color: 'success',
+        // icon: 'publish',
+        position: this.$store.state.settings.notifPos,
+        time: 4000
+      })
+    },
+    previewJiraTable () {
+      let jiraTable = []
+
+      this.testItems.forEach(element => {
+        let formattedPurpose = ''
+        // Going to add New lines
+        if (this.$store.state.settings.planCreator.jiraNewLine) {
+          // Split up each word
+          let words = element.testPurpose.split(' ')
+          // keep track of the number of charcters on each line
+          let currentCharacterCount = 0
+
+          // foreach word...
+          words.forEach(element => {
+            // ... add the number of chars ...
+            currentCharacterCount += element.length
+            // ... if the number of chars is larger than the limit set in the settings
+            if (currentCharacterCount > this.$store.state.settings.planCreator.jiraNewLineAmount) {
+              // ... then add a new line ...
+              formattedPurpose += element + '<br/>'
+              currentCharacterCount = 0
+            } else {
+              // ... else just add the word
+              formattedPurpose += ` ${element}`
+            }
+          })
+        } else {
+          // if not adding new lines then just proceed as normal
+
+          formattedPurpose = element.testPurpose.replace('\n', '</br>')
+        }
+        formattedPurpose = formattedPurpose.replace(/\*(.*?)\*/gi, '<strong>$1</strong>')
+        formattedPurpose = formattedPurpose.replace(/_(.*?)_/gi, '<i>$1</i>')
+        formattedPurpose = formattedPurpose.replace(/-(.*?)-/gi, ' <span style="text-decoration: line-through;">$1</span>')
+        formattedPurpose = formattedPurpose.replace(/\+(.*?)\+/gi, ' <span style="text-decoration: underline;">$1</span>')
+        jiraTable.push(`<tr><td>[${element.jiraTaskId}]</td><td>${element.testType}</td><td>${element.testName}</td><td>${formattedPurpose}</td></tr>`)
+      })
+      this.JiraPreviewPopup.text = jiraTable.join('\n')
+      this.JiraPreviewPopup.active = true
+    },
     showPreview (object) {
       this.previewPopup.active = true
       this.previewPopup.syntax = object.syntax

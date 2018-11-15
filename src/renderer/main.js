@@ -30,6 +30,9 @@ window.$ = require('jquery')
 window.popper = require('popper.js')
 window.Bootstrap = require('bootstrap')
 const username = require('username')
+// const path = require('path')
+
+// shell.openItem(path.join(__dirname, 'test.docx'))
 
 // Init
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
