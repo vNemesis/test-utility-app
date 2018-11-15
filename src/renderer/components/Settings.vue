@@ -41,8 +41,8 @@
 
                 <p>Application Main Theme</p>
                 <vs-row>
-                  <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="1" >
-                    <input id="primaryThemeColourPicker" type="color" v-model="settings.theme.primary" @input="isTyping = true"/>
+                  <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1" >
+                    <input id="primaryThemeColourPicker" class="h-50" style="margin-top: 30px;" type="color" v-model="settings.theme.primary" @input="isTyping = true"/>
                   </vs-col>
 
                   <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="3">
