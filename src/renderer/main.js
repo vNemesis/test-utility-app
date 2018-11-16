@@ -26,6 +26,7 @@ library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faLis
 const {dialog, shell, app} = require('electron').remote
 var log = require('electron-log/main')
 var fs = require('fs')
+var _ = require('lodash')
 window.$ = require('jquery')
 window.popper = require('popper.js')
 window.Bootstrap = require('bootstrap')
@@ -48,29 +49,51 @@ fs.writeFile(`${app.getPath('userData')}/log.log`, '', { flag: 'wx' }, function 
 
 // Config Storage
 const EStore = require('electron-store')
-const appStore = new EStore({
-  defaults: {
-    settings: {
-      editor: {
-        autoLine: false,
-        showEditor: false
-      },
-      planCreator: {
-        defaultAssignee: '',
-        defaultPlanExportDir: '',
-        jiraNewLine: false,
-        jiraNewLineAmount: ''
-      },
-      notifPos: 'bottom-right',
-      theme: {
-        primary: '#1f74ff',
-        darkMode: false
-      }
+
+const defaultSettings = {
+  settings: {
+    editor: {
+      autoLine: false,
+      showEditor: false
     },
-    quickLinks: [
-      { text: 'Example Website Bookmark', url: 'www.google.co.uk' },
-      { text: 'Example Local Bookmark', url: 'c://' }
-    ]
+    planCreator: {
+      defaultAssignee: '',
+      defaultPlanExportDir: '',
+      jiraNewLine: false,
+      jiraNewLineAmount: ''
+    },
+    notifPos: 'bottom-right',
+    theme: {
+      primary: '#1f74ff',
+      darkMode: false
+    }
+  },
+  quickLinks: [
+    { text: 'Example Website Bookmark', url: 'www.google.co.uk' },
+    { text: 'Example Local Bookmark', url: 'c://' }
+  ]
+}
+
+const appStore = new EStore({
+  defaults: defaultSettings
+})
+
+// config checks, will create config settings if they are missing
+const keyify = (obj, prefix = '') =>
+  Object.keys(obj).reduce((res, el) => {
+    if (Array.isArray(obj[el])) {
+      return res
+    } else if (typeof obj[el] === 'object' && obj[el] !== null) {
+      return [...res, ...keyify(obj[el], prefix + el + '.')]
+    } else {
+      return [...res, prefix + el]
+    }
+  }, [])
+
+keyify(defaultSettings).forEach(element => {
+  console.log(element)
+  if (appStore.has(element) === false) {
+    appStore.set(element, _.get(defaultSettings, element))
   }
 })
 
@@ -82,7 +105,7 @@ const testPlanStore = new EStore({
 Vue.use(Vuesax, {
   theme: {
     colors: {
-      primary: appStore.store.settings.theme.primary
+      primary: appStore.get('settings.theme.primary')
     }
   }
 })
@@ -155,8 +178,8 @@ console.warn = function () {
 }
 
 // Load Settings
-store.state.settings = appStore.store.settings
-store.state.quickLinks = appStore.store.quickLinks
+store.state.settings = appStore.get('settings')
+store.state.quickLinks = appStore.get('quickLinks')
 
 if ((fs.statSync(`${app.getPath('userData')}/log.log`).size / 1000000.0) > 4) {
   fs.truncate(`${app.getPath('userData')}/log.log`, 0)
