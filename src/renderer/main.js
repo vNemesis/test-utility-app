@@ -91,7 +91,6 @@ const keyify = (obj, prefix = '') =>
   }, [])
 
 keyify(defaultSettings).forEach(element => {
-  console.log(element)
   if (appStore.has(element) === false) {
     appStore.set(element, _.get(defaultSettings, element))
   }

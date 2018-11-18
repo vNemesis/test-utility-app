@@ -133,18 +133,12 @@
           urlInvalid: false
         },
         localQuickLinks: [],
-        paginate: ['quickLinks']
+        paginate: ['quickLinks'],
+        outdated: false
       }
     },
 
     computed: {
-      outdated () {
-        let appVersion = window.require('electron').remote.app.getVersion().replace(/\./g, '')
-        // let releaseVersion = this.releases[0].version.substring(1).replace(/\./g, '')
-        let releaseVersion = 1
-
-        return releaseVersion > appVersion
-      },
       quickLinks: {
         get () {
           return this.$store.state.quickLinks
@@ -246,10 +240,16 @@
               this.releases.push(release)
             }
             this.$vs.loading.close('#div-with-loading > .con-vs-loading')
+            this.checkOutdated()
           })
           .catch(Response => {
             log.info(Response.data)
           })
+      },
+      checkOutdated () {
+        let appVersion = window.require('electron').remote.app.getVersion().replace(/\./g, '')
+        let releaseVersion = this.releases[0].version.substring(1).replace(/\./g, '')
+        this.outdated = releaseVersion > appVersion
       }
     },
 
