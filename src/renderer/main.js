@@ -60,7 +60,7 @@ const defaultSettings = {
       defaultAssignee: '',
       defaultPlanExportDir: '',
       jiraNewLine: false,
-      jiraNewLineAmount: ''
+      jiraNewLineAmount: 50
     },
     notifPos: 'bottom-right',
     theme: {
@@ -129,7 +129,7 @@ const store = new Vuex.Store({
         defaultAssignee: '',
         defaultPlanExportDir: '',
         jiraNewLine: false,
-        jiraNewLineAmount: ''
+        jiraNewLineAmount: 50
       },
       notifPos: 'bottom-right',
       theme: {
