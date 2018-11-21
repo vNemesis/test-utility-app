@@ -69,8 +69,8 @@ const defaultSettings = {
     }
   },
   quickLinks: [
-    { text: 'Example Website Bookmark', url: 'www.google.co.uk' },
-    { text: 'Example Local Bookmark', url: 'c://' }
+    { id: 1, text: 'Example Website Bookmark', url: 'www.google.co.uk' },
+    { id: 2, text: 'Example Local Bookmark', url: 'c://' }
   ]
 }
 

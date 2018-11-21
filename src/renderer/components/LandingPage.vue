@@ -88,15 +88,18 @@
 
       <!-- Add new -->
       <div v-if="editQuickLinks == true" class="row">
-          <div class="col-sm-5">
-            <vs-input class="w-100" label-placeholder="Text" :vs-danger="newLink.textInvalid" vs-danger-text="Cannot be Empty" v-model="newLink.text"/>
-          </div>
-          <div class="col-sm-5">
-            <vs-input class="w-100" label-placeholder="Url" :vs-danger="newLink.urlInvalid" vs-danger-text="Cannot be Empty" v-model="newLink.url"/>
-          </div>
-          <div class="col-sm-2 mt-3">
-            <a @click="addLink()" class="text-white btn btn-block btn-success"><font-awesome-icon icon="plus" size="lg" /></a>
-          </div>
+        <div class="col-sm-2 mt-4">
+          <p>{{ quickLinks.length }}/24</p>
+        </div>
+        <div class="col-sm-4">
+          <vs-input class="w-100" label-placeholder="Text" :vs-danger="newLink.textInvalid" vs-danger-text="Cannot be Empty" v-model="newLink.text"/>
+        </div>
+        <div class="col-sm-4">
+          <vs-input class="w-100" label-placeholder="Url" :vs-danger="newLink.urlInvalid" vs-danger-text="Cannot be Empty" v-model="newLink.url"/>
+        </div>
+        <div class="col-sm-2 mt-3">
+          <a @click="addLink();" class="text-white btn btn-block btn-success"><font-awesome-icon icon="plus" size="lg" /></a>
+        </div>
       </div>
       <!-- Add new -->
 
@@ -186,6 +189,19 @@
       },
       addLink () {
         let valid = true
+
+        if (this.quickLinks.length >= 24) {
+          this.$vs.notify({
+            title: 'Limit Reached',
+            text: 'You cannot add anymore quick links, please change/remove some to add a new one',
+            color: 'danger',
+            position: this.$store.state.settings.notifPos,
+            time: 5000
+          })
+          return
+        }
+
+        this.isTyping = true
 
         if (this.newLink.text === '') {
           this.newLink.textInvalid = true
