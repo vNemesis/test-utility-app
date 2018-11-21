@@ -168,6 +168,14 @@
 
         <div class="row">
           <div class="col-sm-12">
+            <h1 class="mt-3">Log</h1>
+            <vs-button type="line" @click="openLog()">Open Log File</vs-button>
+            <!-- <vs-button type="line" color="danger" @click="resetSettings()">Reset Settings</vs-button> -->
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
             <h1 class="mt-3">Advanced</h1>
             <vs-button type="line" @click="openConfig()">Open Config File</vs-button>
             <vs-button type="line" color="danger" @click="resetSettings()">Reset Settings</vs-button>
@@ -179,6 +187,42 @@
 
       </vs-tabs>
 
+      <!-- Popups -->
+      <vs-popup fullscreen title="fullscreen" :active.sync="logPopup.active">
+        <div class="row">
+          <div class="col-sm-12">
+            <vs-button type="filled" color="danger" @click="clearLog()">Clear Log</vs-button>
+          </div>
+        </div>
+
+        <div class="row mt-2">
+          <div class="col-sm-12">
+
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead>
+                  <tr class="text-center">
+                    <th width="20%">Date Time</th>
+                    <th width="5%">Type</th>
+                    <th width="75%">Message</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="message in logPopup.logContents" v-bind:key="message.id">
+                    <td class="text-center" v-html="message.datetime"></td>
+                    <td class="text-center" v-html="message.type"></td>
+                    <td v-html="message.desc"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+          </div>
+        </div>
+
+      </vs-popup>
+      <!-- Popups -->
+
     </div> <!-- Master Col -->
   </div> <!-- Master Row -->
 </div> <!-- Master Container -->
@@ -187,7 +231,9 @@
 <script>
   import _ from 'lodash'
   import axios from 'axios'
+  const { app } = require('electron').remote
   var log = require('electron-log')
+  var fs = require('fs')
   export default {
     name: 'settings',
 
@@ -207,6 +253,11 @@
         oldNotifPos: '',
         validationErrors: {
           themePrimary: false
+        },
+        logPopup: {
+          active: false,
+          logContents: '',
+          loading: false
         }
       }
     },
@@ -255,6 +306,59 @@
     methods: {
       openUrl (link) {
         this.$electron.shell.openExternal(link)
+      },
+      openLog () {
+        this.logPopup.loading = true
+
+        let logLines = fs.readFileSync(`${app.getPath('userData')}/log.log`, 'utf8').split('}')
+
+        if (logLines.length === 0 || logLines[0] === '') {
+          this.$vs.notify({
+            title: 'Log empty',
+            text: 'Log file contains no errors :D',
+            color: 'danger',
+            position: this.$store.state.settings.notifPos,
+            time: 5000
+          })
+          return
+        }
+
+        let testobj = []
+
+        logLines.forEach(element => {
+          element = `${element}}<br /><br />`
+
+          let datetime = element.match(/(\[[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\])/g)
+          let type = element.match(/(\[error\])|(\[warn\])/g)
+          let desc = element.match(/\{((.|\n)*?)\}/)
+
+          if (datetime === null || type === null || desc === null) {
+            return
+          }
+
+          testobj.push({
+            id: testobj.length + 1,
+            datetime: datetime[0].replace(/^\[(.+)\]$/, '$1').replace(/([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+)/g, '<span style="color: #ce024d;">$1</span>'),
+            type: type[0].replace(/^\[(.+)\]$/, '$1').replace(/(error)/g, '<span style="color: red;">$1</span>').replace(/(warn)/g, '<span style="color: #ffc535;">$1</span>'),
+            desc: desc[0].replace(/(\\n)+/g, '<br/>')
+          })
+        })
+
+        this.logPopup.logContents = testobj
+        this.logPopup.loading = false
+        this.logPopup.active = true
+      },
+      clearLog () {
+        fs.truncate(`${app.getPath('userData')}/log.log`, 0, function () {
+          this.$vs.notify({
+            title: 'Success',
+            text: 'Log cleared',
+            color: 'success',
+            position: this.$store.state.settings.notifPos,
+            time: 5000
+          })
+        })
+        this.logPopup.active = false
       },
       getLatestRelease () {
         this.$vs.loading({
