@@ -84,9 +84,7 @@
             </vs-tooltip>
           </div>
           <div class="col-sm-1 mt-3">
-            <vs-tooltip text="Delete Link">
-              <vs-button color="danger" type="filled" @click="removeLink(index); isTyping = true"><font-awesome-icon icon="trash" size="lg" /></vs-button>
-            </vs-tooltip>
+            <vs-button color="danger" type="filled" @click="removeLink(index); isTyping = true"><font-awesome-icon icon="trash" size="lg" /></vs-button>
           </div>
         </div>
       </div>
