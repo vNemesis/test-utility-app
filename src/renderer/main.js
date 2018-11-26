@@ -18,9 +18,9 @@ import 'highlight.js/styles/default.css'
 
 // Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone, faAlignLeft } from '@fortawesome/free-solid-svg-icons'
+import { faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone, faAlignLeft, faFileExport, faFileImport } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone, faAlignLeft)
+library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone, faAlignLeft, faFileExport, faFileImport)
 
 // Load Plugins
 const {dialog, shell, app} = require('electron').remote

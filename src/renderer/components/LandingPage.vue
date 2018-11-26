@@ -59,7 +59,7 @@
       <paginate name="quickLinks" :list="quickLinks" tag="div" :per="6">
 
         <vs-button color="#17a2b8" type="filled" class="w-100 mt-2" v-if="editQuickLinks == false" v-for="(link, index) in paginated('quickLinks')"
-        v-bind:key="index" @click="$electron.shell.openExternal(link.url)">{{link.text}}</vs-button>
+        v-bind:key="index" @click="runLinks(link.url)">{{link.text}}</vs-button>
         
       </paginate>
       <paginate-links v-if="quickLinks.length > 6 && editQuickLinks == false" for="quickLinks" :show-step-links="true" :simple="{prev: '<< Back', next: 'Next >>'}" class="mt-2"></paginate-links>
@@ -78,8 +78,15 @@
           <div class="col-sm-4">
             <vs-input class="w-100" label-placeholder="Url" @input="isTyping = true" v-model="link.url"/>
           </div>
-          <div class="col-sm-2 mt-3">
-            <a @click="removeLink(index); isTyping = true" class="text-white btn btn-block btn-danger"><font-awesome-icon icon="trash" size="lg" /></a>
+          <div class="col-sm-1 mt-3">
+            <vs-tooltip text="Export Link">
+              <vs-button color="primary" type="filled" @click="exportLink(index);"><font-awesome-icon icon="file-export" size="lg" /></vs-button>
+            </vs-tooltip>
+          </div>
+          <div class="col-sm-1 mt-3">
+            <vs-tooltip text="Delete Link">
+              <vs-button color="danger" type="filled" @click="removeLink(index); isTyping = true"><font-awesome-icon icon="trash" size="lg" /></vs-button>
+            </vs-tooltip>
           </div>
         </div>
       </div>
@@ -97,8 +104,15 @@
         <div class="col-sm-4">
           <vs-input class="w-100" label-placeholder="Url" :vs-danger="newLink.urlInvalid" vs-danger-text="Cannot be Empty" v-model="newLink.url"/>
         </div>
-        <div class="col-sm-2 mt-3">
-          <a @click="addLink();" class="text-white btn btn-block btn-success"><font-awesome-icon icon="plus" size="lg" /></a>
+        <div class="col-sm-1 mt-3">
+          <vs-tooltip text="Import Link">
+            <vs-button color="primary" type="filled" @click="importLink(); isTyping = true"><font-awesome-icon icon="file-import" size="lg" /></vs-button>
+          </vs-tooltip>
+        </div>
+        <div class="col-sm-1 mt-3">
+          <vs-tooltip text="Add Link">
+            <vs-button color="success" type="filled" @click="addLink();"><font-awesome-icon icon="plus" size="lg" /></vs-button>
+          </vs-tooltip>
         </div>
       </div>
       <!-- Add new -->
@@ -121,6 +135,9 @@
   var showdown = require('showdown')
   var converter = new showdown.Converter()
   converter.getOptions().headerLevelStart = 4
+  const {dialog, shell} = require('electron').remote
+  var fs = require('fs')
+
   export default {
     name: 'landing-page',
 
@@ -233,6 +250,62 @@
       removeLink (index) {
         this.localQuickLinks.splice(index, 1)
         this.quickLinks = this.localQuickLinks
+      },
+      exportLink (index) {
+        let item = this.localQuickLinks[index]
+        let jsonContent = JSON.stringify(item)
+        this.$root.exportFile(`${item.text}.json`, jsonContent, 'JSON File', 'json')
+      },
+      importLink () {
+        dialog.showOpenDialog({
+          filters: [
+            { name: 'JSON File', extensions: ['json'] }
+          ]
+        },
+        (fileName) => {
+          // fileNames is an array that contains all the selected
+          if (fileName === undefined) {
+            return
+          }
+
+          fs.readFile(fileName[0], 'utf-8', (err, data) => {
+            if (err) {
+              this.$vs.notify({
+                title: 'Error!',
+                text: `An error ocurred creating the file: ${err.message}`,
+                color: 'danger',
+                // icon: 'error_outline',
+                position: this.$store.state.settings.notifPos,
+                time: 4000
+              })
+            } else {
+              this.$vs.notify({
+                title: 'File Imported!',
+                text: `File "${fileName[0]}" was imported successfully`,
+                color: 'success',
+                // icon: 'publish',
+                position: this.$store.state.settings.notifPos,
+                time: 4000
+              })
+
+              let item = JSON.parse(data)
+
+              this.localQuickLinks.push({
+                id: this.localQuickLinks.length + 1,
+                text: item.text,
+                url: item.url
+              })
+
+              this.quickLinks = this.localQuickLinks
+            }
+          })
+        })
+      },
+      runLinks (link) {
+        let links = link.split(';')
+        links.forEach(element => {
+          shell.openExternal(element.trim())
+        })
       },
       getLatestReleaseBody () {
         this.$vs.loading({
