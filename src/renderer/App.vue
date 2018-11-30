@@ -41,11 +41,17 @@
       <vs-spacer></vs-spacer>
 
       <vs-navbar-item index="1">
-        <a @click="onOpenUrl('https://rimilia.atlassian.net/projects/AZCI/issues?filter=myopenissues')" class="nav-bar-link"><font-awesome-icon icon="bug" size="lg"/> Jira</a>
+        <a @click="onOpenUrl('https://rimilia.atlassian.net/projects/AZCI/issues?filter=myopenissues')" class="nav-bar-link"><font-awesome-icon icon="book" size="lg"/> Jira</a>
       </vs-navbar-item>
 
       <vs-navbar-item index="2">
         <a @click="onOpenUrl('https://rimilia.atlassian.net/wiki/spaces/AZURE/pages/454426652')" class="nav-bar-link"><font-awesome-icon icon="book" size="lg"/> CI Subspace</a>
+      </vs-navbar-item>
+
+      |
+
+      <vs-navbar-item index="3">
+        <a @click="onOpenUrl('https://github.com/HarmanU/test-utility-app/issues')" class="nav-bar-link text-danger"><font-awesome-icon icon="bug" size="lg"/> Report Issue</a>
       </vs-navbar-item>
     </vs-navbar>
 
@@ -71,7 +77,7 @@
   export default {
     name: 'test-plan-utility',
     data: () => ({
-      activeItem: 3,
+      activeItem: 4,
       name: 'Test Plan Utility',
       active: false
     }),
@@ -103,7 +109,7 @@
     },
     watch: {
       activeItem () {
-        this.activeItem = 3
+        this.activeItem = 4
       }
     }
   }

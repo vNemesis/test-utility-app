@@ -46,16 +46,6 @@
       </vs-switch>
 
       <!-- View -->
-      <vs-button color="primary" type="filled" class="w-100" @click="this.$electron.shell.openExternal('https://rimilia.atlassian.net/projects/AZCI/issues?filter=myopenissues')">
-        <font-awesome-icon icon="book" size="lg"/>
-        CI Subspace
-       </vs-button>
-
-      <vs-button color="primary" type="filled" class="w-100 mt-2" @click="this.$electron.shell.openExternal('https://rimilia.atlassian.net/wiki/spaces/AZURE/pages/454426652')">
-        <font-awesome-icon icon="bug" size="lg"/>
-        Jira
-       </vs-button>
-
       <paginate name="quickLinks" :list="quickLinks" tag="div" :per="6">
 
         <vs-button color="#17a2b8" type="filled" class="w-100 mt-2" v-if="editQuickLinks == false" v-for="(link, index) in paginated('quickLinks')"
