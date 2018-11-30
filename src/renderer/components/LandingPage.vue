@@ -16,7 +16,7 @@
   <div class="row text-dark">
 
     <!-- Newsfeed -->
-    <div class="col-sm-7">
+    <div :class="editQuickLinks ? 'col-sm-6' : 'col-sm-9'">
       <h1 class="mt-3 title">Latest Releases</h1>
       <hr>
       <div id="div-with-loading" class="vs-con-loading__container text-left">
@@ -36,7 +36,7 @@
 
 
     <!-- Quick Links -->
-    <div class="col-sm-5 text-center">
+    <div :class="editQuickLinks ? 'col-sm-6' : 'col-sm-3'" class="text-center">
       <h1 class="mt-3">Quick Links</h1>
       <vs-progress indeterminate color="success" v-if="isTyping" class="mb-2"></vs-progress>
       <hr v-if="!isTyping">
@@ -48,7 +48,7 @@
       <!-- View -->
       <paginate name="quickLinks" :list="quickLinks" tag="div" :per="6">
 
-        <vs-button color="#17a2b8" type="filled" class="w-100 mt-2" v-if="editQuickLinks == false" v-for="(link, index) in paginated('quickLinks')"
+        <vs-button :color="link.colour" type="filled" class="w-100 mt-2" :class="textColour(link.colour)" v-if="editQuickLinks == false" v-for="(link, index) in paginated('quickLinks')"
         v-bind:key="index" @click="runLinks(link.url)">{{link.text}}</vs-button>
         
       </paginate>
@@ -57,52 +57,73 @@
 
       <!-- Edit -->
       <div v-if="editQuickLinks == true" v-for="(link, index) in quickLinks" v-bind:key="link.id">
-        <div class="row">
-          <div class="col-sm-2 mt-3">
+
+        <vs-row>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1" >
             <button @click="moveLink(index, index - 1); isTyping = true" :disabled="index == 0"><font-awesome-icon icon="arrow-up" size="sm"/></button>
             <button @click="moveLink(index, index + 1); isTyping = true" :disabled="index == (quickLinks.length - 1)"><font-awesome-icon icon="arrow-down" size="sm" /></button>
-          </div>
-          <div class="col-sm-4">
-            <vs-input class="w-100" label-placeholder="Text" @input="isTyping = true" v-model="link.text"/>
-          </div>
-          <div class="col-sm-4">
-            <vs-input class="w-100" label-placeholder="Url" @input="isTyping = true" v-model="link.url"/>
-          </div>
-          <div class="col-sm-1 mt-3">
+          </vs-col>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="4">
+            <vs-input style="width: 90%;" label-placeholder="Text" @input="isTyping = true" v-model="link.text"/>
+          </vs-col>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="4">
+            <vs-input style="width: 90%;" label-placeholder="Url" @input="isTyping = true" v-model="link.url"/>
+          </vs-col>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1" >
+            <input type="color" v-model="link.colour" @input="isTyping = true" class="mt-2"/>
+          </vs-col>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1" >
             <vs-tooltip text="Export Link">
               <vs-button color="primary" type="filled" @click="exportLink(index);"><font-awesome-icon icon="file-export" size="lg" /></vs-button>
             </vs-tooltip>
-          </div>
-          <div class="col-sm-1 mt-3">
+          </vs-col>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1" >
             <vs-button color="danger" type="filled" @click="removeLink(index); isTyping = true"><font-awesome-icon icon="trash" size="lg" /></vs-button>
-          </div>
-        </div>
+          </vs-col>
+
+        </vs-row>
       </div>
 
 
 
       <!-- Add new -->
-      <div v-if="editQuickLinks == true" class="row">
-        <div class="col-sm-2 mt-4">
+      <vs-row v-if="editQuickLinks == true">
+
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1" >
           <p>{{ quickLinks.length }}/24</p>
-        </div>
-        <div class="col-sm-4">
-          <vs-input class="w-100" label-placeholder="Text" :vs-danger="newLink.textInvalid" vs-danger-text="Cannot be Empty" v-model="newLink.text"/>
-        </div>
-        <div class="col-sm-4">
-          <vs-input class="w-100" label-placeholder="Url" :vs-danger="newLink.urlInvalid" vs-danger-text="Cannot be Empty" v-model="newLink.url"/>
-        </div>
-        <div class="col-sm-1 mt-3">
+        </vs-col>
+
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="4">
+          <vs-input style="width: 90%;" label-placeholder="Text" :vs-danger="newLink.textInvalid" vs-danger-text="Cannot be Empty" v-model="newLink.text"/>
+        </vs-col>
+
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="4">
+          <vs-input style="width: 90%;" label-placeholder="Url" :vs-danger="newLink.urlInvalid" vs-danger-text="Cannot be Empty" v-model="newLink.url"/>
+        </vs-col>
+
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1" >
+          <input type="color" v-model="newLink.colour" @input="isTyping = true" class="mt-2"/>
+        </vs-col>
+
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1" >
           <vs-tooltip text="Import Link">
             <vs-button color="primary" type="filled" @click="importLink(); isTyping = true"><font-awesome-icon icon="file-import" size="lg" /></vs-button>
           </vs-tooltip>
-        </div>
-        <div class="col-sm-1 mt-3">
+        </vs-col>
+
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1" >
           <vs-tooltip text="Add Link">
             <vs-button color="success" type="filled" @click="addLink();"><font-awesome-icon icon="plus" size="lg" /></vs-button>
           </vs-tooltip>
-        </div>
-      </div>
+        </vs-col>
+
+      </vs-row>
       <!-- Add new -->
 
       <!-- Edit -->
@@ -137,6 +158,7 @@
           id: 0,
           text: '',
           url: '',
+          colour: '#51d5ef',
           textInvalid: false,
           urlInvalid: false
         },
@@ -177,7 +199,7 @@
           this.$vs.notify({
             title: 'Changes Saved',
             color: 'success',
-            icon: 'save',
+            // icon: 'save',
             position: this.$store.state.settings.notifPos,
             time: 3000
           })
@@ -226,13 +248,37 @@
           this.localQuickLinks.push({
             id: this.localQuickLinks.length + 1,
             text: this.newLink.text,
-            url: this.newLink.url
+            url: this.newLink.url,
+            colour: this.newLink.colour
           })
 
           this.quickLinks = this.localQuickLinks
           this.newLink.text = ''
           this.newLink.url = ''
+          this.newLink.colour = '#51d5ef'
         }
+      },
+      textColour (hex) {
+        let rgb = this.hexToRgb(hex)
+
+        let brightness = ((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000
+
+        return brightness > 123 ? 'text-dark' : 'text-white'
+      },
+
+      hexToRgb (hex) {
+        // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+        var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i
+        hex = hex.replace(shorthandRegex, function (m, r, g, b) {
+          return r + r + g + g + b + b
+        })
+
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : null
       },
 
       removeLink (index) {
