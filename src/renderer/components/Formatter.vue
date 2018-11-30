@@ -8,7 +8,7 @@
 
       <vs-row class="my-3">
 
-        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="4">
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
 
           <vs-select autocomplete placeholder="Input Delimiter" label="Input Delimiter" class="w-75" v-model="inputDelimiter">
             <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in delimiter" />
@@ -16,7 +16,7 @@
 
         </vs-col>
 
-        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="4">
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
 
           <vs-select autocomplete placeholder="Conversion Type" label="Conversion Type" class="w-75" v-model="conversionType">
             <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in conversionTypes" />
@@ -24,7 +24,25 @@
 
         </vs-col>
 
-        <vs-col vs-type="flex" vs-justify="center" vs-align="flex-end" vs-w="4">
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+
+          <vs-select autocomplete placeholder="Wrapper" label="Wrapper" class="w-75" v-model="wrapper">
+            <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in wrappers" />
+          </vs-select>
+
+        </vs-col>
+
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+          <small class="mt-3 mr-2">Seperate elements with whitespaces? </small>
+          <vs-switch id="space" v-model="seperateWithSpace" class="mt-4">
+            <span slot="on">Yes</span>
+            <span slot="off">No</span>
+          </vs-switch>
+
+        </vs-col>
+
+
+        <vs-col vs-type="flex" vs-justify="center" vs-align="flex-end" vs-w="2">
 
           <vs-button type="border" color="success" class="w-75" :disabled="invalid" @click="format()">Format Input</vs-button>
 
@@ -32,7 +50,24 @@
 
       </vs-row>
 
-      <vs-textarea v-model="output" label="Output" rows="10" class="w-100 border-info" readonly/>
+      <vs-row>
+
+        <vs-col vs-type="flex" vs-w="11" class="mt-3">
+
+          <vs-textarea v-model="output" label="Output" rows="5" class="w-100 border-info" readonly/>
+
+        </vs-col>
+
+
+        <vs-col vs-type="flex" vs-w="1">
+
+          <vs-button color="dark" type="flat" class="my-3 w-100" @click="copy()"><font-awesome-icon icon="copy" size="2x" /></vs-button>
+
+        </vs-col>
+
+      </vs-row>
+
+      
 
     </div>
   </div>
@@ -49,7 +84,9 @@ export default {
       input: '',
       output: '',
       conversionType: '',
+      wrapper: '',
       inputDelimiter: '',
+      seperateWithSpace: false,
       delimiter: {
         Comma: ',',
         'Whitespace': ' ',
@@ -67,13 +104,21 @@ export default {
         'Tab Seperated Quoted': 'tabsepquote',
         'New Line Seperated': 'newlinesep',
         'New Line Seperated Quoted': 'newlinesepquote'
+      },
+      wrappers: {
+        'No Wrapping': 'none',
+        '( )': 'bracket',
+        '{ }': 'curly',
+        '[ ]': 'square',
+        '" "': 'doublequote',
+        '\'\'': 'singlequote'
       }
     }
   },
 
   computed: {
     invalid () {
-      return this.conversionType === '' || this.inputDelimiter === '' || this.outputDelimiter === ''
+      return this.conversionType === '' || this.inputDelimiter === '' || this.outputDelimiter === '' || this.wrapper === ''
     }
   },
 
@@ -114,16 +159,38 @@ export default {
     },
     Seperate (quotes, list, delimiter) {
       let values = this.input.split(this.inputDelimiter)
+      let result = ''
 
       if (quotes) {
         values = values.map(i => `"${i}"`)
       }
 
       if (list) {
-        this.output = values.join(`${delimiter}\n`)
+        result = values.join(`${delimiter}\n`)
       } else {
-        this.output = values.join(delimiter)
+        result = values.join(this.seperateWithSpace ? `${delimiter} ` : delimiter)
       }
+
+      this.output = this.wrap(result)
+    },
+    wrap (content) {
+      switch (this.wrapper) {
+        case 'none':
+          return content
+        case 'bracket':
+          return `( ${content} )`
+        case 'curly':
+          return `{ ${content} }`
+        case 'square':
+          return `[ ${content} ]`
+        case 'doublequote':
+          return `" ${content} "`
+        case 'singlequote':
+          return `' ${content} '`
+      }
+    },
+    copy () {
+      this.$root.copyToClipboard(this.output, 'Output copied to clipboard!')
     }
   }
 }

@@ -22,7 +22,7 @@
             <!-- Generation -->
             <vs-tab @click="tabColour = 'rgb(100, 175, 134)'" vs-label="Generate">
               <p>Format plan for different applications</p>
-              <vs-button type="line" :color="tabColour" @click="copyToClipboard(generateJiraTable(), 'Jira Table has been copied to your clipboard')">Generate Jira Table</vs-button>
+              <vs-button type="line" :color="tabColour" @click="copy(generateJiraTable(), 'Jira Table has been copied to your clipboard')">Generate Jira Table</vs-button>
               <vs-button type="line" color="rgb(116, 204, 201)" @click="previewJiraTable()">Preview Jira Table</vs-button>
               |
               <vs-button type="line" :color="tabColour" @click="generateSpecflow('api')">Generate API Specflow Scenarios</vs-button>
@@ -809,17 +809,8 @@ export default {
     },
 
     // -------------------------------------------------- Misc --------------------------------------------------
-
-    copyToClipboard (content, message) {
-      clipboard.writeText(content)
-      this.$vs.notify({
-        title: 'Copied to clipboard',
-        text: message,
-        color: 'success',
-        // icon: 'publish',
-        position: this.$store.state.settings.notifPos,
-        time: 4000
-      })
+    copy (content, message) {
+      this.$root.copyToClipboard(content, message)
     },
     previewJiraTable () {
       let jiraTable = []

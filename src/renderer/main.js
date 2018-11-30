@@ -18,12 +18,13 @@ import 'highlight.js/styles/default.css'
 
 // Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone, faAlignLeft, faFileExport, faFileImport } from '@fortawesome/free-solid-svg-icons'
+import { faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone, faAlignLeft, faFileExport, faFileImport, faCopy } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone, faAlignLeft, faFileExport, faFileImport)
+library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone, faAlignLeft, faFileExport, faFileImport, faCopy)
 
 // Load Plugins
 const {dialog, shell, app} = require('electron').remote
+const { clipboard } = require('electron')
 var log = require('electron-log/main')
 var fs = require('fs')
 var _ = require('lodash')
@@ -279,6 +280,17 @@ new Vue({
     refreshTheme () {
       this.$vs.theme({
         primary: appStore.store.settings.theme.primary
+      })
+    },
+    copyToClipboard (content, message) {
+      clipboard.writeText(content)
+      this.$vs.notify({
+        title: 'Copied to clipboard',
+        text: message,
+        color: 'success',
+        // icon: 'publish',
+        position: this.$store.state.settings.notifPos,
+        time: 4000
       })
     }
   }
