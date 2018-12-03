@@ -362,7 +362,6 @@
       },
       getLatestRelease () {
         this.$vs.loading({
-          background: 'primary',
           color: '#000',
           container: '#span-with-loading',
           scale: 0.45
