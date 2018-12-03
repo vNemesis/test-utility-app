@@ -114,11 +114,9 @@
 </template>
 
 <script>
-  import JiraWikiEditor from './JiraWikiEditor'
   const {clipboard} = require('electron')
   export default {
     name: 'test-item',
-    components: { JiraWikiEditor },
 
     props: ['testdata', 'totalNumberOfTestItems', 'order'],
 

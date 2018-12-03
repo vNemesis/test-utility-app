@@ -60,9 +60,7 @@
 
 
         <vs-col vs-type="flex" vs-w="1">
-
           <vs-button color="dark" type="flat" class="my-3 w-100" @click="copy()"><font-awesome-icon icon="copy" size="2x" /></vs-button>
-
         </vs-col>
 
       </vs-row>
