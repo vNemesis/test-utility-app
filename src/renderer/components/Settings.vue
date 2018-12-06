@@ -51,7 +51,7 @@
                   </vs-col>
                 </vs-row>
 
-                <p class="mt-3">Dark Mode (NYI)</p>
+                <p class="mt-3">Dark Mode</p>
                 <vs-switch id="autoJiraNewLine" v-model="settings.theme.darkMode" @input="isTyping = true">
                     <span slot="on">On</span>
                     <span slot="off">Off</span>

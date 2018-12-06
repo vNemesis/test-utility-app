@@ -2,7 +2,7 @@
     <div>
       <vs-progress indeterminate color="success" v-if="isTyping" class="mb-2"></vs-progress>
       <hr v-if="!isTyping">
-      <vs-switch ref="quickLinksEditSwitch" class="mb-2" color="dark" vs-icon-on="border_color" vs-icon-off="remove_red_eye" v-model="editQuickLinks" @input="$emit('change-state', editQuickLinks)">
+      <vs-switch ref="quickLinksEditSwitch" class="mb-2" color="primary" vs-icon-on="border_color" vs-icon-off="remove_red_eye" v-model="editQuickLinks" @input="$emit('change-state', editQuickLinks)">
         <span slot="on">Edit </span>
         <span slot="off">View </span>
       </vs-switch>
@@ -24,8 +24,8 @@
         <vs-row>
 
           <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1" >
-            <button @click="moveLink(index, index - 1); isTyping = true" :disabled="index == 0" class="mt-3"><font-awesome-icon icon="arrow-up" size="sm"/></button>
-            <button @click="moveLink(index, index + 1); isTyping = true" :disabled="index == (quickLinks.length - 1)" class="mt-3"><font-awesome-icon icon="arrow-down" size="sm" /></button>
+            <button @click="moveLink(index, index - 1); isTyping = true" :disabled="index == 0" class="mt-3 sorting-buttons"><font-awesome-icon icon="arrow-up" size="sm"/></button>
+            <button @click="moveLink(index, index + 1); isTyping = true" :disabled="index == (quickLinks.length - 1)" class="mt-3 sorting-buttons"><font-awesome-icon icon="arrow-down" size="sm" /></button>
           </vs-col>
 
           <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="4">
@@ -66,15 +66,15 @@
         </vs-col>
 
         <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="4">
-          <vs-input style="width: 90%;" label-placeholder="Text" :vs-danger="newLink.textInvalid" vs-danger-text="Cannot be Empty" v-model="newLink.text"/>
+          <vs-input style="width: 90%;" label-placeholder="Text" :danger="newLink.textInvalid" danger-text="Cannot be Empty" v-model="newLink.text"/>
         </vs-col>
 
         <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="4">
-          <vs-input style="width: 90%;" label-placeholder="Url" :vs-danger="newLink.urlInvalid" vs-danger-text="Cannot be Empty" v-model="newLink.url"/>
+          <vs-input style="width: 90%;" label-placeholder="Url" :danger="newLink.urlInvalid" danger-text="Cannot be Empty" v-model="newLink.url"/>
         </vs-col>
 
         <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1" >
-          <input type="color" v-model="newLink.colour" @input="isTyping = true" class="mt-3"/>
+          <input type="color" v-model="newLink.colour" class="mt-3"/>
           <vs-tooltip text="Paste Colour Code">
             <a @click="pasteColour()"><font-awesome-icon icon="paste" size="lg" class="mt-3 ml-2"/></a>
           </vs-tooltip>
@@ -82,13 +82,13 @@
 
         <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1" >
           <vs-tooltip text="Import Link">
-            <vs-button color="primary" type="filled" @click="importLink(); isTyping = true" class="mt-3"><font-awesome-icon icon="file-import" size="lg" /></vs-button>
+            <vs-button color="primary" type="filled" @click="importLink()" class="mt-3"><font-awesome-icon icon="file-import" size="lg" /></vs-button>
           </vs-tooltip>
         </vs-col>
 
         <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1" >
           <vs-tooltip text="Add Link">
-            <vs-button color="success" type="filled" @click="addLink();" class="mt-3"><font-awesome-icon icon="plus" size="lg" /></vs-button>
+            <vs-button color="success" type="filled" @click="addLink(newLink.text, newLink.url, newLink.colour);" class="mt-3"><font-awesome-icon icon="plus" size="lg" /></vs-button>
           </vs-tooltip>
         </vs-col>
 
@@ -119,6 +119,7 @@
           textInvalid: false,
           urlInvalid: false
         },
+        addingNewLink: false,
         localQuickLinks: [],
         paginate: ['quickLinks']
       }
@@ -151,14 +152,24 @@
         deep: true
       },
       isTyping (val) {
-        if (!val) {
+        if (!val && !this.addingNewLink) {
           this.$vs.notify({
             title: 'Changes Saved',
+            text: 'Your changes where saved sucessfully',
             color: 'success',
             // icon: 'save',
             position: this.$store.state.settings.notifPos,
             time: 3000
           })
+        } else if (!val && this.addingNewLink) {
+          this.$vs.notify({
+            title: 'Link added',
+            text: `A new Link was added Sucessfully`,
+            color: 'success',
+            position: this.$store.state.settings.notifPos,
+            time: 4000
+          })
+          this.addingNewLink = false
         }
       }
     },
@@ -183,7 +194,7 @@
           this.quickLinks[i].id = i + 1
         }
       },
-      addLink () {
+      addLink (text, url, colour) {
         let valid = true
 
         if (this.quickLinks.length >= 32) {
@@ -197,35 +208,39 @@
           return
         }
 
-        this.isTyping = true
-
-        if (this.newLink.text === '') {
+        if (text === '') {
           this.newLink.textInvalid = true
           valid = false
         } else {
           this.newLink.textInvalid = false
         }
 
-        if (this.newLink.url === '') {
+        if (url === '') {
           this.newLink.urlInvalid = true
           valid = false
         } else {
           this.newLink.urlInvalid = false
         }
 
-        if (valid) {
-          this.localQuickLinks.push({
-            id: this.localQuickLinks.length + 1,
-            text: this.newLink.text,
-            url: this.newLink.url,
-            colour: this.newLink.colour
-          })
-
-          this.quickLinks = this.localQuickLinks
-          this.newLink.text = ''
-          this.newLink.url = ''
-          this.newLink.colour = '#51d5ef'
+        if (!valid) {
+          return
         }
+
+        this.isTyping = true
+        this.addingNewLink = true
+
+        this.localQuickLinks.push({
+          id: this.localQuickLinks.length + 1,
+          text: text,
+          url: url,
+          colour: colour.toLowerCase() === '#ffffff' ? '#efffff' : colour.toLowerCase()
+        })
+
+        this.quickLinks = this.localQuickLinks
+
+        this.newLink.text = ''
+        this.newLink.url = ''
+        this.newLink.colour = '#51d5ef'
       },
       textColour (hex) {
         let rgb = this.hexToRgb(hex)
@@ -252,6 +267,9 @@
 
       removeLink (index) {
         this.localQuickLinks.splice(index, 1)
+        for (let i = 0; i < this.localQuickLinks.length; i++) {
+          this.localQuickLinks[i].id = i + 1
+        }
         this.quickLinks = this.localQuickLinks
       },
       exportLink (index) {
@@ -282,25 +300,21 @@
                 time: 4000
               })
             } else {
-              this.$vs.notify({
-                title: 'File Imported!',
-                text: `File "${fileName[0]}" was imported successfully`,
-                color: 'success',
-                // icon: 'publish',
-                position: this.$store.state.settings.notifPos,
-                time: 4000
-              })
-
               let item = JSON.parse(data)
 
-              this.localQuickLinks.push({
-                id: this.localQuickLinks.length + 1,
-                text: item.text,
-                url: item.url,
-                colour: item.colour
-              })
-
-              this.quickLinks = this.localQuickLinks
+              if (item.text === '' || item.url === '' || item.colour === '') {
+                this.$vs.notify({
+                  title: 'Error!',
+                  text: `Imported link format invalid, Please correct this before adding!`,
+                  color: 'danger',
+                  position: this.$store.state.settings.notifPos,
+                  time: 8000
+                })
+                this.newLink.text = item.text
+                this.newLink.url = item.url
+                this.newLink.colour = item.colour.toLowerCase() === '#ffffff' ? '#efffff' : item.colour.toLowerCase()
+              }
+              this.addLink(item.text, item.url, '#effffe')
             }
           })
         })
@@ -322,9 +336,12 @@
 <style>
 .sorting-buttons {
   background-color: rgb(31,116,255);
-  color: white !important;
-  border-radius: 5px;
-  padding: 4px;
+  color: white;
+}
+
+.sorting-buttons:disabled {
+  background-color: rgb(22, 68, 141);
+  color: white;
 }
 </style>
 

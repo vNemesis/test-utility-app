@@ -84,11 +84,11 @@
           </vs-col>
 
           <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
-            <vs-button type="line" color="dark" @click="addItemsPopup.active = true">Bulk add test items</vs-button>
+            <vs-button type="line" :color="this.$store.state.settings.theme.darkMode === true ? 'primary' : 'dark'" @click="addItemsPopup.active = true">Bulk add test items</vs-button>
           </vs-col>
 
           <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
-            <vs-button type="line" color="dark" @click="bulkOpPopup.active = true">Bulk operations</vs-button>
+            <vs-button type="line" :color="this.$store.state.settings.theme.darkMode === true ? 'primary' : 'dark'" @click="bulkOpPopup.active = true">Bulk operations</vs-button>
           </vs-col>
         </vs-row>
       </vs-collapse-item>
