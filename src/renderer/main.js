@@ -288,10 +288,18 @@ new Vue({
         title: 'Copied to clipboard',
         text: message,
         color: 'success',
-        // icon: 'publish',
         position: this.$store.state.settings.notifPos,
         time: 4000
       })
+    },
+    pasteFromClipboard () {
+      this.$vs.notify({
+        title: 'Pasted text from clipboard',
+        color: 'success',
+        position: this.$store.state.settings.notifPos,
+        time: 4000
+      })
+      return clipboard.readText()
     }
   }
 }).$mount('#app')

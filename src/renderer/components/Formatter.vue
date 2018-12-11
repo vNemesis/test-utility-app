@@ -4,11 +4,21 @@
     <div class="col-md-12 text-center">
       <h1>Formatter</h1>
 
-      <vs-textarea v-model="input" label="Input" rows="10" class="w-100 border-dark"/>
+      <vs-row>
+
+        <vs-col vs-type="flex" vs-w="11" class="mt-3">
+          <vs-textarea v-model="input" label="Input" rows="15" class="w-100 border-dark"/>
+        </vs-col>
+
+        <vs-col vs-type="flex" vs-w="1">
+          <vs-button color="dark" type="flat" class="my-3 w-100" @click="paste()" title="Paste from Clipboard"><font-awesome-icon icon="paste" size="2x" /></vs-button>
+        </vs-col>
+
+      </vs-row>
 
       <vs-row class="my-3">
 
-        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
 
           <vs-select autocomplete placeholder="Input Delimiter" label="Input Delimiter" class="w-75" v-model="inputDelimiter">
             <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in delimiter" />
@@ -16,10 +26,18 @@
 
         </vs-col>
 
-        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
 
           <vs-select autocomplete placeholder="Conversion Type" label="Conversion Type" class="w-75" v-model="conversionType">
             <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in conversionTypes" />
+          </vs-select>
+
+        </vs-col>
+
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+
+          <vs-select autocomplete placeholder="Quotes" label="Quotes" class="w-75" v-model="quote">
+            <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in quoteTypes" />
           </vs-select>
 
         </vs-col>
@@ -44,7 +62,7 @@
 
         <vs-col vs-type="flex" vs-justify="center" vs-align="flex-end" vs-w="2">
 
-          <vs-button type="border" color="success" class="w-75" :disabled="invalid" @click="format()">Format Input</vs-button>
+          <vs-button type="border" :color="invalid ? 'danger' : 'success'" class="w-75" :disabled="invalid" @click="format()">{{ invalid ? 'Please select required options' : 'Format Input'}}</vs-button>
 
         </vs-col>
 
@@ -54,13 +72,13 @@
 
         <vs-col vs-type="flex" vs-w="11" class="mt-3">
 
-          <vs-textarea v-model="output" label="Output" rows="5" class="w-100 border-info" readonly/>
+          <vs-textarea v-model="output" label="Output" rows="15" class="w-100 border-info" readonly/>
 
         </vs-col>
 
 
         <vs-col vs-type="flex" vs-w="1">
-          <vs-button color="dark" type="flat" class="my-3 w-100" @click="copy()"><font-awesome-icon icon="copy" size="2x" /></vs-button>
+          <vs-button color="dark" type="flat" class="my-3 w-100" @click="copy()" title="Copy Output"><font-awesome-icon icon="copy" size="2x" /></vs-button>
         </vs-col>
 
       </vs-row>
@@ -83,8 +101,14 @@ export default {
       output: '',
       conversionType: '',
       wrapper: '',
+      quote: '',
       inputDelimiter: '',
       seperateWithSpace: false,
+      quoteTypes: {
+        None: '',
+        Single: '\'',
+        Double: '"'
+      },
       delimiter: {
         Comma: ',',
         'Whitespace': ' ',
@@ -92,16 +116,11 @@ export default {
         NewLine: '\n'
       },
       conversionTypes: {
-        'Comma Seperated Line': 'commasepline',
-        'Comma Seperated Quoted Line': 'commasepquoteline',
-        'Comma Seperated List': 'commaseplist',
-        'Comma Seperated Quoted List': 'commasepquotelist',
-        'Whitespace Seperated': 'spacesep',
-        'Whitespace Seperated Quoted': 'spacesepquote',
-        'Tab Seperated': 'tabsep',
-        'Tab Seperated Quoted': 'tabsepquote',
-        'New Line Seperated': 'newlinesep',
-        'New Line Seperated Quoted': 'newlinesepquote'
+        'Comma Seperated Line': {delimiter: ',', list: false},
+        'Comma Seperated List': {delimiter: ',', list: true},
+        'Whitespace Seperated': {delimiter: ' ', list: false},
+        'Tab Seperated': {delimiter: '\t', list: false},
+        'New Line Seperated': {delimiter: '\n', list: true}
       },
       wrappers: {
         'No Wrapping': 'none',
@@ -109,7 +128,7 @@ export default {
         '{ }': 'curly',
         '[ ]': 'square',
         '" "': 'doublequote',
-        '\'\'': 'singlequote'
+        '\' \'': 'singlequote'
       }
     }
   },
@@ -122,45 +141,14 @@ export default {
 
   methods: {
     format () {
-      switch (this.conversionType) {
-        case 'commasepline':
-          this.Seperate(false, false, ',')
-          break
-        case 'commasepquoteline':
-          this.Seperate(true, false, ',')
-          break
-        case 'commaseplist':
-          this.Seperate(false, true, ',')
-          break
-        case 'commasepquotelist':
-          this.Seperate(true, true, ',')
-          break
-        case 'spacesep':
-          this.Seperate(false, false, ' ')
-          break
-        case 'spacesepquote':
-          this.Seperate(true, false, ' ')
-          break
-        case 'tabsep':
-          this.Seperate(false, false, '\t')
-          break
-        case 'tabsepquote':
-          this.Seperate(true, false, '\t')
-          break
-        case 'newlinesep':
-          this.Seperate(false, false, '\n')
-          break
-        case 'newlinesepquote':
-          this.Seperate(true, false, '\n')
-          break
-      }
+      this.Seperate(this.conversionType.list, this.conversionType.delimiter)
     },
-    Seperate (quotes, list, delimiter) {
+    Seperate (list, delimiter) {
       let values = this.input.split(this.inputDelimiter)
       let result = ''
 
-      if (quotes) {
-        values = values.map(i => `"${i}"`)
+      if (this.quote !== '') {
+        values = values.map(i => `${this.quote}${i}${this.quote}`)
       }
 
       if (list) {
@@ -189,6 +177,9 @@ export default {
     },
     copy () {
       this.$root.copyToClipboard(this.output, 'Output copied to clipboard!')
+    },
+    paste () {
+      this.input = this.$root.pasteFromClipboard()
     }
   }
 }
