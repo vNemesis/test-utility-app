@@ -1,5 +1,6 @@
 <template>
 <div>
+  <span v-shortkey="['ctrl', 's']" @shortkey="save()"></span>
   <vs-progress indeterminate color="success" v-if="autoSaving"></vs-progress>
   <div class="row" :class="autoSaving ? 'my-4' : 'my-5'">
     <div class="col-md-12 text-center">
@@ -32,13 +33,29 @@
             <!-- Export / Import -->
             <vs-tab @click="tabColour = 'rgb(120, 157, 232)'" vs-label="Import | Export">
               <p>Export/Import the test plan to/from outside of the application</p>
-              <vs-button type="line" :color="tabColour" @click="exportToJiraCSV()">Export to Jira CSV</vs-button>
-              <vs-button type="line" :color="tabColour" @click="importFromJiraCSV()">Import Jira CSV</vs-button>
-              |
-              <vs-button type="line" :color="tabColour" @click="exportToJson()">Export JSON</vs-button>
-              <vs-button type="line" :color="tabColour" @click="importFromJson()">Import JSON</vs-button>
-              |
-              <vs-button type="line" :color="tabColour" @click="activePromptImportFromExcel = true">Import from Excel Clipboard</vs-button>
+
+              <vs-row class="justify-content-center">
+                <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
+                  <vs-button type="line" class="mr-1" :color="tabColour" @click="exportToJiraCSV(true)">Export Jira CSV</vs-button>
+                  <vs-button type="line" :color="tabColour" @click="importFromJiraCSV()">Import Jira CSV</vs-button>
+                </vs-col>
+
+                <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
+                  <vs-button type="line" class="mr-1" :color="tabColour" @click="exportToJson(true)">Export JSON</vs-button>
+                  <vs-button type="line" :color="tabColour" @click="importFromJson()">Import JSON</vs-button>
+                </vs-col>
+
+                <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
+                  <vs-button type="line" :color="tabColour" @click="activePromptImportFromExcel = true">Import from Excel Clipboard</vs-button>
+                </vs-col>
+              </vs-row>
+
+              <vs-row class="justify-content-center mt-2">
+                <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="12">
+                  <p>Current file location: {{ fileLocation.location ? fileLocation.location : 'No location set'}}</p>
+                </vs-col>
+              </vs-row>
+
             </vs-tab>
             <!-- Export / Import -->
           </vs-tabs>
@@ -249,7 +266,6 @@
 
 </div>
 </template>
-
 <script>
 import TestItem from './TestItem'
 import { HotTable } from '@handsontable/vue'
@@ -257,7 +273,7 @@ import Papa from 'papaparse'
 import _ from 'lodash'
 import $ from 'jquery'
 
-const {dialog} = require('electron').remote
+const remote = require('electron').remote
 var fs = require('fs')
 
 const {clipboard} = require('electron')
@@ -270,6 +286,8 @@ export default {
     return {
       autoSave: false,
       autoSaving: false,
+      // Plan
+      fileLocation: {location: '', type: ''},
       planID: '',
       jiraTask: '',
       planDesc: '',
@@ -448,7 +466,17 @@ export default {
 
     // ----------------------------------------------- Export -----------------------------------------------
 
-    exportToJiraCSV () {
+    exportToJiraCSV (showDialog) {
+      if (!this.jiraTask) {
+        this.$vs.notify({
+          title: 'Error!',
+          text: 'Please specify a Jira Task ID',
+          color: 'danger',
+          position: this.$store.state.settings.notifPos,
+          time: 4000
+        })
+        return
+      }
       let csvContent = ''
       csvContent += ['Test Name (Summary)', 'Test Purpose (Description)', 'Jira Task (Parent Id)', 'Issue Type', 'Assignee', 'Priority', 'Application'].join(',') + '\r\n'
 
@@ -459,9 +487,20 @@ export default {
         csvContent += row + '\r\n'
       })
 
-      this.$root.exportFile(`Jira Issue Import ${this.jiraTask}.csv`, csvContent, 'CSV File', 'csv')
+      this.exportFile(`Jira Issue Import ${this.jiraTask}.csv`, csvContent, 'CSV File', 'csv', showDialog)
     },
-    exportToJson () {
+    exportToJson (showDialog) {
+      if (!this.jiraTask) {
+        this.$vs.notify({
+          title: 'Error!',
+          text: 'Please specify a Jira Task ID',
+          color: 'danger',
+          position: this.$store.state.settings.notifPos,
+          time: 4000
+        })
+        return
+      }
+
       let plan = {
         testItems: this.testItems,
         jiraTask: this.jiraTask,
@@ -471,11 +510,12 @@ export default {
       }
 
       let jsonContent = JSON.stringify(plan)
-      this.$root.exportFile(`Test Plan ${this.jiraTask}.json`, jsonContent, 'JSON File', 'json')
+      this.exportFile(`Test Plan ${this.jiraTask}.json`, jsonContent, 'JSON File', 'json', showDialog)
     },
 
     // ----------------------------------------------- App Saving / Loading -----------------------------------------------
 
+    // Will save to internal storage and external is file location is specified
     save () {
       let plan = {
         testItems: this.testItems,
@@ -489,13 +529,23 @@ export default {
           data: JSON.stringify(plan),
           planDesc: this.planDesc
         }
+        let externalSave = false
+
         this.$root.saveTestPlan(`${this.jiraTask}`, jsonContent)
 
         this.allTestPlans[this.jiraTask] = jsonContent
 
+        if (this.fileLocation.type === 'json') {
+          this.exportToJson(false)
+          externalSave = true
+        } else if (this.fileLocation.type === 'csv') {
+          this.exportToJiraCSV(false)
+          externalSave = true
+        }
+
         this.$vs.notify({
           title: 'Plan Saved',
-          text: `Plan ${this.jiraTask} was saved successfully`,
+          text: `Plan ${this.jiraTask} was saved to app${externalSave ? ' and external file' : ' '} successfully`,
           color: 'success',
           // icon: 'publish',
           position: this.$store.state.settings.notifPos,
@@ -510,6 +560,7 @@ export default {
       }
       let plan = this.$root.getTestPlan(key)
       let parsedData = JSON.parse(plan.data)
+      this.fileLocation = {location: '', type: ''}
 
       if (parsedData === {}) {
         return
@@ -552,7 +603,7 @@ export default {
     // ----------------------------------------------- Import -----------------------------------------------
 
     importFromJson () {
-      dialog.showOpenDialog({
+      remote.dialog.showOpenDialog({
         filters: [
           { name: 'JSON File', extensions: ['json'] }
         ]
@@ -574,6 +625,11 @@ export default {
               time: 4000
             })
           } else {
+            if (confirm('Saving and auto-saving will save your test plan in the app, would you like it to also save to this file?')) {
+              this.fileLocation = {location: fileName[0], type: 'csv'}
+            } else {
+              this.fileLocation = {location: '', type: ''}
+            }
             this.$vs.notify({
               title: 'File Imported!',
               text: `File "${fileName[0]}" was imported successfully`,
@@ -594,7 +650,7 @@ export default {
       })
     },
     importFromJiraCSV () {
-      dialog.showOpenDialog({
+      remote.dialog.showOpenDialog({
         filters: [
           { name: 'CSV File', extensions: ['csv'] }
         ]
@@ -616,6 +672,11 @@ export default {
               time: 4000
             })
           } else {
+            if (confirm('Saving and auto-saving will save your test plan in the app, would you like it to also save to this file?')) {
+              this.fileLocation = {location: fileName[0], type: 'csv'}
+            } else {
+              this.fileLocation = {location: '', type: ''}
+            }
             this.$vs.notify({
               title: 'File Imported!',
               text: `File "${fileName[0]}" was imported successfully`,
@@ -856,6 +917,57 @@ export default {
       this.previewPopup.active = true
       this.previewPopup.syntax = object.syntax
       this.previewPopup.code = object.code
+    },
+    /**
+     * Will begin the download of a file
+     * @param {string} filename name of file
+     * @param {string} content content of file
+     */
+    exportFile (filename, content, extensionName, extension, showDialog) {
+      let path = this.fileLocation.location ? this.fileLocation.location : ''
+
+      if (showDialog) {
+        path = remote.dialog.showSaveDialog({
+          title: `Export ${extension} file`,
+          filters: [{
+            name: extensionName,
+            extensions: [extension]
+          }],
+          defaultPath: filename,
+          buttonLabel: 'Export'
+        })
+      }
+
+      if (!path) {
+        return
+      }
+
+      // fileName is a string that contains the path and filename created in the save file dialog.
+      fs.writeFile(path, content, (err) => {
+        if (err) {
+          this.$vs.notify({
+            title: 'Error!',
+            text: `An error ocurred creating the file: ${err.message}`,
+            color: 'danger',
+            icon: 'error_outline',
+            position: this.$store.state.settings.notifPos,
+            time: 4000
+          })
+        } else {
+          this.fileLocation = {location: path, type: extension}
+          if (showDialog) {
+            this.$vs.notify({
+              title: 'File Exported!',
+              text: `File '${filename}' was exported successfully`,
+              color: 'success',
+              icon: 'save',
+              position: this.$store.state.settings.notifPos,
+              time: 10000
+            })
+            setTimeout(remote.shell.showItemInFolder(path), 3000)
+          }
+        }
+      })
     }
   }
 }

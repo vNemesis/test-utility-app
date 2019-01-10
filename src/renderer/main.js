@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 import VueHighlightJS from 'vue-highlight.js'
 import 'es6-promise/auto'
 import VuePaginate from 'vue-paginate'
+import VueShortKey from 'vue-shortkey'
 
 import axios from 'axios'
 
@@ -23,7 +24,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone, faAlignLeft, faFileExport, faFileImport, faCopy, faPaste)
 
 // Load Plugins
-const {dialog, shell, app} = require('electron').remote
+const remote = require('electron').remote
 const { clipboard } = require('electron')
 var log = require('electron-log/main')
 var fs = require('fs')
@@ -42,7 +43,7 @@ Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
 
 // Will create log file if it doesn't exist
-fs.writeFile(`${app.getPath('userData')}/log.log`, '', { flag: 'wx' }, function (err) {
+fs.writeFile(`${remote.app.getPath('userData')}/log.log`, '', { flag: 'wx' }, function (err) {
   if (err) {
   }
 }
@@ -67,7 +68,8 @@ const defaultSettings = {
     theme: {
       primary: '#1f74ff',
       darkMode: false
-    }
+    },
+    allowDevTools: false
   },
   quickLinks: [
     { id: 1, text: 'Example Website Bookmark', url: 'www.google.co.uk', colour: '#51d5ef' },
@@ -101,6 +103,11 @@ const testPlanStore = new EStore({
   name: 'testPlans'
 })
 
+// Open dev tools if the option is enabled
+if (appStore.get('settings.allowDevTools') === true) {
+  remote.getCurrentWindow().toggleDevTools()
+}
+
 // Vue Plugins
 Vue.use(Vuesax, {
   theme: {
@@ -113,6 +120,7 @@ Vue.use(Vuesax, {
 Vue.use(Vuex)
 Vue.use(VueHighlightJS)
 Vue.use(VuePaginate)
+Vue.use(VueShortKey)
 
 // Vue Components
 Vue.component('font-awesome-icon', FontAwesomeIcon)
@@ -181,8 +189,8 @@ console.warn = function () {
 store.state.settings = appStore.get('settings')
 store.state.quickLinks = appStore.get('quickLinks')
 
-if ((fs.statSync(`${app.getPath('userData')}/log.log`).size / 1000000.0) > 4) {
-  fs.truncate(`${app.getPath('userData')}/log.log`, 0)
+if ((fs.statSync(`${remote.app.getPath('userData')}/log.log`).size / 1000000.0) > 4) {
+  fs.truncate(`${remote.app.getPath('userData')}/log.log`, 0)
 }
 
 /* eslint-disable no-new */
@@ -204,48 +212,6 @@ new Vue({
     },
     deleteTestPlan (key) {
       return testPlanStore.delete(key)
-    },
-    /**
-     * Will begin the download of a file
-     * @param {string} filename name of file
-     * @param {string} content content of file
-     */
-    exportFile (filename, content, extensionName, extension) {
-      dialog.showSaveDialog({
-        filters: [{
-          name: extensionName,
-          extensions: [extension]
-        }],
-        defaultPath: filename
-      }, (fileName) => {
-        if (fileName === undefined) {
-          return
-        }
-
-        // fileName is a string that contains the path and filename created in the save file dialog.
-        fs.writeFile(fileName, content, (err) => {
-          if (err) {
-            this.$vs.notify({
-              title: 'Error!',
-              text: `An error ocurred creating the file: ${err.message}`,
-              color: 'danger',
-              icon: 'error_outline',
-              position: appStore.settings.notifPos,
-              time: 4000
-            })
-          } else {
-            this.$vs.notify({
-              title: 'File Exported!',
-              text: `File '${filename}' was exported successfully`,
-              color: 'success',
-              icon: 'save',
-              position: appStore.settings.notifPos,
-              time: 10000
-            })
-            setTimeout(shell.showItemInFolder(fileName), 3000)
-          }
-        })
-      })
     },
     openConfig () {
       appStore.openInEditor()
@@ -274,8 +240,8 @@ new Vue({
           { text: 'Example Local Bookmark', url: 'c://' }
         ]
       }
-      app.relaunch()
-      app.exit(0)
+      remote.app.relaunch()
+      remote.app.exit(0)
     },
     refreshTheme () {
       this.$vs.theme({

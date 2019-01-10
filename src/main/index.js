@@ -13,6 +13,7 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 require('electron-context-menu')({
+  showInspectElement: false
 })
 
 let mainWindow
