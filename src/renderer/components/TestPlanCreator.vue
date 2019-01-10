@@ -131,13 +131,14 @@
           </tbody>
         </table>
       </div>
-      <a @click="addTestItem()" class="text-white btn-block btn-success py-2"><font-awesome-icon icon="plus" size="2x" /></a>
+      <!-- <a  class="text-white btn-block btn-success py-2"></a> -->
+      <vs-button @click="addTestItem()" color="primary" type="flat" class="py-2 w-100"><font-awesome-icon icon="plus" size="2x" /></vs-button>
     </div>
   </div>
 
   <div id="globals">
      <vs-popup title="Load Test Plan" :active.sync="activePromptLoadPlan">
-        <div class="row justify-content-center">
+        <div class="row m-0">
           <div class="col-sm-12">
             <vs-select label="Select a test plan to load" vs-autocomplete v-model="planID" :danger="LoadPlanWarning" danger-text="Please select a test plan" class="w-100">
               <vs-select-item :key="index" :value="index" :text="`${index} - ${item.planDesc}`" v-for="(item,index) in allTestPlans" />
@@ -149,14 +150,14 @@
        </div>
       </vs-popup>
 
-      <vs-popup fullscreen title="Load Test Plan" :active.sync="activePromptImportFromExcel">
-        <div class="row justify-content-center">
+      <vs-popup fullscreen title="Import for Excel" :active.sync="activePromptImportFromExcel">
+        <div class="row justify-content-center m-0">
           <div class="col-sm-12">
             <small>You may need to click inside this window for the table to appear!</small>
             <div id="hot-preview">
               <HotTable ref="excelTable" :settings="hotTableSettings"></HotTable>
             </div>
-            <vs-button @click="importFromExcelData()" color="primary" type="border">Import</vs-button>
+            <vs-button @click="importFromExcelData()" color="primary" type="border" class="mt-3">Import</vs-button>
           </div>
        </div>
       </vs-popup>
@@ -221,9 +222,19 @@
           </vs-col>
         </vs-row>
 
+        <vs-row>
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="9">
+            <vs-select label="Test Type" v-model="bulkOpPopup.changeTestType.testType" class="w-75 mb-3"
+            :danger="!this.bulkOpPopup.changeTestType.valid" danger-text="Please Select a Test Type" 
+            description-text="This will change all test types to the selected value">
+              <vs-select-item :key="index" :value="item" :text="item" v-for="(item,index) in {API: 'API', UI: 'UI'}" />
+            </vs-select>
+          </vs-col>
 
-
-
+          <vs-col vs-type="flex" vs-justify="center" vs-align="flex-start" vs-w="3">
+            <vs-button @click="bulkChangeTestType()" color="primary" type="line" class="w-100 mt-4">Start</vs-button>
+          </vs-col>
+        </vs-row>
 
       </vs-popup>
       <!--  Bulk Op  -->
@@ -328,6 +339,10 @@ export default {
         },
         changePriorities: {
           priority: '',
+          valid: true
+        },
+        changeTestType: {
+          testType: '',
           valid: true
         }
       },
@@ -845,7 +860,7 @@ export default {
             position: this.$store.state.settings.notifPos,
             time: 4000
           })
-          this.bulkOpPopup.changeJiraID.startID = ''
+          this.bulkOpPopup.changePriorities.priority = ''
           this.bulkOpPopup.active = false
           return
         }
@@ -858,7 +873,42 @@ export default {
         this.bulkOpPopup.changePriorities.priority = ''
         this.bulkOpPopup.active = false
       } else {
-        this.bulkOpPopup.changeJiraID.valid = false
+        this.bulkOpPopup.changePriorities.valid = false
+      }
+      this.$vs.notify({
+        title: 'Operation completed',
+        text: 'Bulk operation completed with no errors',
+        color: 'success',
+        position: this.$store.state.settings.notifPos,
+        time: 4000
+      })
+    },
+    bulkChangeTestType () {
+      if (this.bulkOpPopup.changeTestType.testType !== '') {
+        this.bulkOpPopup.changeTestType.valid = true
+
+        if (this.testItems.length === 0) {
+          this.$vs.notify({
+            title: 'Error',
+            text: 'You do not have any Tests to update',
+            color: 'danger',
+            position: this.$store.state.settings.notifPos,
+            time: 4000
+          })
+          this.bulkOpPopup.changeTestType.testType = ''
+          this.bulkOpPopup.active = false
+          return
+        }
+
+        for (let index = 0; index < this.testItems.length; index++) {
+          let element = this.testItems[index]
+          element.testType = this.bulkOpPopup.changeTestType.testType
+        }
+
+        this.bulkOpPopup.changeTestType.testType = ''
+        this.bulkOpPopup.active = false
+      } else {
+        this.bulkOpPopup.changeTestType.valid = false
       }
       this.$vs.notify({
         title: 'Operation completed',

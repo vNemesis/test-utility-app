@@ -87,7 +87,7 @@
     <td class="align-middle">
       <vs-dropdown vs-custom-content vs-trigger-click>
 
-        <font-awesome-icon icon="ellipsis-h" size="lg" />
+        <font-awesome-icon icon="ellipsis-h" size="lg" class="more-button"/>
 
         <vs-dropdown-menu style="width: 17.5%;">
 
@@ -258,5 +258,9 @@
   color: white;
   border-radius: 5px;
   padding: 4px;
+}
+
+.more-button:hover {
+  color: grey;
 }
 </style>
