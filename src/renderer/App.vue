@@ -24,7 +24,11 @@
           Formatter
         </vs-sidebar-item>
 
-        <vs-sidebar-item index="4" icon="settings" @click="navigate('/settings')">
+        <vs-sidebar-item index="4" icon="create" @click="navigate('/filecreator')">
+          File Creator
+        </vs-sidebar-item>
+
+        <vs-sidebar-item index="5" icon="settings" @click="navigate('/settings')">
           Settings
         </vs-sidebar-item>
 

@@ -125,6 +125,7 @@ Vue.use(VueShortKey)
 // Vue Components
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.component('test-item', './components/TestItem.vue')
+Vue.component('payment-item', './components/FileCreator/PaymentItem.vue')
 Vue.component('quick-links', './components/LandingPage/QuickLinks.vue')
 
 const store = new Vuex.Store({

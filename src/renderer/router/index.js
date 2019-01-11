@@ -21,6 +21,11 @@ export default new Router({
       component: require('@/components/Formatter').default
     },
     {
+      path: '/filecreator',
+      name: 'file-creator',
+      component: require('@/components/FileCreator/FileCreator').default
+    },
+    {
       path: '/settings',
       name: 'settings',
       component: require('@/components/Settings').default
