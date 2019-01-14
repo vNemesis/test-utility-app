@@ -6,7 +6,7 @@
   <div class="row justify-content-center">
     <div class="col-sm-6">
       <vs-alert title="New Release Available" :active="outdated" color="success">
-        A newer version is available to download. <a @click="$electron.shell.openExternal(releases[0].url)" class="text-primary pl-2"> Click here to view</a>
+        A newer version is available. <a @click="$electron.shell.openExternal('https://github.com/Shockwave-Interactive/test-utility-app-info/releases')" class="text-info ml-2">See Releases</a>
       </vs-alert>
     </div>
   </div>
@@ -20,15 +20,13 @@
       <h1 class="mt-3 title">Latest Releases</h1>
       <hr>
       <div id="div-with-loading" class="vs-con-loading__container text-left">
-        <h4>Latest Build Status: <img src="https://ci.appveyor.com/api/projects/status/da9tomaqs4tf119f?svg=true"/></h4>
-        <br>
         <div v-for="(release, index) in releases" v-bind:key="index">
           <h3>Version: {{ release.version }}</h3>
           <p v-html="release.body"></p>
           <hr>
         </div>
         <div class="text-center">
-          <h3><a @click="$electron.shell.openExternal('https://github.com/HarmanU/test-utility-app/releases')" class="text-info">More releases...</a></h3>
+          <h3><a @click="$electron.shell.openExternal('https://github.com/Shockwave-Interactive/test-utility-app-info/releases')" class="text-info">More releases...</a></h3>
         </div>
       </div>
     </div>
@@ -76,7 +74,7 @@
         })
         axios({
           method: 'get',
-          url: 'https://api.github.com/repos/HarmanU/test-utility-app/releases'
+          url: 'https://api.github.com/repos/Shockwave-Interactive/test-utility-app-info/releases'
         })
           .then(Response => {
             let releasesRaw = Response.data
@@ -97,7 +95,8 @@
           })
       },
       checkOutdated () {
-        let appVersion = window.require('electron').remote.app.getVersion().replace(/\./g, '')
+        // let appVersion = window.require('electron').remote.app.getVersion().replace(/\./g, '')
+        let appVersion = 100
         let releaseVersion = this.releases[0].version.substring(1).replace(/\./g, '')
         this.outdated = releaseVersion > appVersion
       }
