@@ -156,16 +156,6 @@
       <!-- Misc Tab -->
       <vs-tab vs-label="Misc">
         <!-- Info -->
-        <div class="row justify-content-center">
-          <div class="col-sm-12">
-            <h1 class="mt-3">Info</h1>
-            <p>Installed Version: {{ appVersion }}</p>
-            <p>Latest Version: <span id="span-with-loading" class="vs-con-loading__container">{{ latestRelease }}</span></p>
-            <vs-button ref="getLatestButton" @click="getLatestRelease" type="line" color="primary">Check for Update</vs-button>
-            <vs-button v-if="releaseFound" @click="openUrl(releaseUrl)" type="line" >Release Page</vs-button>
-          </div>
-        </div>
-
         <div class="row">
           <div class="col-sm-12">
             <h1 class="mt-3">Log</h1>
@@ -230,18 +220,13 @@
 
 <script>
   import _ from 'lodash'
-  import axios from 'axios'
   const { app } = require('electron').remote
-  var log = require('electron-log')
   var fs = require('fs')
   export default {
     name: 'settings',
 
     data: function () {
       return {
-        latestRelease: '',
-        releaseFound: false,
-        releaseUrl: '',
         notifPosOptions: {
           'Top left': 'top-left',
           'Top middle': 'top-center',
@@ -304,9 +289,6 @@
     },
 
     methods: {
-      openUrl (link) {
-        this.$electron.shell.openExternal(link)
-      },
       openLog () {
         this.logPopup.loading = true
 
@@ -359,26 +341,6 @@
           })
         })
         this.logPopup.active = false
-      },
-      getLatestRelease () {
-        this.$vs.loading({
-          color: '#000',
-          container: '#span-with-loading',
-          scale: 0.45
-        })
-        axios({
-          method: 'get',
-          url: 'https://api.github.com/repos/HarmanU/test-utility-app/releases/latest'
-        })
-          .then(Response => {
-            this.latestRelease = Response.data.tag_name
-            this.releaseUrl = Response.data.html_url
-            this.releaseFound = true
-            this.$vs.loading.close('#span-with-loading > .con-vs-loading')
-          })
-          .catch(Response => {
-            log.info(Response.data)
-          })
       },
       checkNotifPosChanged () {
         if (this.settings.notifPos !== this.oldNotifPos) {
