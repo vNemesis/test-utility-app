@@ -9,13 +9,13 @@
       <vs-tabs vs-alignment="fixed">
 
         <vs-tab vs-label="Bank File">
-          <bank-file-creator></bank-file-creator>
+          <bank-file-creator v-on:export-file="exportFile"></bank-file-creator>
         </vs-tab>
-        <vs-tab vs-label="Service">
+        <!-- <vs-tab vs-label="Service">
           <div class="con-tab-ejemplo">
-            Service
+            
           </div>
-        </vs-tab>
+        </vs-tab> -->
 
       </vs-tabs>
       <!-- Tabs -->
@@ -31,6 +31,9 @@
 <script>
 import BankFileCreator from './BankFileCreator'
 
+const remote = require('electron').remote
+const fs = require('fs')
+
 export default {
   name: 'file-creator',
   components: { BankFileCreator },
@@ -44,6 +47,45 @@ export default {
   },
 
   methods: {
+    exportFile (filename, content, extensionName, extension, filetype) {
+      let path = remote.dialog.showSaveDialog({
+        title: `Export ${filetype} file`,
+        filters: [{
+          name: extensionName,
+          extensions: [extension]
+        }],
+        defaultPath: filename,
+        buttonLabel: 'Export'
+      })
+
+      if (!path) {
+        return
+      }
+
+      // fileName is a string that contains the path and filename created in the save file dialog.
+      fs.writeFile(path, content, (err) => {
+        if (err) {
+          this.$vs.notify({
+            title: 'Error!',
+            text: `An error ocurred creating the file: ${err.message}`,
+            color: 'danger',
+            icon: 'error_outline',
+            position: this.$store.state.settings.notifPos,
+            time: 4000
+          })
+        } else {
+          this.$vs.notify({
+            title: 'File Exported!',
+            text: `File '${filename}' was exported successfully`,
+            color: 'success',
+            icon: 'save',
+            position: this.$store.state.settings.notifPos,
+            time: 10000
+          })
+          setTimeout(remote.shell.showItemInFolder(path), 3000)
+        }
+      })
+    }
   }
 }
 </script>

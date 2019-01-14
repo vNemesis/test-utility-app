@@ -4,37 +4,21 @@
     <div class="col-md-12">
 
       <vs-row>
+        <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="8">
 
-        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="4">
-          <vs-list>
+          <vs-input type="date" label="Posting date" v-model="postingDate"/>
 
-            <vs-list-header title="Posting date"></vs-list-header>
-
-            <vs-list-item title="Date">
-              <vs-input type="date" v-model="postingDate.date"/>
-            </vs-list-item>
-
-            <vs-list-item title="Row Number">
-              <vs-input-number v-model="postingDate.rowNumber"/>
-            </vs-list-item>
-
-            <vs-list-item title="Line Start">
-              <vs-input-number v-model="postingDate.lineStart"/>
-            </vs-list-item>
-
-          </vs-list>         
-        </vs-col>
-
-        <vs-col vs-type="flex" vs-justify="flex-start" vs-align="flex-start" vs-w="4" class="mt-4 px-4">
-          <vs-select autocomplete placeholder="File Type" label="File Type" v-model="fileType">
+          <vs-select autocomplete placeholder="File Type" label="File Type" class="ml-2" v-model="fileType" :danger="fileType === ''" danger-text="Please select a file type">
             <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in fileTypes" />
-          </vs-select>
+          </vs-select>          
         </vs-col>
-
-        <vs-col vs-type="flex" vs-justify="center" vs-align="flex-start" vs-w="4" class="mt-4">
-          <vs-button @click="exportFile()" color="primary" type="flat" class="w-100">Export</vs-button>
+        <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="2">
+          <vs-button @click="exportToJson()" color="dark" type="border" class="mt-4" >Export template</vs-button>
+          <vs-button @click="importFromJson()" color="dark" type="border" class="ml-2 mt-4" >Import template</vs-button>
         </vs-col>
-
+        <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="2">
+          <vs-button @click="exportFile()" color="rgb(100, 175, 134)" type="filled" class="mt-4 w-100" >Export File</vs-button>
+        </vs-col>
       </vs-row>
 
       <vs-row>
@@ -42,14 +26,13 @@
           <div class="table-responsive">
             <table class="table mt-2">
               <thead>
-                <th width="5%"></th>
-                <th width="12%">Recieving Sortcode</th>
-                <th width="12%">Recieving AccountNo</th>
-                <th width="12%">Sortcode</th>
-                <th width="12%">AccountNo</th>
-                <th width="12%">Amount</th>
-                <th width="20%">Account Name</th>
-                <th width="5%"></th>
+                <th width="2.5%"></th>
+                <th width="18%">Sortcode</th>
+                <th width="18%">AccountNo</th>
+                <th width="18%">Amount</th>
+                <th width="18%">Account Name</th>
+                <th width="18%">Payment Ref</th>
+                <th width="7.5%"><vs-button @click="addItemsPopup.active = true" color="danger" type="filled" class="py-0">Bulk Add</vs-button></th>
               </thead>
               <tbody>
                 <tr is="payment-item" v-for="(payment, index) in paymentItems" :key="payment.id"
@@ -68,6 +51,39 @@
     </div>
     <!-- Container -->
   </div>
+  <!-- Popups -->
+      <!-- Add Items -->
+      <vs-popup title="Add Payment Items" :active.sync="addItemsPopup.active">
+
+          <vs-input placeholder="123456" label="Sortcode" class="w-100"
+            :maxLength="6"
+            @keydown="numbersOnly"
+            v-model="addItemsPopup.item.Sortcode"/>
+
+          <vs-input placeholder="12345678" label="Account Number" class="w-100 mt-2"
+          :maxLength="8"
+          @keydown="numbersOnly"
+          v-model="addItemsPopup.item.AccountNo"/>
+
+          <small class="mt-2">Payment Amount</small>
+          <vs-input-number v-model="addItemsPopup.item.Amount"/>
+
+          <vs-input placeholder="Bank Account Name" label="Account Name " class="w-100 mt-2" :maxLength="18" v-model="addItemsPopup.item.AccountName"/>
+
+          <vs-input placeholder="Payee Ref" class="w-100 mt-2" label="Payment Reference" :maxLength="18" v-model="addItemsPopup.item.PaymentRef"/>
+
+        <div class="row mt-2">
+          <div class="col-sm-3">
+            <vs-button @click="bulkAdd()" color="primary" type="border">Add Items</vs-button>
+          </div>
+          <div class="col-sm-9 text-center">
+            <small>Amount</small>
+            <vs-input-number v-model="addItemsPopup.amount" size="mini" min="1"/>
+          </div>
+        </div>
+      </vs-popup>
+      <!-- Add Items -->
+  <!-- Popups -->
   <!-- Wrapper Div -->
 </div>
 </template>
@@ -75,23 +91,34 @@
 <script>
 import $ from 'jquery'
 import PaymentItem from './PaymentItem'
+const remote = require('electron').remote
+const fs = require('fs')
+
 export default {
   name: 'bank-file-creator',
   components: { PaymentItem },
 
   data: function () {
     return {
-      postingDate: {
-        date: '',
-        rowNumber: 4,
-        lineStart: 6
-      },
+      postingDate: '',
       fileTypes: {
         'HSBC BACS': 'hsbcbacs'
       },
       fileType: '',
       paymentItems: [],
-      order: true
+      order: true,
+      addItemsPopup: {
+        active: false,
+        item: {
+          id: 0,
+          Sortcode: '',
+          AccountNo: '',
+          Amount: 0.00,
+          AccountName: '',
+          PaymentRef: ''
+        },
+        amount: 1
+      }
     }
   },
 
@@ -99,7 +126,7 @@ export default {
   },
 
   mounted () {
-    this.postingDate.date = new Date(Date.now()).toISOString().substring(0, 10)
+    this.postingDate = new Date(Date.now()).toISOString().substring(0, 10)
   },
 
   methods: {
@@ -114,12 +141,11 @@ export default {
       if (paymentItem === null) {
         this.paymentItems.push({
           id: this.paymentItems.length + 1,
-          recSortcode: '',
-          recAccountNo: '',
           Sortcode: '',
           AccountNo: '',
           Amount: 0.00,
-          AccountName: ''
+          AccountName: '',
+          PaymentRef: ''
         }
         )
       } else {
@@ -134,21 +160,100 @@ export default {
         this.paymentItems[i].id = i + 1
       }
     },
+    bulkAdd () {
+      for (let i = 0; i < this.addItemsPopup.amount; ++i) {
+        this.addPaymentItem(this.addItemsPopup.item)
+      }
+
+      this.addItemsPopup.active = false
+
+      this.$vs.notify({
+        title: 'Items added',
+        text: 'Items added successfully',
+        color: 'success',
+        // icon: 'publish',
+        position: this.$store.state.settings.notifPos,
+        time: 4000
+      })
+    },
     // ----------------------------------------------- Export -----------------------------------------------
+    exportToJson (showDialog) {
+      let file = {
+        paymentItems: this.paymentItems,
+        postingDate: this.postingDate,
+        fileType: this.fileType
+      }
+
+      let jsonContent = JSON.stringify(file)
+      this.$emit('export-file', `Bank file template ${new Date(Date.now()).toISOString().substring(0, 10)}.json`, jsonContent, 'JSON File', 'json', 'Template File')
+    },
     exportFile () {
       if (this.fileType === 'hsbcbacs') {
         this.exportHSBCBACS()
+      } else if (this.fileType === '') {
+        this.$vs.notify({
+          title: 'Error!',
+          text: 'Please select a file type',
+          color: 'danger',
+          position: this.$store.state.settings.notifPos,
+          time: 4000
+        })
       }
     },
     exportHSBCBACS () {
       let content = '\r\n\r\n\r\n'
-      content += `UHL1 ${this.getJulianDate(this.postingDate.date)}000977    0000000013DAILY  001            SYNDC           DISK 000                        `
+      content += `UHL1 ${this.getJulianDate(this.postingDate)}000977    0000000013DAILY  001            SYNDC           DISK 000                        \r\n`
       this.paymentItems.forEach(element => {
-        content += `${element.recSortcode}${element.recAccountNo}0099${element.Sortcode}${element.AccountNo}${element.Amount}${element.AccountName}\r\n`
+        let amount = Math.round(element.Amount * 100)
+        content += `00000000000000099${element.Sortcode}${element.AccountNo}${String(amount).padStart(15, '0')}${element.AccountName.padEnd(18, ' ')}${element.PaymentRef.padEnd(18, ' ')}\r\n`
       })
-      content += '\r\n\r\n\r\n'
-      console.log(content)
+
+      // exportFile (filename, content, extensionName, extension, filetype)
+      this.$emit('export-file', 'Custom HSBC BACS.txt', content, 'Text File', 'txt', 'HSBC BACS')
     },
+
+    // Import
+    importFromJson () {
+      remote.dialog.showOpenDialog({
+        filters: [
+          { name: 'JSON File', extensions: ['json'] }
+        ]
+      },
+      (fileName) => {
+        // fileNames is an array that contains all the selected
+        if (fileName === undefined) {
+          return
+        }
+
+        fs.readFile(fileName[0], 'utf-8', (err, data) => {
+          if (err) {
+            this.$vs.notify({
+              title: 'Error!',
+              text: `An error ocurred creating the file: ${err.message}`,
+              color: 'danger',
+              position: this.$store.state.settings.notifPos,
+              time: 4000
+            })
+          } else {
+            this.$vs.notify({
+              title: 'File Imported!',
+              text: `File "${fileName[0]}" was imported successfully`,
+              color: 'success',
+              // icon: 'publish',
+              position: this.$store.state.settings.notifPos,
+              time: 4000
+            })
+            let parsedData = JSON.parse(data)
+
+            this.paymentItems = parsedData.paymentItems
+            this.postingDate = parsedData.postingDate
+            this.fileType = parsedData.fileType
+          }
+        })
+      })
+    },
+
+    // Helpers
     getJulianDate (date) {
       var now = new Date(Date.parse(date))
       var start = new Date(now.getFullYear(), 0, 0)
@@ -156,6 +261,14 @@ export default {
       var oneDay = 1000 * 60 * 60 * 24
       var day = Math.floor(diff / oneDay)
       return `${now.getFullYear().toString().substring(2, 4)}${day.toString().padStart(3, 0)}`
+    },
+
+    numbersOnly (evt) {
+      if (evt.keyCode < 48 || evt.keyCode > 57) {
+        if (evt.keyCode !== 8) {
+          evt.preventDefault()
+        }
+      }
     }
   }
 }

@@ -20,8 +20,6 @@
       <h1 class="mt-3 title">Latest Releases</h1>
       <hr>
       <div id="div-with-loading" class="vs-con-loading__container text-left">
-        <h4>Latest Build Status: <img src="https://ci.appveyor.com/api/projects/status/da9tomaqs4tf119f?svg=true"/></h4>
-        <br>
         <div v-for="(release, index) in releases" v-bind:key="index">
           <h3>Version: {{ release.version }}</h3>
           <p v-html="release.body"></p>

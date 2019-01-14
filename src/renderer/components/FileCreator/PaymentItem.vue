@@ -6,43 +6,32 @@
       <font-awesome-icon icon="arrow-down" size="2x" v-if="canMoveDown" @click="$emit('move-down')" class="sorting-buttons"/>
     </td>
     <td class="align-middle">
-      <vs-input placeholder="123456" class="w-100" v-model="paymentData.recSortcode"/>
+      <vs-input placeholder="123456" class="w-100"
+        :maxLength="6"
+        @keydown="numbersOnly"
+        v-model="paymentData.Sortcode"/>
     </td>
     <td class="align-middle">
-      <vs-input placeholder="12345678" class="w-100" v-model="paymentData.recAccountNo"/>
-    </td>
-    <td class="align-middle">
-      <vs-input placeholder="123456" class="w-100" v-model="paymentData.Sortcode"/>
-    </td>
-    <td class="align-middle">
-      <vs-input placeholder="12345678" class="w-100" v-model="paymentData.AccountNo"/>
+      <vs-input placeholder="12345678" class="w-100"
+      :maxLength="8"
+      @keydown="numbersOnly"
+      v-model="paymentData.AccountNo"/>
     </td>
     <td class="align-middle">
       <vs-input-number v-model="paymentData.Amount"/>
     </td>
     <td class="align-middle">
-      <vs-input placeholder="" class="w-100" v-model="paymentData.AccountName"/>
+      <vs-input placeholder="Bank Account Name" class="w-100" :maxLength="editAccountName.max" @focus="editAccountName.edit = true" @blur="editAccountName.edit = false" v-model="paymentData.AccountName"/>
+      <small v-if="editAccountName.edit" class="float-right">{{accountNameRemainingChars}}/{{editAccountName.max}}</small>
     </td>
     <td class="align-middle">
-      <vs-dropdown vs-custom-content vs-trigger-click>
-
-        <font-awesome-icon icon="ellipsis-h" size="lg" class="more-button"/>
-
-        <vs-dropdown-menu style="width: 17.5%;">
-
-          <vs-dropdown-item @click="$emit('duplicate')">
-            <font-awesome-icon icon="clone" size="lg" class="text-primary"/>
-            <span class="float-right">Duplicate</span>
-          </vs-dropdown-item>
-
-          <vs-dropdown-item divider @click="$emit('remove-self')">
-            <font-awesome-icon icon="trash" size="lg" class="text-danger"/>
-            <span class="float-right">Delete</span> 
-          </vs-dropdown-item>
-
-        </vs-dropdown-menu>
-
-      </vs-dropdown>
+      <vs-input placeholder="Payee Ref" class="w-100" :maxLength="editPaymentRef.max" @focus="editPaymentRef.edit = true" @blur="editPaymentRef.edit = false" v-model="paymentData.PaymentRef"/>
+      <small v-if="editPaymentRef.edit" class="float-right">{{paymentRefRemainingChars}}/{{editPaymentRef.max}}</small>
+    </td>
+    <td class="align-middle">
+      <a title="Duplicate"><font-awesome-icon icon="clone" size="lg" class="text-primary" @click="$emit('duplicate')"/></a>
+      |
+      <a title="Delete"><font-awesome-icon icon="trash" size="lg" class="text-danger" @click="$emit('remove-self')"/></a>
     </td>
 </tr>
 </template>
@@ -55,6 +44,24 @@
 
     data: function () {
       return {
+        editAccountName: {
+          edit: false,
+          max: 18
+        },
+        editPaymentRef: {
+          edit: false,
+          max: 18
+        }
+      }
+    },
+
+    methods: {
+      numbersOnly (evt) {
+        if (evt.keyCode < 48 || evt.keyCode > 57) {
+          if (evt.keyCode !== 8) {
+            evt.preventDefault()
+          }
+        }
       }
     },
 
@@ -64,6 +71,12 @@
       },
       canMoveDown () {
         return (this.paymentData.id !== this.totalNumberOfPaymentItems && this.order === true)
+      },
+      accountNameRemainingChars () {
+        return this.editAccountName.max - this.paymentData.AccountName.length
+      },
+      paymentRefRemainingChars () {
+        return this.editPaymentRef.max - this.paymentData.PaymentRef.length
       }
     }
   }
@@ -97,5 +110,16 @@
 
 .more-button:hover {
   color: grey;
+}
+
+/* For Firefox */
+input[type='number'] {
+    -moz-appearance:textfield;
+}
+/* Webkit browsers like Safari and Chrome */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 </style>
