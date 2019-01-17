@@ -4,7 +4,7 @@
     <div class="col-md-12">
 
       <vs-row>
-        <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="8">
+        <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="6">
 
           <vs-input type="date" label="Posting date" v-model="postingDate"/>
 
@@ -12,9 +12,9 @@
             <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in fileTypes" />
           </vs-select>          
         </vs-col>
-        <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="2">
+        <vs-col vs-type="flex" vs-justify="flex-end" vs-align="center" vs-w="4">
           <vs-button @click="exportToJson()" color="dark" type="border" class="mt-4" >Export template</vs-button>
-          <vs-button @click="importFromJson()" color="dark" type="border" class="ml-2 mt-4" >Import template</vs-button>
+          <vs-button @click="importFromJson()" color="dark" type="border" class="mx-2 mt-4" >Import template</vs-button>
         </vs-col>
         <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="2">
           <vs-button @click="exportFile()" color="rgb(100, 175, 134)" type="filled" class="mt-4 w-100" >Export File</vs-button>
