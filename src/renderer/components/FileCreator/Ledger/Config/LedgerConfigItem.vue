@@ -18,14 +18,14 @@
       @focus="editFieldName.edit = true"
       @blur="editFieldName.edit = false"
       v-model="ledgerConfigData.fieldName"
-      @input="$emit('editing')"/>
+      @input="$emit('editing', false)"/>
       <small v-if="editFieldName.edit" class="float-right">{{fieldNameRemainingChars}}/{{editFieldName.max}}</small>
     </td>
 
     <td class="align-middle">
       <vs-row>
         <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="12">
-          <vs-input-number max="999999" min="1" step="1" v-model="ledgerConfigData.linePosition.value" @input="$emit('editing')"/>
+          <vs-input-number max="999999" min="1" step="1" v-model="ledgerConfigData.linePosition.value" @input="$emit('editing', false)"/>
         </vs-col>
       </vs-row>
       <small>
@@ -38,7 +38,7 @@
     <td class="align-middle">
       <vs-row>
         <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="6">
-          <vs-input-number max="999999" min="1" step="1" v-model="ledgerConfigData.charLength.value" @input="$emit('editing')"/>
+          <vs-input-number max="999999" min="1" step="1" v-model="ledgerConfigData.charLength.value" @input="$emit('editing', false)"/>
         </vs-col>
         <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="6">
           <small>Character Range: {{ledgerConfigData.linePosition.value}} - {{ledgerConfigData.endLinePosition}}</small>
@@ -52,15 +52,21 @@
     </td>
 
     <td class="align-middle">
-      <vs-select autocomplete placeholder="Type" v-model="ledgerConfigData.type" class="w-100" @input="$emit('editing')">
+      <vs-select autocomplete placeholder="Type" v-model="ledgerConfigData.type" class="w-100" @input="$emit('editing', true)">
         <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in { Text: 'text', Date: 'date', Number: 'number' }" />
       </vs-select>  
-    </td> 
+    </td>
 
     <td class="align-middle">
-      <a title="Duplicate"><font-awesome-icon icon="clone" size="lg" class="text-primary" @click="$emit('duplicate'); $emit('editing')"/></a>
+      <vs-select autocomplete placeholder="Shared Data" v-model="ledgerConfigData.sharedData" class="w-100" @input="$emit('editing', false); $emit('link-item', ledgerConfigData.id, ledgerConfigData.sharedData)">
+        <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in configItems" />
+      </vs-select>  
+    </td>
+
+    <td class="align-middle">
+      <a title="Duplicate"><font-awesome-icon icon="clone" size="lg" class="text-primary" @click="$emit('duplicate'); $emit('editing', false)"/></a>
       |
-      <a title="Delete"><font-awesome-icon icon="trash" size="lg" class="text-danger" @click="$emit('remove-self'); $emit('editing')"/></a>
+      <a title="Delete"><font-awesome-icon icon="trash" size="lg" class="text-danger" @click="$emit('remove-self'); $emit('editing', false)"/></a>
     </td>
 </tr>
 </template>
@@ -69,7 +75,7 @@
   export default {
     name: 'ledger-config-item',
 
-    props: ['ledgerConfigData', 'totalNumberOfLedgerConfigItems', 'order'],
+    props: ['ledgerConfigData', 'totalNumberOfLedgerConfigItems', 'order', 'ledgerConfigItems'],
 
     data: function () {
       return {
@@ -99,6 +105,15 @@
       },
       fieldNameRemainingChars () {
         return this.editFieldName.max - this.ledgerConfigData.fieldName.length
+      },
+      configItems () {
+        let items = {}
+        items['None'] = ''
+        this.ledgerConfigItems.forEach(element => {
+          items[`${element.id}-${element.fieldName}`] = element.id
+        })
+
+        return items
       }
     }
   }

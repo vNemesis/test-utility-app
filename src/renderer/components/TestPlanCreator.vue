@@ -680,7 +680,7 @@ export default {
           if (err) {
             this.$vs.notify({
               title: 'Error!',
-              text: `An error ocurred creating the file: ${err.message}`,
+              text: `An error ocurred loading the file: ${err.message}`,
               color: 'danger',
               // icon: 'error_outline',
               position: this.$store.state.settings.notifPos,

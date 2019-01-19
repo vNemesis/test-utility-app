@@ -5,7 +5,7 @@
   <vs-tabs vs-alignment="fixed" vs-position="top" color="success" v-model="activeTab">
 
     <vs-tab vs-label="Configuration">
-      <ledger-config v-bind:ledgerConfigItems="ledgerConfigItems" v-bind:hasValidated="hasValidated" v-on:has-validated="hasValidated = $event" v-on:export-file="exportFile" v-on:update-config="updateConfig"></ledger-config>
+      <ledger-config v-bind:ledgerConfigItems="ledgerConfigItems" v-bind:hasValidated="hasValidated" v-on:has-validated="hasValidated = $event;" v-on:export-file="exportFile" v-on:clear="clear"></ledger-config>
     </vs-tab>
     <vs-tab vs-label="Data" >
       <ledger-data v-if="hasValidated" v-bind:ledgerDataItems="ledgerDataItems" v-bind:ledgerConfigItems="ledgerConfigItems"></ledger-data>
@@ -54,6 +54,15 @@ export default {
     },
     updateData (data) {
       this.ledgerDataItems = data
+    },
+    clear (clearConfig, clearData) {
+      if (clearConfig) {
+        this.ledgerConfigItems = []
+      }
+
+      if (clearData) {
+        this.ledgerDataItems = []
+      }
     }
   }
 }

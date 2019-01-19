@@ -1,17 +1,32 @@
 <template>
 <div>
-  <div class="row mt-5">
+  <vs-progress indeterminate color="primary" v-if="editing"> Validating</vs-progress>
+  <div class="row" :class="editing ? 'my-4' : 'my-5'">
     <div class="col-md-12">
 
       <p>Define a configuration for the ledger file</p>
 
+      <div class="alert alert-warning" role="alert">
+        Any changes to the configuration <strong>type</strong> will clear any data!
+      </div>
+
       <vs-row>
-        <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="12">
-          <vs-button @click="validateConfig()" :color="hasValidated ? 'success' : 'danger'" type="border" class="ml-2" >Validate</vs-button>
+        <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="10">
           <vs-switch class="ml-2" v-model="order">
             <span slot="on">Order On</span>
             <span slot="off">Order Off</span>
           </vs-switch>
+          <vs-switch class="ml-2" v-model="autoValidate">
+            <span slot="on">Auto Validate On</span>
+            <span slot="off">Auto Validate Off</span>
+          </vs-switch>
+          <vs-select autocomplete placeholder="File Type" label="File Type" class="ml-2" v-model="fileType" :danger="fileType === ''" danger-text="Please select a file type">
+            <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in fileTypes" />
+          </vs-select> 
+          <vs-button @click="validateConfig()" :color="hasValidated ? 'success' : 'danger'" type="border" class="ml-2" >Validate</vs-button>
+        </vs-col>
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+          <vs-button @click="clear()" color="danger" type="filled" class="ml-2" >Clear Config and Data</vs-button>
         </vs-col>
       </vs-row>
 
@@ -22,17 +37,26 @@
               <thead>
                 <th v-if="order" width="2.5%"></th>
                 <th :width="order ? '2.5%' : '5%'">ID</th>
-                <th width="22.5%">Field Name</th>
-                <th width="22.5%">Line Position</th>
-                <th width="22.5%">Length (Chars)</th>
-                <th width="22.5%">Type</th>
+                <th width="18%">Field Name</th>
+                <th width="15%">Line Position</th>
+                <th width="22%">Length (Chars)</th>
+                <th width="10%">Type</th>
+                <th width="25%">Shared Data</th>
                 <th width="5%">Options</th>
               </thead>
               <tbody>
                 <tr is="ledger-config-item" v-for="(ledgerConfig, index) in ledgerConfigItems" :key="ledgerConfig.id"
-                v-bind:ledgerConfigData="ledgerConfig" v-bind:totalNumberOfLedgerConfigItems="ledgerConfigItems.length" v-bind:order="order"
-                v-on:remove-self="removeLedgerConfigItem(index)" v-on:move-up="moveLedgerConfigItem(index, index - 1)" v-on:move-down="moveLedgerConfigItem(index, index + 1)"
-                  v-on:duplicate="addLedgerConfigItem(ledgerConfig)" v-on:editing="editing = true"></tr>
+                v-bind:ledgerConfigData="ledgerConfig"
+                v-bind:totalNumberOfLedgerConfigItems="ledgerConfigItems.length"
+                v-bind:order="order"
+                v-bind:ledgerConfigItems="ledgerConfigItems"
+                v-on:remove-self="removeLedgerConfigItem(index)"
+                v-on:move-up="moveLedgerConfigItem(index, index - 1)"
+                v-on:move-down="moveLedgerConfigItem(index, index + 1)"
+                v-on:duplicate="addLedgerConfigItem(ledgerConfig)"
+                v-on:editing="editingHandler"
+                v-on:link-item="linkItem"
+                ></tr>
               </tbody>
             </table>
           </div>
@@ -53,6 +77,7 @@
 import $ from 'jquery'
 import _ from 'lodash'
 import LedgerConfigItem from './LedgerConfigItem'
+import LedgerConfigItemObject from '../../../../classes/LedgerConfigItem.js'
 
 export default {
   name: 'ledger-file-config',
@@ -63,7 +88,8 @@ export default {
   data: function () {
     return {
       order: false,
-      editing: false
+      editing: false,
+      autoValidate: true
     }
   },
 
@@ -97,23 +123,26 @@ export default {
           linePos = last.linePosition.value + last.charLength.value + 1
         }
 
-        this.ledgerConfigItems.push({
-          id: this.ledgerConfigItems.length + 1,
-          fieldName: '',
-          linePosition: {
-            value: linePos,
-            errors: []
-          },
-          charLength: {
-            value: 1,
-            errors: []
-          },
-          get endLinePosition () {
-            return this.linePosition.value + this.charLength.value
-          },
-          type: 'text'
-        }
-        )
+        // this.ledgerConfigItems.push({
+        //   id: this.ledgerConfigItems.length + 1,
+        //   fieldName: '',
+        //   linePosition: {
+        //     value: linePos,
+        //     errors: []
+        //   },
+        //   charLength: {
+        //     value: 1,
+        //     errors: []
+        //   },
+        //   get endLinePosition () {
+        //     return this.linePosition.value + (this.charLength.value - 1)
+        //   },
+        //   type: 'text'
+        // })
+
+        let newItem = new LedgerConfigItemObject(this.ledgerConfigItems.length + 1, '', linePos, 1, 'text', '')
+
+        this.ledgerConfigItems.push(newItem)
       } else {
         let duplicate = $.extend(true, {}, ledgerConfigItem)
         duplicate.id = this.ledgerConfigItems.length + 1
@@ -162,7 +191,7 @@ export default {
           let iEnd = item.endLinePosition
 
           // Does the start of this element conflict with the start or end of the other?
-          if (eStart >= iStart && eStart <= iEnd) {
+          if (eStart >= iStart && eStart <= iEnd && element.sharedData === '') {
             if (!element.linePosition.errors.find(x => x.conflictID === item.id)) {
               element.linePosition.errors.push({
                 message: `Starting Position conflicts with item ID ${item.id}`,
@@ -178,7 +207,7 @@ export default {
           }
 
           // does the end of this element conflict with the start or end of the pther
-          if (eEnd >= iStart && eEnd <= iEnd) {
+          if (eEnd >= iStart && eEnd <= iEnd && element.sharedData === '') {
             if (!element.charLength.errors.find(x => x.conflictID === item.id)) {
               element.charLength.errors.push({
                 message: `Ending Position conflicts with item ID ${item.id}`,
@@ -216,6 +245,49 @@ export default {
           position: this.$store.state.settings.notifPos,
           time: 4000
         })
+      }
+    },
+
+    clear () {
+      if (confirm('This will clear all config and data, Press "OK" if you wish to proceed')) {
+        this.$emit('clear', true, true)
+      }
+    },
+
+    editingHandler (clearData) {
+      this.$emit('has-validated', false)
+      // Check if this needs auto-validating
+      if (this.autoValidate) {
+        this.editing = true
+      }
+
+      if (clearData) {
+        this.$emit('clear', false, true)
+      }
+    },
+
+    linkItem (elementID, itemID) {
+      let item1 = null
+      let item2 = null
+
+      if (elementID && itemID) {
+        this.ledgerConfigItems.forEach(element => {
+          if (element.id === elementID) {
+            item1 = element
+          } else if (element.id === itemID) {
+            item2 = element
+          }
+        })
+      } else if (!itemID) {
+        this.ledgerConfigItems.forEach(element => {
+          if (element.sharedData === elementID) {
+            element.sharedData = ''
+          }
+        })
+      }
+
+      if (item1 !== null || item2 !== null) {
+        item2.sharedData = item1.id
       }
     }
   }
