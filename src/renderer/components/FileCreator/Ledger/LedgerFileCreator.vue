@@ -37,6 +37,7 @@ export default {
       // Ledger Config
       ledgerConfigItems: [],
       ledgerDataItems: [],
+      delimiter: '',
       hasValidated: false,
       activeTab: 0,
       order: true
@@ -47,9 +48,11 @@ export default {
     exportFile (filename, content, extensionName, extension, filetype) {
       this.$emit('export-file', filename, content, extensionName, extension, filetype)
     },
-    updateConfig (data) {
+    // TODO: add delimiter to other options
+    updateConfig (data, delimiter) {
       this.ledgerDataItems = []
       this.ledgerConfigItems = data
+      this.delimiter = delimiter
       this.activeTab = 0
     },
     updateData (data) {

@@ -58,7 +58,7 @@
     </td>
 
     <td class="align-middle">
-      <vs-select autocomplete placeholder="Shared Data" v-model="ledgerConfigData.sharedData" class="w-100" @input="$emit('editing', false); $emit('link-item', ledgerConfigData.id, ledgerConfigData.sharedData)">
+      <vs-select autocomplete multiple placeholder="Shared Data" v-model="ledgerConfigData.sharedData" class="w-100" @input="$emit('editing', false); $emit('link-item', ledgerConfigData.id, ledgerConfigData.sharedData)">
         <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in configItems" />
       </vs-select>  
     </td>
@@ -108,9 +108,10 @@
       },
       configItems () {
         let items = {}
-        items['None'] = ''
         this.ledgerConfigItems.forEach(element => {
-          items[`${element.id}-${element.fieldName}`] = element.id
+          if (element.id !== this.ledgerConfigData.id) {
+            items[`(${element.id})-${element.fieldName}`] = element.id
+          }
         })
 
         return items

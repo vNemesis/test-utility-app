@@ -4,10 +4,11 @@
     <div class="col-md-12">
 
       <vs-row>
-        <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="10">
+        <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="9">
         </vs-col>
-        <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="2">
-          <vs-button @click="exportFile()" color="rgb(100, 175, 134)" type="filled" class="mt-4 w-100" >Export File</vs-button>
+        <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="3">
+          <vs-button @click="addItemsPopup.active = true" color="danger" type="filled" class="w-50 mr-2">Bulk Add</vs-button>
+          <vs-button @click="exportFile()" color="rgb(100, 175, 134)" type="filled" class="w-50" >Export File</vs-button>
         </vs-col>
       </vs-row>
 
@@ -18,7 +19,7 @@
               <thead>
                 <th></th>
                 <th v-for="ledgerConfigItem in ledgerConfigItems" :key="ledgerConfigItem.id">{{ ledgerConfigItem.fieldName }}</th>
-                <th><vs-button @click="addItemsPopup.active = true" color="danger" type="filled" class="py-0">Bulk Add</vs-button></th>
+                <th></th>
               </thead>
               <tbody>
                 <tr is="ledger-data-item" v-for="(ledgerData, index) in ledgerDataItems" :key="ledgerData.id"
@@ -39,24 +40,13 @@
   </div>
   <!-- Popups -->
       <!-- Add Items -->
-      <vs-popup title="Add Payment Items" :active.sync="addItemsPopup.active">
+      <vs-popup title="Add Ledger Items" :active.sync="addItemsPopup.active">
 
-          <vs-input placeholder="123456" label="Sortcode" class="w-100"
-            :maxLength="6"
-            @keydown="numbersOnly"
-            v-model="addItemsPopup.item.Sortcode"/>
-
-          <vs-input placeholder="12345678" label="Account Number" class="w-100 mt-2"
-          :maxLength="8"
-          @keydown="numbersOnly"
-          v-model="addItemsPopup.item.AccountNo"/>
-
-          <small class="mt-2">Payment Amount</small>
-          <vs-input-number v-model="addItemsPopup.item.Amount"/>
-
-          <vs-input placeholder="Bank Account Name" label="Account Name " class="w-100 mt-2" :maxLength="18" v-model="addItemsPopup.item.AccountName"/>
-
-          <vs-input placeholder="Payee Ref" class="w-100 mt-2" label="Payment Reference" :maxLength="18" v-model="addItemsPopup.item.PaymentRef"/>
+        <td v-for="item in ledgerConfigItems" :key="item.id">
+          <vs-input v-if="item.type === 'text'" :placeholder="item.fieldName" class="w-100" :maxLength="item.charLength" v-model="ledgerData[`${item.id}_data`]"/>
+          <vs-input-number v-if="item.type === 'number'" max="999999" min="1" step="1" v-model="ledgerData[`${item.id}_data`]"/>
+          <vs-input v-if="item.type === 'date'" type="date" class="w-100" v-model="ledgerData[`${item.id}_data`]"/>
+        </td>
 
         <div class="row mt-2">
           <div class="col-sm-3">
@@ -140,6 +130,7 @@ export default {
         this.ledgerDataItems[i].id = i + 1
       }
     },
+    // TODO: Fix this
     bulkAdd () {
       for (let i = 0; i < this.addItemsPopup.amount; ++i) {
         this.addLedgerDataItem(this.addItemsPopup.item)

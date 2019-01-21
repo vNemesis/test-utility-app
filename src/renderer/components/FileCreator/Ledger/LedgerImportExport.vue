@@ -129,7 +129,7 @@ export default {
 
       configLine.forEach(element => {
         let columns = element.split('\t')
-        configData.push(new LedgerConfigItemObject(configData.length + 1, columns[0], parseInt(columns[1]), parseInt(columns[2]), 'text', ''))
+        configData.push(new LedgerConfigItemObject(configData.length + 1, columns[0], parseInt(columns[1]), parseInt(columns[2]), 'text', []))
       })
 
       this.$emit('update-config', configData)
@@ -171,7 +171,7 @@ export default {
               if (!parsedData[index][0] && !parsedData[index][1] && !parsedData[index][0]) {
                 continue
               }
-              configData.push(new LedgerConfigItemObject(configData.length + 1, parsedData[index][0], parseInt(parsedData[index][1]), parseInt(parsedData[index][2]), 'text', ''))
+              configData.push(new LedgerConfigItemObject(configData.length + 1, parsedData[index][0], parseInt(parsedData[index][1]), parseInt(parsedData[index][2]), 'text', []))
             }
             this.$emit('update-config', configData)
           }

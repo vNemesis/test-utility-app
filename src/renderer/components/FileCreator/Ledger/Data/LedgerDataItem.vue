@@ -8,7 +8,7 @@
 
     <td v-for="item in ledgerConfigData" :key="item.id">
       <vs-input v-if="item.type === 'text'" :placeholder="item.fieldName" class="w-100" :maxLength="item.charLength" v-model="ledgerData[`${item.id}_data`]"/>
-      <vs-input v-if="item.type === 'number'" :placeholder="item.fieldName" class="w-100" :maxLength="item.charLength" @keydown="numbersOnly" v-model="ledgerData[`${item.id}_data`]"/>
+      <vs-input-number v-if="item.type === 'number'" max="999999" min="1" step="1" v-model="ledgerData[`${item.id}_data`]"/>
       <vs-input v-if="item.type === 'date'" type="date" class="w-100" v-model="ledgerData[`${item.id}_data`]"/>
     </td>
 
@@ -36,13 +36,6 @@
     },
 
     methods: {
-      numbersOnly (evt) {
-        if (evt.keyCode < 48 || evt.keyCode > 57) {
-          if (evt.keyCode !== 8) {
-            evt.preventDefault()
-          }
-        }
-      }
     },
 
     computed: {
