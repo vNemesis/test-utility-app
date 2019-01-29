@@ -20,8 +20,8 @@
             <span slot="on">Auto Validate On</span>
             <span slot="off">Auto Validate Off</span>
           </vs-switch>
-          <vs-select autocomplete placeholder="Please select a delimiter" class="ml-2" v-model="delimiter" :danger="delimiter === ''" danger-text="Please select a file type">
-            <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in { Pipe: '|', Comma: ',' }" />
+          <vs-select autocomplete placeholder="Please select a delimiter" class="ml-2" v-model="delimiter">
+            <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in { None: '', Pipe: '|', Comma: ',' }" />
           </vs-select> 
           <vs-button @click="validateConfig()" :color="hasValidated ? 'success' : 'danger'" type="border" class="ml-2" >Validate</vs-button>
         </vs-col>
@@ -41,8 +41,8 @@
                 <th width="15%">Line Position</th>
                 <th width="22%">Length (Chars)</th>
                 <th width="10%">Type</th>
-                <th width="25%">Shared Data</th>
-                <th width="5%">Options</th>
+                <th width="25%">Options</th>
+                <th width="5%">Action</th>
               </thead>
               <tbody>
                 <tr is="ledger-config-item" v-for="(ledgerConfig, index) in ledgerConfigItems" :key="ledgerConfig.id"
@@ -55,7 +55,6 @@
                 v-on:move-down="moveLedgerConfigItem(index, index + 1)"
                 v-on:duplicate="addLedgerConfigItem(ledgerConfig)"
                 v-on:editing="editingHandler"
-                v-on:link-item="linkItem"
                 ></tr>
               </tbody>
             </table>
@@ -83,14 +82,24 @@ export default {
   name: 'ledger-file-config',
   components: { LedgerConfigItem },
 
-  props: ['ledgerConfigItems', 'hasValidated'],
+  props: ['ledgerConfigItems', 'hasValidated', 'delimiterValue'],
 
   data: function () {
     return {
       order: false,
       editing: false,
-      autoValidate: true,
-      delimiter: ''
+      autoValidate: true
+    }
+  },
+
+  computed: {
+    delimiter: {
+      get () {
+        return this.delimiterValue
+      },
+      set (value) {
+        this.$emit('set-delimiter', value)
+      }
     }
   },
 
@@ -124,23 +133,6 @@ export default {
           linePos = last.linePosition.value + last.charLength.value + 1
         }
 
-        // this.ledgerConfigItems.push({
-        //   id: this.ledgerConfigItems.length + 1,
-        //   fieldName: '',
-        //   linePosition: {
-        //     value: linePos,
-        //     errors: []
-        //   },
-        //   charLength: {
-        //     value: 1,
-        //     errors: []
-        //   },
-        //   get endLinePosition () {
-        //     return this.linePosition.value + (this.charLength.value - 1)
-        //   },
-        //   type: 'text'
-        // })
-
         let newItem = new LedgerConfigItemObject(this.ledgerConfigItems.length + 1, '', linePos, 1, 'text', [])
 
         this.ledgerConfigItems.push(newItem)
@@ -170,17 +162,6 @@ export default {
         })
         return
       }
-      if (this.delimiter === '') {
-        this.$emit('has-validated', false)
-        this.$vs.notify({
-          title: 'Validation Errors',
-          text: 'Please select a delimiter',
-          color: 'danger',
-          position: this.$store.state.settings.notifPos,
-          time: 4000
-        })
-        return
-      }
       let errored = 0
 
       for (let i = 0; i < this.ledgerConfigItems.length; ++i) {
@@ -202,7 +183,7 @@ export default {
           let iEnd = item.endLinePosition
 
           // Does the start of this element conflict with the start or end of the other?
-          if (eStart >= iStart && eStart <= iEnd && !element.sharedData.length) {
+          if (eStart >= iStart && eStart <= iEnd) {
             if (!element.linePosition.errors.find(x => x.conflictID === item.id)) {
               element.linePosition.errors.push({
                 message: `Starting Position conflicts with item ID ${item.id}`,
@@ -218,7 +199,7 @@ export default {
           }
 
           // does the end of this element conflict with the start or end of the other
-          if (eEnd >= iStart && eEnd <= iEnd && !element.sharedData.length) {
+          if (eEnd >= iStart && eEnd <= iEnd) {
             if (!element.charLength.errors.find(x => x.conflictID === item.id)) {
               element.charLength.errors.push({
                 message: `Ending Position conflicts with item ID ${item.id}`,
@@ -274,29 +255,6 @@ export default {
 
       if (clearData) {
         this.$emit('clear', false, true)
-      }
-    },
-
-    linkItem (elementID, itemIDS) {
-      // Find the element that called the event
-      // let configItem = this.ledgerConfigItems.find(x => x.id === elementID)
-      // Get a list of the items this element is linked to
-      let linkedItems = this.ledgerConfigItems.filter(item => itemIDS.includes(item.id))
-
-      // if that item does have a reference to the subject element, add one
-      linkedItems.forEach(element => {
-        if (!element.sharedData.includes(elementID)) {
-          element.sharedData.push(elementID)
-        }
-      })
-
-      // removing old references
-      for (let i = 0; i < this.ledgerConfigItems.length; ++i) {
-        let element = this.ledgerConfigItems[i]
-        // if the element has a refernce to the subject element but the subject does not have a refernece to it, then remove it
-        if (element.id !== elementID && element.sharedData.includes(elementID) && !itemIDS.includes(element.id)) {
-          element.sharedData.splice(element.sharedData.indexOf(elementID), 1)
-        }
       }
     }
   }

@@ -8,7 +8,7 @@
         </vs-col>
         <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="3">
           <vs-button @click="addItemsPopup.active = true" color="danger" type="filled" class="w-50 mr-2">Bulk Add</vs-button>
-          <vs-button @click="exportFile()" color="rgb(100, 175, 134)" type="filled" class="w-50" >Export File</vs-button>
+          <vs-button @click="exportLedgerFile()" color="rgb(100, 175, 134)" type="filled" class="w-50" >Export File</vs-button>
         </vs-col>
       </vs-row>
 
@@ -22,10 +22,16 @@
                 <th></th>
               </thead>
               <tbody>
-                <tr is="ledger-data-item" v-for="(ledgerData, index) in ledgerDataItems" :key="ledgerData.id"
-                v-bind:ledgerData="ledgerData" v-bind:ledgerConfigData="ledgerConfigItems" v-bind:totalNumberOfLedgerDataItems="ledgerDataItems.length" v-bind:order="order"
-                v-on:remove-self="removeLedgerDataItem(index)" v-on:move-up="moveLedgerDataItem(index, index - 1)" v-on:move-down="moveLedgerDataItem(index, index + 1)"
-                 v-on:duplicate="addLedgerDataItem(payment)"></tr>
+                <tr is="ledger-data-item" v-for="(ledgerDataItem, index) in ledgerDataItems" :key="ledgerDataItem.id"
+                v-bind:ledgerData="ledgerDataItem"
+                v-bind:ledgerConfigData="ledgerConfigItems"
+                v-bind:totalNumberOfLedgerDataItems="ledgerDataItems.length"
+                v-bind:order="order"
+                v-on:remove-self="removeLedgerDataItem(index)"
+                v-on:move-up="moveLedgerDataItem(index, index - 1)"
+                v-on:move-down="moveLedgerDataItem(index, index + 1)"
+                v-on:duplicate="addLedgerDataItem(payment)"
+                ></tr>
               </tbody>
             </table>
           </div>
@@ -42,21 +48,26 @@
       <!-- Add Items -->
       <vs-popup title="Add Ledger Items" :active.sync="addItemsPopup.active">
 
-        <td v-for="item in ledgerConfigItems" :key="item.id">
-          <vs-input v-if="item.type === 'text'" :placeholder="item.fieldName" class="w-100" :maxLength="item.charLength" v-model="ledgerData[`${item.id}_data`]"/>
-          <vs-input-number v-if="item.type === 'number'" max="999999" min="1" step="1" v-model="ledgerData[`${item.id}_data`]"/>
-          <vs-input v-if="item.type === 'date'" type="date" class="w-100" v-model="ledgerData[`${item.id}_data`]"/>
-        </td>
+        <vs-row v-for="item in ledgerConfigItems" :key="item.id" class="mt-2">
+          <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="6">
+            {{item.fieldName}}
+          </vs-col>
+          <vs-col vs-type="flex" vs-justify="flex-start" vs-align="flex-start" vs-w="6">
+            <vs-input v-if="item.type === 'text'" :placeholder="item.fieldName" class="w-100" :maxLength="item.charLength.value" v-model="addItemsPopup.item[`${item.id}_data`]"/>
+            <vs-input-number v-if="item.type === 'number'" :max="numberMaxLength(item.charLength.value)" min="1" step="1" v-model="addItemsPopup.item[`${item.id}_data`]"/>
+            <vs-input v-if="item.type === 'date'" type="date" class="w-100" v-model="addItemsPopup.item[`${item.id}_data`]"/>
+          </vs-col>
+        </vs-row>
 
-        <div class="row mt-2">
-          <div class="col-sm-3">
+        <vs-row class="mt-2">
+          <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="3">
             <vs-button @click="bulkAdd()" color="primary" type="border">Add Items</vs-button>
-          </div>
-          <div class="col-sm-9 text-center">
+          </vs-col>
+          <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="9">
             <small>Amount</small>
             <vs-input-number v-model="addItemsPopup.amount" size="mini" min="1"/>
-          </div>
-        </div>
+          </vs-col>
+        </vs-row>
       </vs-popup>
       <!-- Add Items -->
   <!-- Popups -->
@@ -72,7 +83,7 @@ export default {
   name: 'ledger-data',
   components: { LedgerDataItem },
 
-  props: ['ledgerConfigItems', 'ledgerDataItems'],
+  props: ['ledgerConfigItems', 'ledgerDataItems', 'delimiter'],
 
   data: function () {
     return {
@@ -81,13 +92,9 @@ export default {
       addItemsPopup: {
         active: false,
         item: {
-          id: 0,
-          Sortcode: '',
-          AccountNo: '',
-          Amount: 0.00,
-          AccountName: '',
-          PaymentRef: ''
+          id: 0
         },
+        test: 0,
         amount: 1
       }
     }
@@ -96,15 +103,22 @@ export default {
   computed: {
   },
 
-  mounted () {
+  beforeMount () {
+    this.ledgerConfigItems.forEach(element => {
+      if (element.type === 'number') {
+        this.$set(this.addItemsPopup.item, `${element.id}_data`, 0)
+      } else {
+        this.$set(this.addItemsPopup.item, `${element.id}_data`, '')
+      }
+    })
   },
 
   methods: {
     // ----------------------------------------------- Test Items -----------------------------------------------
     moveLedgerDataItem (from, to) {
       this.ledgerDataItems.splice(to, 0, this.ledgerDataItems.splice(from, 1)[0])
-      for (let i = 0; i < this.ledgerDataItems.length; i++) {
-        this.ledgerDataItems[i].id = i + 1
+      for (let i = 0; i < this.ledgerDataItemsItems.length; i++) {
+        this.ledgerDataItemsItems[i].id = i + 1
       }
     },
     addLedgerDataItem (ledgerDataItem = null) {
@@ -114,7 +128,11 @@ export default {
         }
 
         this.ledgerConfigItems.forEach(element => {
-          obj[`${element.id}_data`] = ''
+          if (element.type === 'number') {
+            obj[`${element.id}_data`] = 0
+          } else {
+            obj[`${element.id}_data`] = ''
+          }
         })
 
         this.ledgerDataItems.push(obj)
@@ -142,42 +160,50 @@ export default {
         title: 'Items added',
         text: 'Items added successfully',
         color: 'success',
-        // icon: 'publish',
         position: this.$store.state.settings.notifPos,
         time: 4000
       })
     },
     // ----------------------------------------------- Export -----------------------------------------------
-    exportFile () {
-      if (this.fileType === 'hsbcbacs') {
-        this.exportHSBCBACS()
-      } else if (this.fileType === '') {
-        this.$vs.notify({
-          title: 'Error!',
-          text: 'Please select a file type',
-          color: 'danger',
-          position: this.$store.state.settings.notifPos,
-          time: 4000
-        })
-      }
-    },
-    exportHSBCBACS () {
-      let content = '\r\n\r\n\r\n'
-      content += `UHL1 ${this.getJulianDate(this.postingDate)}000977    0000000013DAILY  001            SYNDC           DISK 000                        \r\n`
+    exportLedgerFile () {
+      // Create a template aray
+      let lineTemplate = []
+      this.ledgerConfigItems.forEach(element => {
+        lineTemplate.push(new Array(element.charLength.length).fill(' '))
+      })
+      // Content to be written to file
+      let content = ''
+
+      // For each of the ledger data items ...
       this.ledgerDataItems.forEach(element => {
-        let amount = Math.round(element.Amount * 100)
-        content += `00000000000000099${element.Sortcode}${element.AccountNo}${String(amount).padStart(15, '0')}${element.AccountName.padEnd(18, ' ')}${element.PaymentRef.padEnd(18, ' ')}\r\n`
+        // ... create a new array from the template ...
+        let line = lineTemplate.slice()
+
+        // ... foreach config, get the configuration and add the data to the array based on that ...
+        line = this.fillData(line, element)
+
+        content += `${line.join(this.delimiter)}\r\n`
       })
 
-      // exportFile (filename, content, extensionName, extension, filetype)
-      this.$emit('export-file', 'Custom HSBC BACS.txt', content, 'Text File', 'txt', 'HSBC BACS')
+      // exportLedgerFile (filename, content, extensionName, extension, filetype)
+      this.$emit('export-file', 'Custom Ledger.txt', content, 'Text File', 'txt', 'Ledger')
     },
-    numbersOnly (evt) {
-      if (evt.keyCode < 48 || evt.keyCode > 57) {
-        if (evt.keyCode !== 8) {
-          evt.preventDefault()
+    fillData (line, element) {
+      for (let i = 0; i < this.ledgerConfigItems.length; ++i) {
+        let configItem = this.ledgerConfigItems[i]
+        let data = element[`${configItem.id}_data`].toString()
+
+        if (data.length > configItem.charLength.value) {
+          line[i] = data.substring(0, configItem.charLength.value)
+        } else {
+          line[i] = data.padEnd(configItem.charLength.value, ' ')
         }
       }
+      return line
+    },
+    // Helpers
+    numberMaxLength (length) {
+      return parseInt(''.padEnd(length, '9'))
     }
   }
 }

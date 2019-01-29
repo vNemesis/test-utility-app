@@ -5,15 +5,35 @@
   <vs-tabs vs-alignment="fixed" vs-position="top" color="success" v-model="activeTab">
 
     <vs-tab vs-label="Configuration">
-      <ledger-config v-bind:ledgerConfigItems="ledgerConfigItems" v-bind:hasValidated="hasValidated" v-on:has-validated="hasValidated = $event;" v-on:export-file="exportFile" v-on:clear="clear"></ledger-config>
+      <ledger-config
+        v-bind:ledgerConfigItems="ledgerConfigItems"
+        v-bind:hasValidated="hasValidated"
+        v-bind:delimiterValue="delimiter"
+        v-on:has-validated="hasValidated = $event;"
+        v-on:export-file="exportFile"
+        v-on:clear="clear"
+        v-on:set-delimiter="delimiter = $event"
+        ></ledger-config>
     </vs-tab>
     <vs-tab vs-label="Data" >
-      <ledger-data v-if="hasValidated" v-bind:ledgerDataItems="ledgerDataItems" v-bind:ledgerConfigItems="ledgerConfigItems"></ledger-data>
+      <ledger-data v-if="hasValidated"
+        v-bind:ledgerDataItems="ledgerDataItems"
+        v-bind:ledgerConfigItems="ledgerConfigItems"
+        v-bind:delimiter="delimiter"
+        v-on:export-file="exportFile"
+        ></ledger-data>
       <vs-alert v-if="!hasValidated" color="danger" active="true" class="mt-3">Please validate the configuration before entering data.</vs-alert>
     </vs-tab>
 
     <vs-tab vs-label="Import / Export">
-      <ledger-import-export v-bind:ledgerDataItems="ledgerDataItems" v-bind:ledgerConfigItems="ledgerConfigItems" v-on:export-file="exportFile" v-on:update-config="updateConfig" v-on:update-data="updateData"></ledger-import-export>
+      <ledger-import-export
+        v-bind:ledgerDataItems="ledgerDataItems"
+        v-bind:ledgerConfigItems="ledgerConfigItems"
+        v-bind:delimiter="delimiter"
+        v-on:export-file="exportFile"
+        v-on:update-config="updateConfig"
+        v-on:update-data="updateData"
+        ></ledger-import-export>
     </vs-tab>
 
   </vs-tabs>

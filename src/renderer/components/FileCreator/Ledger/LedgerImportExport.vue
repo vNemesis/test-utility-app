@@ -55,7 +55,7 @@ const fs = require('fs')
 export default {
   name: 'ledger-file-creator',
 
-  props: ['ledgerConfigItems', 'ledgerDataItems'],
+  props: ['ledgerConfigItems', 'ledgerDataItems', 'delimiter'],
 
   data: function () {
     return {
@@ -67,7 +67,8 @@ export default {
     exportToJson () {
       let file = {
         configItems: this.ledgerConfigItems,
-        dataItems: this.ledgerDataItems
+        dataItems: this.ledgerDataItems,
+        delimiter: this.delimiter
       }
 
       let jsonContent = JSON.stringify(file)
@@ -110,10 +111,10 @@ export default {
             let configData = []
 
             parsedData.configItems.forEach(element => {
-              configData.push(new LedgerConfigItemObject(element.id, element.fieldName, element.linePosition.value, element.charLength.value, element.type, element.sharedData))
+              configData.push(new LedgerConfigItemObject(element.id, element.fieldName, element.linePosition.value, element.charLength.value, element.type, element.options))
             })
 
-            this.$emit('update-config', configData)
+            this.$emit('update-config', configData, parsedData.delimiter)
 
             if (importData) {
               this.$emit('update-data', parsedData.dataItems)

@@ -1,9 +1,9 @@
 export default class LedgerConfigItem {
-  constructor (id, fieldName, linePosition, charLength, type, sharedData) {
+  constructor (id, fieldName, linePosition, charLength, type, options) {
     this.id = id
     this.fieldName = fieldName
     this.type = type
-    this.sharedData = sharedData
+    this.options = options
     this.linePosition = {
       value: linePosition,
       errors: []

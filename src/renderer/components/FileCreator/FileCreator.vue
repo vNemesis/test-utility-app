@@ -68,7 +68,7 @@ export default {
             title: 'Error!',
             text: `An error ocurred creating the file: ${err.message}`,
             color: 'danger',
-            icon: 'error_outline',
+            // icon: 'error_outline',
             position: this.$store.state.settings.notifPos,
             time: 4000
           })
@@ -77,7 +77,7 @@ export default {
             title: 'File Exported!',
             text: `File '${filename}' was exported successfully`,
             color: 'success',
-            icon: 'save',
+            // icon: 'save',
             position: this.$store.state.settings.notifPos,
             time: 10000
           })

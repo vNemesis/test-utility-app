@@ -7,8 +7,8 @@
     </td>
 
     <td v-for="item in ledgerConfigData" :key="item.id">
-      <vs-input v-if="item.type === 'text'" :placeholder="item.fieldName" class="w-100" :maxLength="item.charLength" v-model="ledgerData[`${item.id}_data`]"/>
-      <vs-input-number v-if="item.type === 'number'" max="999999" min="1" step="1" v-model="ledgerData[`${item.id}_data`]"/>
+      <vs-input v-if="item.type === 'text'" :placeholder="item.fieldName" class="w-100" :maxLength="item.charLength.value" v-model="ledgerData[`${item.id}_data`]"/>
+      <vs-input-number v-if="item.type === 'number'" :max="numberMaxLength(item.charLength.value)" min="1" step="1" v-model="ledgerData[`${item.id}_data`]"/>
       <vs-input v-if="item.type === 'date'" type="date" class="w-100" v-model="ledgerData[`${item.id}_data`]"/>
     </td>
 
@@ -36,6 +36,9 @@
     },
 
     methods: {
+      numberMaxLength (length) {
+        return parseInt(''.padEnd(length, '9'))
+      }
     },
 
     computed: {
@@ -50,24 +53,6 @@
 </script>
 
 <style>
-.border-right-flat {
-  border-top-right-radius: 0px !important;
-  border-bottom-right-radius: 0px !important;
-}
-
-.border-left-flat {
-  border-top-left-radius: 0px !important;
-  border-bottom-left-radius: 0px !important;
-}
-
-.border-right-dark {
-    border-right-color: black !important;
-}
-
-.border-left-dark {
-    border-left-color: black !important;
-}
-
 .sorting-buttons {
   background-color: rgb(31,116,255);
   color: white;

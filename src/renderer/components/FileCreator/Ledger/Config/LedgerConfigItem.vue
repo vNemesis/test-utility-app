@@ -58,8 +58,8 @@
     </td>
 
     <td class="align-middle">
-      <vs-select autocomplete multiple placeholder="Shared Data" v-model="ledgerConfigData.sharedData" class="w-100" @input="$emit('editing', false); $emit('link-item', ledgerConfigData.id, ledgerConfigData.sharedData)">
-        <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in configItems" />
+      <vs-select autocomplete multiple placeholder="Options" v-model="ledgerConfigData.options" class="w-100" @input="$emit('editing', false);">
+        <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in options" />
       </vs-select>  
     </td>
 
@@ -82,18 +82,14 @@
         editFieldName: {
           edit: false,
           max: 50
+        },
+        options: {
+          Required: 'required'
         }
       }
     },
 
     methods: {
-      numbersOnly (evt) {
-        if (evt.keyCode < 48 || evt.keyCode > 57) {
-          if (evt.keyCode !== 8) {
-            evt.preventDefault()
-          }
-        }
-      }
     },
 
     computed: {
@@ -121,24 +117,6 @@
 </script>
 
 <style>
-.border-right-flat {
-  border-top-right-radius: 0px !important;
-  border-bottom-right-radius: 0px !important;
-}
-
-.border-left-flat {
-  border-top-left-radius: 0px !important;
-  border-bottom-left-radius: 0px !important;
-}
-
-.border-right-dark {
-    border-right-color: black !important;
-}
-
-.border-left-dark {
-    border-left-color: black !important;
-}
-
 .sorting-buttons {
   background-color: rgb(31,116,255);
   color: white;
