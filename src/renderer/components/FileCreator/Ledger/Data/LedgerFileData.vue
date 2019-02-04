@@ -4,11 +4,16 @@
     <div class="col-md-12">
 
       <vs-row>
-        <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="9">
+        <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="8">
+          <vs-switch class="ml-2" v-model="includeHeaders">
+            <span slot="on">Include Headers</span>
+            <span slot="off">Exclude Headers</span>
+          </vs-switch>
         </vs-col>
-        <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="3">
-          <vs-button @click="addItemsPopup.active = true" color="danger" type="filled" class="w-50 mr-2">Bulk Add</vs-button>
-          <vs-button @click="exportLedgerFile()" color="rgb(100, 175, 134)" type="filled" class="w-50" >Export File</vs-button>
+        <vs-col vs-type="flex" vs-justify="flex-end" vs-align="center" vs-w="4">
+          <vs-button @click="addItemsPopup.active = true" color="danger" type="filled" class="mr-2">Bulk Add</vs-button>
+          <vs-button @click="exportLedgerFile()" color="rgb(100, 175, 134)" type="filled" class="mr-2" >Export Fixed Width File</vs-button>
+          <vs-button @click="exportLedgerCSV()" color="rgb(100, 175, 134)" type="filled" class="" >Export Delimited File</vs-button>
         </vs-col>
       </vs-row>
 
@@ -83,11 +88,10 @@ export default {
   name: 'ledger-data',
   components: { LedgerDataItem },
 
-  props: ['ledgerConfigItems', 'ledgerDataItems', 'delimiter'],
+  props: ['ledgerConfigItems', 'ledgerDataItems', 'delimiter', 'includeHeaders'],
 
   data: function () {
     return {
-      // TODO: Move this to parent component
       order: true,
       addItemsPopup: {
         active: false,
@@ -148,7 +152,7 @@ export default {
         this.ledgerDataItems[i].id = i + 1
       }
     },
-    // TODO: Fix this
+    // TODO: Add Auto-increment feature
     bulkAdd () {
       for (let i = 0; i < this.addItemsPopup.amount; ++i) {
         this.addLedgerDataItem(this.addItemsPopup.item)
@@ -174,6 +178,16 @@ export default {
       // Content to be written to file
       let content = ''
 
+      if (this.includeHeaders) {
+        let line = []
+
+        this.ledgerConfigItems.forEach(configItem => {
+          line.push(`${configItem.fieldName.padEnd(configItem.charLength.value, ' ')}`)
+        })
+
+        content += `${line.join('')}\r\n`
+      }
+
       // For each of the ledger data items ...
       this.ledgerDataItems.forEach(element => {
         // ... create a new array from the template ...
@@ -181,6 +195,36 @@ export default {
 
         // ... foreach config, get the configuration and add the data to the array based on that ...
         line = this.fillData(line, element)
+
+        content += `${line.join('')}\r\n`
+      })
+
+      // exportLedgerFile (filename, content, extensionName, extension, filetype)
+      this.$emit('export-file', 'Custom Ledger.txt', content, 'Text File', 'txt', 'Ledger')
+    },
+    exportLedgerCSV () {
+      let content = ''
+
+      if (this.includeHeaders) {
+        let line = []
+
+        this.ledgerConfigItems.forEach(configItem => {
+          line.push(`${configItem.fieldName}`)
+        })
+
+        content += `${line.join(this.delimiter)}\r\n`
+      }
+
+      this.ledgerDataItems.forEach(element => {
+        let line = []
+
+        this.ledgerConfigItems.forEach(configItem => {
+          if (configItem.type === 'number') {
+            line.push(parseFloat(element[`${configItem.id}_data`]).toFixed(2).toString())
+          } else {
+            line.push(element[`${configItem.id}_data`].toString())
+          }
+        })
 
         content += `${line.join(this.delimiter)}\r\n`
       })

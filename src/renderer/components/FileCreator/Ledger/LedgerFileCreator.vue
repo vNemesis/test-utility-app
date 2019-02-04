@@ -9,6 +9,7 @@
         v-bind:ledgerConfigItems="ledgerConfigItems"
         v-bind:hasValidated="hasValidated"
         v-bind:delimiterValue="delimiter"
+        v-bind:ledgerDataItems="ledgerDataItems"
         v-on:has-validated="hasValidated = $event;"
         v-on:export-file="exportFile"
         v-on:clear="clear"
@@ -20,6 +21,7 @@
         v-bind:ledgerDataItems="ledgerDataItems"
         v-bind:ledgerConfigItems="ledgerConfigItems"
         v-bind:delimiter="delimiter"
+        v-bind:includeHeaders="includeHeaders"
         v-on:export-file="exportFile"
         ></ledger-data>
       <vs-alert v-if="!hasValidated" color="danger" active="true" class="mt-3">Please validate the configuration before entering data.</vs-alert>
@@ -30,6 +32,7 @@
         v-bind:ledgerDataItems="ledgerDataItems"
         v-bind:ledgerConfigItems="ledgerConfigItems"
         v-bind:delimiter="delimiter"
+        v-bind:includeHeaders="includeHeaders"
         v-on:export-file="exportFile"
         v-on:update-config="updateConfig"
         v-on:update-data="updateData"
@@ -59,6 +62,7 @@ export default {
       ledgerDataItems: [],
       delimiter: '',
       hasValidated: false,
+      includeHeaders: false,
       activeTab: 0,
       order: true
     }
@@ -68,15 +72,15 @@ export default {
     exportFile (filename, content, extensionName, extension, filetype) {
       this.$emit('export-file', filename, content, extensionName, extension, filetype)
     },
-    // TODO: add delimiter to other options
     updateConfig (data, delimiter) {
       this.ledgerDataItems = []
       this.ledgerConfigItems = data
       this.delimiter = delimiter
       this.activeTab = 0
     },
-    updateData (data) {
+    updateData (data, headersToggle) {
       this.ledgerDataItems = data
+      this.includeHeaders = headersToggle
     },
     clear (clearConfig, clearData) {
       if (clearConfig) {

@@ -73,6 +73,13 @@
 </template>
 
 <script>
+/**
+ * Todos
+ * TODO: Create logic to switch between delimiters and Fixed Width
+ * TODO: Configuration import Validation
+ * TODO: Date Conversion
+ * TODO: Duplicate Column Identifier
+ */
 import $ from 'jquery'
 import _ from 'lodash'
 import LedgerConfigItem from './LedgerConfigItem'
@@ -82,7 +89,7 @@ export default {
   name: 'ledger-file-config',
   components: { LedgerConfigItem },
 
-  props: ['ledgerConfigItems', 'hasValidated', 'delimiterValue'],
+  props: ['ledgerConfigItems', 'ledgerDataItems', 'hasValidated', 'delimiterValue'],
 
   data: function () {
     return {
@@ -143,9 +150,26 @@ export default {
       }
     },
     removeLedgerConfigItem (index) {
+      let removedDataID = this.ledgerConfigItems[index].id
       this.ledgerConfigItems.splice(index, 1)
       for (let i = 0; i < this.ledgerConfigItems.length; i++) {
         this.ledgerConfigItems[i].id = i + 1
+      }
+
+      for (let j = 0; j < this.ledgerDataItems.length; ++j) {
+        let element = this.ledgerDataItems[j]
+        delete element[`${removedDataID}_data`]
+
+        let newElement = { id: element.id }
+        let dataIndex = 1
+
+        for (let i = 0; i < Object.keys(element).length; i++) {
+          if (Object.keys(element)[i] !== 'id') {
+            newElement[`${dataIndex}_data`] = element[Object.keys(element)[i]]
+            dataIndex++
+          }
+        }
+        this.ledgerDataItems[j] = newElement
       }
     },
     // ----------------------------------------------- Export -----------------------------------------------

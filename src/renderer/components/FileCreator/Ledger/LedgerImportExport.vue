@@ -55,7 +55,7 @@ const fs = require('fs')
 export default {
   name: 'ledger-file-creator',
 
-  props: ['ledgerConfigItems', 'ledgerDataItems', 'delimiter'],
+  props: ['ledgerConfigItems', 'ledgerDataItems', 'delimiter', 'includeHeaders'],
 
   data: function () {
     return {
@@ -68,7 +68,8 @@ export default {
       let file = {
         configItems: this.ledgerConfigItems,
         dataItems: this.ledgerDataItems,
-        delimiter: this.delimiter
+        delimiter: this.delimiter,
+        includeHeaders: this.includeHeaders
       }
 
       let jsonContent = JSON.stringify(file)
@@ -117,7 +118,7 @@ export default {
             this.$emit('update-config', configData, parsedData.delimiter)
 
             if (importData) {
-              this.$emit('update-data', parsedData.dataItems)
+              this.$emit('update-data', parsedData.dataItems, parsedData.includeHeaders)
             }
           }
         })

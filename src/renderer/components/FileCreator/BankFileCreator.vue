@@ -102,7 +102,8 @@ export default {
     return {
       postingDate: '',
       fileTypes: {
-        'HSBC BACS': 'hsbcbacs'
+        'HSBC BACS': 'hsbcbacs',
+        'Barclays CSV': 'barclayscsv'
       },
       fileType: '',
       paymentItems: [],
@@ -188,16 +189,31 @@ export default {
       this.$emit('export-file', `Bank file template ${new Date(Date.now()).toISOString().substring(0, 10)}.json`, jsonContent, 'JSON File', 'json', 'Template File')
     },
     exportFile () {
-      if (this.fileType === 'hsbcbacs') {
-        this.exportHSBCBACS()
-      } else if (this.fileType === '') {
-        this.$vs.notify({
-          title: 'Error!',
-          text: 'Please select a file type',
-          color: 'danger',
-          position: this.$store.state.settings.notifPos,
-          time: 4000
-        })
+      switch (this.fileType) {
+        case 'hsbcbacs':
+          this.exportHSBCBACS()
+          break
+        case 'barclayscsv':
+          this.exportBarclaysCSV()
+          break
+        case '':
+          this.$vs.notify({
+            title: 'Error!',
+            text: 'Please select a file type',
+            color: 'danger',
+            position: this.$store.state.settings.notifPos,
+            time: 4000
+          })
+          break
+        default:
+          this.$vs.notify({
+            title: 'Error!',
+            text: 'Code BFC001',
+            color: 'danger',
+            position: this.$store.state.settings.notifPos,
+            time: 4000
+          })
+          break
       }
     },
     exportHSBCBACS () {
@@ -210,6 +226,18 @@ export default {
 
       // exportFile (filename, content, extensionName, extension, filetype)
       this.$emit('export-file', 'Custom HSBC BACS.txt', content, 'Text File', 'txt', 'HSBC BACS')
+    },
+
+    exportBarclaysCSV () {
+      let content = ''
+      this.paymentItems.forEach(element => {
+        let amount = parseFloat(element.Amount).toFixed(2)
+        let pDate = new Date(Date.parse(this.postingDate))
+        content += `,,,,,${pDate.getUTCDate()}${(pDate.getUTCMonth() + 1).toString().padStart(2, '0')}${pDate.getUTCFullYear()},,,,,,${element.AccountName.padEnd(18, ' ')},13,14,${element.PaymentRef.padEnd(18, ' ')},${element.Sortcode},${element.AccountNo},,${amount}\r\n`
+      })
+
+      // exportFile (filename, content, extensionName, extension, filetype)
+      this.$emit('export-file', `Custom Barclays CSV ${new Date(Date.now()).toISOString().substring(0, 10)}.csv`, content, 'Comma Seperated Value File', 'CSV', 'Barclays CSV')
     },
 
     // Import
