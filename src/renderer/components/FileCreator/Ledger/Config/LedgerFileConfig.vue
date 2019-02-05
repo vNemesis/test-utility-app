@@ -137,7 +137,7 @@ export default {
         let linePos = 1
         if (this.ledgerConfigItems.length !== 0) {
           let last = this.ledgerConfigItems[this.ledgerConfigItems.length - 1]
-          linePos = last.linePosition.value + last.charLength.value + 1
+          linePos = parseInt(last.linePosition.value) + parseInt(last.charLength.value) + 1
         }
 
         let newItem = new LedgerConfigItemObject(this.ledgerConfigItems.length + 1, '', linePos, 1, 'text', [])
@@ -270,7 +270,7 @@ export default {
       }
     },
 
-    editingHandler (clearData) {
+    editingHandler (clearData, clearfield = false, configID, type) {
       this.$emit('has-validated', false)
       // Check if this needs auto-validating
       if (this.autoValidate) {
@@ -279,6 +279,10 @@ export default {
 
       if (clearData) {
         this.$emit('clear', false, true)
+      }
+
+      if (clearfield) {
+        this.$emit('clear-field', configID, type)
       }
     }
   }

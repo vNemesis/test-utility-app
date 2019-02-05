@@ -37,7 +37,7 @@
 
     methods: {
       numberMaxLength (length) {
-        return parseInt(''.padEnd(length, '9'))
+        return parseInt('9'.repeat(length))
       }
     },
 

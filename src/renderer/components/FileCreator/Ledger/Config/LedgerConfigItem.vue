@@ -38,7 +38,7 @@
     <td class="align-middle">
       <vs-row>
         <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="6">
-          <vs-input-number max="999999" min="1" step="1" v-model="ledgerConfigData.charLength.value" @input="$emit('editing', false)"/>
+          <vs-input-number max="999999" min="1" step="1" v-model="ledgerConfigData.charLength.value" @input="$emit('editing', false, true, ledgerConfigData.id, ledgerConfigData.type)"/>
         </vs-col>
         <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="6">
           <small>Character Range: {{ledgerConfigData.linePosition.value}} - {{ledgerConfigData.endLinePosition}}</small>

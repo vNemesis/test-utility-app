@@ -84,6 +84,10 @@
 import $ from 'jquery'
 import LedgerDataItem from './LedgerDataItem'
 
+/**
+ * TODO: fixed width export fix
+ */
+
 export default {
   name: 'ledger-data',
   components: { LedgerDataItem },
@@ -172,8 +176,12 @@ export default {
     exportLedgerFile () {
       // Create a template aray
       let lineTemplate = []
+      let lineLength = 0
       this.ledgerConfigItems.forEach(element => {
         lineTemplate.push(new Array(element.charLength.length).fill(' '))
+        if (parseInt(element.endLinePosition) > lineLength) {
+          lineLength = parseInt(element.endLinePosition)
+        }
       })
       // Content to be written to file
       let content = ''
@@ -191,12 +199,13 @@ export default {
       // For each of the ledger data items ...
       this.ledgerDataItems.forEach(element => {
         // ... create a new array from the template ...
-        let line = lineTemplate.slice()
+        // let line = lineTemplate.slice()
+        let line = ' '.repeat(lineLength)
 
         // ... foreach config, get the configuration and add the data to the array based on that ...
         line = this.fillData(line, element)
 
-        content += `${line.join('')}\r\n`
+        content += `${line}\r\n`
       })
 
       // exportLedgerFile (filename, content, extensionName, extension, filetype)
@@ -233,21 +242,44 @@ export default {
       this.$emit('export-file', 'Custom Ledger.txt', content, 'Text File', 'txt', 'Ledger')
     },
     fillData (line, element) {
+      // for (let i = 0; i < this.ledgerConfigItems.length; ++i) {
+      //   let configItem = this.ledgerConfigItems[i]
+      //   let data = element[`${configItem.id}_data`].toString()
+
+      //   if (data.length > configItem.charLength.value) {
+      //     line[i] = data.substring(0, configItem.charLength.value)
+      //   } else {
+      //     line[i] = data.padEnd(configItem.charLength.value, ' ')
+      //   }
+      // }
+      // return line
+
       for (let i = 0; i < this.ledgerConfigItems.length; ++i) {
         let configItem = this.ledgerConfigItems[i]
         let data = element[`${configItem.id}_data`].toString()
 
+        let start = parseInt(configItem.linePosition.value) - 1
+        let length = parseInt(configItem.charLength.value)
+        let end = parseInt(configItem.endLinePosition)
+
         if (data.length > configItem.charLength.value) {
-          line[i] = data.substring(0, configItem.charLength.value)
+          // line[i] = data.substring(0, configItem.charLength.value)
+          line = this.replaceRange(line, start, end, data.substring(0, length))
         } else {
-          line[i] = data.padEnd(configItem.charLength.value, ' ')
+          // line[i] = data.padEnd(configItem.charLength.value, ' ')
+          line = this.replaceRange(line, start, end, data.padEnd(length, ' '))
         }
+
+        console.log(line)
       }
       return line
     },
     // Helpers
     numberMaxLength (length) {
       return parseInt(''.padEnd(length, '9'))
+    },
+    replaceRange (s, start, end, substitute) {
+      return s.substring(0, start) + substitute + s.substring(end)
     }
   }
 }

@@ -15,6 +15,6 @@ export default class LedgerConfigItem {
   }
 
   get endLinePosition () {
-    return this.linePosition.value + (this.charLength.value - 1)
+    return parseInt(this.linePosition.value) + parseInt(this.charLength.value) - 1
   }
 }

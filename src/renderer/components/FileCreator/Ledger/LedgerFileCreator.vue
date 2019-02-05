@@ -13,6 +13,7 @@
         v-on:has-validated="hasValidated = $event;"
         v-on:export-file="exportFile"
         v-on:clear="clear"
+        v-on:clear-field="clearField"
         v-on:set-delimiter="delimiter = $event"
         ></ledger-config>
     </vs-tab>
@@ -90,6 +91,11 @@ export default {
       if (clearData) {
         this.ledgerDataItems = []
       }
+    },
+    clearField (configID, type) {
+      this.ledgerDataItems.forEach(element => {
+        element[`${configID}_data`] = type === 'number' ? 0 : ''
+      })
     }
   }
 }
