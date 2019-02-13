@@ -12,8 +12,8 @@
         </vs-col>
         <vs-col vs-type="flex" vs-justify="flex-end" vs-align="center" vs-w="4">
           <vs-button @click="addItemsPopup.active = true" color="danger" type="filled" class="mr-2">Bulk Add</vs-button>
-          <vs-button @click="exportLedgerFile()" color="rgb(100, 175, 134)" type="filled" class="mr-2" >Export Fixed Width File</vs-button>
-          <vs-button @click="exportLedgerCSV()" color="rgb(100, 175, 134)" type="filled" class="" >Export Delimited File</vs-button>
+          <vs-button @click="exportFileFile()" color="rgb(100, 175, 134)" type="filled" class="mr-2" >Export Fixed Width File</vs-button>
+          <vs-button @click="exportFileCSV()" color="rgb(100, 175, 134)" type="filled" class="" >Export Delimited File</vs-button>
         </vs-col>
       </vs-row>
 
@@ -23,19 +23,20 @@
             <table class="table mt-2">
               <thead>
                 <th></th>
-                <th v-for="ledgerConfigItem in ledgerConfigItems" :key="ledgerConfigItem.id">{{ ledgerConfigItem.fieldName }}</th>
+                <th v-for="fileConfigItem in fileConfigItems" :key="fileConfigItem.id">{{ fileConfigItem.fieldName }}</th>
                 <th></th>
               </thead>
               <tbody>
-                <tr is="ledger-data-item" v-for="(ledgerDataItem, index) in ledgerDataItems" :key="ledgerDataItem.id"
-                v-bind:ledgerData="ledgerDataItem"
-                v-bind:ledgerConfigData="ledgerConfigItems"
-                v-bind:totalNumberOfLedgerDataItems="ledgerDataItems.length"
+                <tr style="min-width: 100px" is="file-data-item" v-for="(fileDataItem, index) in fileDataItems" :key="fileDataItem.id"
+                v-bind:fileData="fileDataItem"
+                v-bind:fileConfigData="fileConfigItems"
+                v-bind:totalNumberOfFileDataItems="fileDataItems.length"
                 v-bind:order="order"
-                v-on:remove-self="removeLedgerDataItem(index)"
-                v-on:move-up="moveLedgerDataItem(index, index - 1)"
-                v-on:move-down="moveLedgerDataItem(index, index + 1)"
-                v-on:duplicate="addLedgerDataItem(payment)"
+                v-bind:delimiter="delimiter"
+                v-on:remove-self="removeFileDataItem(index)"
+                v-on:move-up="moveFileDataItem(index, index - 1)"
+                v-on:move-down="moveFileDataItem(index, index + 1)"
+                v-on:duplicate="addFileDataItem(payment)"
                 ></tr>
               </tbody>
             </table>
@@ -43,7 +44,7 @@
         </vs-col>
       </vs-row>
 
-      <vs-button @click="addLedgerDataItem()" color="primary" type="flat" class="py-2 w-100"><font-awesome-icon icon="plus" size="2x" /></vs-button>
+      <vs-button @click="addFileDataItem()" color="primary" type="flat" class="py-2 w-100"><font-awesome-icon icon="plus" size="2x" /></vs-button>
 
       <!-- Row -->
     </div>
@@ -51,13 +52,24 @@
   </div>
   <!-- Popups -->
       <!-- Add Items -->
-      <vs-popup title="Add Ledger Items" :active.sync="addItemsPopup.active">
+      <vs-popup title="Add File Items" :active.sync="addItemsPopup.active" class="custom-width">
 
-        <vs-row v-for="item in ledgerConfigItems" :key="item.id" class="mt-2">
+        <vs-row>
+          <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="6">
+            <div><strong>Field</strong></div>
+          </vs-col>
+          <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="6">
+            <div><strong>Data</strong></div>
+          </vs-col>
+        </vs-row>
+
+        <hr>
+
+        <vs-row v-for="item in fileConfigItems" :key="item.id" class="mt-2">
           <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="6">
             {{item.fieldName}}
           </vs-col>
-          <vs-col vs-type="flex" vs-justify="flex-start" vs-align="flex-start" vs-w="6">
+          <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="6">
             <vs-input v-if="item.type === 'text'" :placeholder="item.fieldName" class="w-100" :maxLength="item.charLength.value" v-model="addItemsPopup.item[`${item.id}_data`]"/>
             <vs-input-number v-if="item.type === 'number'" :max="numberMaxLength(item.charLength.value)" min="1" step="1" v-model="addItemsPopup.item[`${item.id}_data`]"/>
             <vs-input v-if="item.type === 'date'" type="date" class="w-100" v-model="addItemsPopup.item[`${item.id}_data`]"/>
@@ -82,17 +94,17 @@
 
 <script>
 import $ from 'jquery'
-import LedgerDataItem from './LedgerDataItem'
+import FileDataItem from './FileDataItem'
 
 /**
  * TODO: fixed width export fix
  */
 
 export default {
-  name: 'ledger-data',
-  components: { LedgerDataItem },
+  name: 'file-data',
+  components: { FileDataItem },
 
-  props: ['ledgerConfigItems', 'ledgerDataItems', 'delimiter', 'includeHeaders'],
+  props: ['fileConfigItems', 'fileDataItems', 'delimiter', 'includeHeaders'],
 
   data: function () {
     return {
@@ -112,7 +124,7 @@ export default {
   },
 
   beforeMount () {
-    this.ledgerConfigItems.forEach(element => {
+    this.fileConfigItems.forEach(element => {
       if (element.type === 'number') {
         this.$set(this.addItemsPopup.item, `${element.id}_data`, 0)
       } else {
@@ -123,19 +135,19 @@ export default {
 
   methods: {
     // ----------------------------------------------- Test Items -----------------------------------------------
-    moveLedgerDataItem (from, to) {
-      this.ledgerDataItems.splice(to, 0, this.ledgerDataItems.splice(from, 1)[0])
-      for (let i = 0; i < this.ledgerDataItemsItems.length; i++) {
-        this.ledgerDataItemsItems[i].id = i + 1
+    moveFileDataItem (from, to) {
+      this.fileDataItems.splice(to, 0, this.fileDataItems.splice(from, 1)[0])
+      for (let i = 0; i < this.fileDataItemsItems.length; i++) {
+        this.fileDataItemsItems[i].id = i + 1
       }
     },
-    addLedgerDataItem (ledgerDataItem = null) {
-      if (ledgerDataItem === null) {
+    addFileDataItem (fileDataItem = null) {
+      if (fileDataItem === null) {
         let obj = {
-          id: this.ledgerDataItems.length + 1
+          id: this.fileDataItems.length + 1
         }
 
-        this.ledgerConfigItems.forEach(element => {
+        this.fileConfigItems.forEach(element => {
           if (element.type === 'number') {
             obj[`${element.id}_data`] = 0
           } else {
@@ -143,23 +155,23 @@ export default {
           }
         })
 
-        this.ledgerDataItems.push(obj)
+        this.fileDataItems.push(obj)
       } else {
-        let duplicate = $.extend(true, {}, ledgerDataItem)
-        duplicate.id = this.ledgerDataItems.length + 1
-        this.ledgerDataItems.push(duplicate)
+        let duplicate = $.extend(true, {}, fileDataItem)
+        duplicate.id = this.fileDataItems.length + 1
+        this.fileDataItems.push(duplicate)
       }
     },
-    removeLedgerDataItem (index) {
-      this.ledgerDataItems.splice(index, 1)
-      for (let i = 0; i < this.ledgerDataItems.length; i++) {
-        this.ledgerDataItems[i].id = i + 1
+    removeFileDataItem (index) {
+      this.fileDataItems.splice(index, 1)
+      for (let i = 0; i < this.fileDataItems.length; i++) {
+        this.fileDataItems[i].id = i + 1
       }
     },
     // TODO: Add Auto-increment feature
     bulkAdd () {
       for (let i = 0; i < this.addItemsPopup.amount; ++i) {
-        this.addLedgerDataItem(this.addItemsPopup.item)
+        this.addFileDataItem(this.addItemsPopup.item)
       }
 
       this.addItemsPopup.active = false
@@ -173,11 +185,11 @@ export default {
       })
     },
     // ----------------------------------------------- Export -----------------------------------------------
-    exportLedgerFile () {
+    exportFileFile () {
       // Create a template aray
       let lineTemplate = []
       let lineLength = 0
-      this.ledgerConfigItems.forEach(element => {
+      this.fileConfigItems.forEach(element => {
         lineTemplate.push(new Array(element.charLength.length).fill(' '))
         if (parseInt(element.endLinePosition) > lineLength) {
           lineLength = parseInt(element.endLinePosition)
@@ -189,15 +201,15 @@ export default {
       if (this.includeHeaders) {
         let line = []
 
-        this.ledgerConfigItems.forEach(configItem => {
+        this.fileConfigItems.forEach(configItem => {
           line.push(`${configItem.fieldName.padEnd(configItem.charLength.value, ' ')}`)
         })
 
         content += `${line.join('')}\r\n`
       }
 
-      // For each of the ledger data items ...
-      this.ledgerDataItems.forEach(element => {
+      // For each of the file data items ...
+      this.fileDataItems.forEach(element => {
         // ... create a new array from the template ...
         // let line = lineTemplate.slice()
         let line = ' '.repeat(lineLength)
@@ -208,26 +220,26 @@ export default {
         content += `${line}\r\n`
       })
 
-      // exportLedgerFile (filename, content, extensionName, extension, filetype)
-      this.$emit('export-file', 'Custom Ledger.txt', content, 'Text File', 'txt', 'Ledger')
+      // exportFileFile (filename, content, extensionName, extension, filetype)
+      this.$emit('export-file', 'Custom File.txt', content, 'Text File', 'txt', 'File')
     },
-    exportLedgerCSV () {
+    exportFileCSV () {
       let content = ''
 
       if (this.includeHeaders) {
         let line = []
 
-        this.ledgerConfigItems.forEach(configItem => {
+        this.fileConfigItems.forEach(configItem => {
           line.push(`${configItem.fieldName}`)
         })
 
         content += `${line.join(this.delimiter)}\r\n`
       }
 
-      this.ledgerDataItems.forEach(element => {
+      this.fileDataItems.forEach(element => {
         let line = []
 
-        this.ledgerConfigItems.forEach(configItem => {
+        this.fileConfigItems.forEach(configItem => {
           if (configItem.type === 'number') {
             line.push(parseFloat(element[`${configItem.id}_data`]).toFixed(2).toString())
           } else {
@@ -238,12 +250,12 @@ export default {
         content += `${line.join(this.delimiter)}\r\n`
       })
 
-      // exportLedgerFile (filename, content, extensionName, extension, filetype)
-      this.$emit('export-file', 'Custom Ledger.txt', content, 'Text File', 'txt', 'Ledger')
+      // exportFileFile (filename, content, extensionName, extension, filetype)
+      this.$emit('export-file', 'Custom File.txt', content, 'Text File', 'txt', 'File')
     },
     fillData (line, element) {
-      // for (let i = 0; i < this.ledgerConfigItems.length; ++i) {
-      //   let configItem = this.ledgerConfigItems[i]
+      // for (let i = 0; i < this.fileConfigItems.length; ++i) {
+      //   let configItem = this.fileConfigItems[i]
       //   let data = element[`${configItem.id}_data`].toString()
 
       //   if (data.length > configItem.charLength.value) {
@@ -254,8 +266,8 @@ export default {
       // }
       // return line
 
-      for (let i = 0; i < this.ledgerConfigItems.length; ++i) {
-        let configItem = this.ledgerConfigItems[i]
+      for (let i = 0; i < this.fileConfigItems.length; ++i) {
+        let configItem = this.fileConfigItems[i]
         let data = element[`${configItem.id}_data`].toString()
 
         let start = parseInt(configItem.linePosition.value) - 1
@@ -286,4 +298,7 @@ export default {
 </script>
 
 <style>
+.custom-width .vs-popup {
+  width: '1000px'
+}
 </style>

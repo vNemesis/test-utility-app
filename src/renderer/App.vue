@@ -21,7 +21,7 @@
         </vs-sidebar-item>
 
         <vs-sidebar-item index="3" icon="text_format" @click="navigate('/formatter')">
-          Formatter
+          Text Formatter
         </vs-sidebar-item>
 
         <vs-sidebar-item index="4" icon="create" @click="navigate('/filecreator')">
@@ -110,6 +110,12 @@
             this.$router.push({ path: path })
           } else {
             this.$refs.sidemenu.currentIndex = 2
+          }
+        } else if (this.$route.path === '/filecreator') {
+          if (confirm('Any unsaved changes will be lost. Please export your file config and data if you wish to save it.')) {
+            this.$router.push({ path: path })
+          } else {
+            this.$refs.sidemenu.currentIndex = 4
           }
         } else {
           this.$router.push({ path: path })

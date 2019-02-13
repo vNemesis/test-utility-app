@@ -2,7 +2,7 @@
 <div>
   <div class="row mt-5">
     <div class="col-md-12 text-center">
-      <h1>Formatter</h1>
+      <h1>Text Formatter</h1>
 
       <vs-row>
 

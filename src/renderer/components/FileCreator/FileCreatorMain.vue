@@ -8,11 +8,11 @@
       <!-- Tabs -->
       <vs-tabs vs-alignment="fixed">
 
+        <vs-tab vs-label="Custom File">
+          <file-creator v-on:export-file="exportFile"></file-creator>
+        </vs-tab>
         <vs-tab vs-label="Bank File">
           <bank-file-creator v-on:export-file="exportFile"></bank-file-creator>
-        </vs-tab>
-        <vs-tab vs-label="Ledger">
-          <ledger-file-creator v-on:export-file="exportFile"></ledger-file-creator>
         </vs-tab>
 
       </vs-tabs>
@@ -28,14 +28,14 @@
 
 <script>
 import BankFileCreator from './BankFileCreator'
-import LedgerFileCreator from './Ledger/LedgerFileCreator'
+import FileCreator from './File/FileCreator'
 
 const remote = require('electron').remote
 const fs = require('fs')
 
 export default {
-  name: 'file-creator',
-  components: { BankFileCreator, LedgerFileCreator },
+  name: 'file-creator-main',
+  components: { BankFileCreator, FileCreator },
 
   data: function () {
     return {

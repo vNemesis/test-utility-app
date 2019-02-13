@@ -48,14 +48,14 @@
 
 <script>
 import Papa from 'papaparse'
-import LedgerConfigItemObject from '../../../classes/LedgerConfigItem.js'
+import FileConfigItemObject from '../../../classes/FileConfigItem.js'
 const remote = require('electron').remote
 const fs = require('fs')
 
 export default {
-  name: 'ledger-file-creator',
+  name: 'file-file-creator',
 
-  props: ['ledgerConfigItems', 'ledgerDataItems', 'delimiter', 'includeHeaders'],
+  props: ['fileConfigItems', 'fileDataItems', 'delimiter', 'includeHeaders'],
 
   data: function () {
     return {
@@ -66,21 +66,21 @@ export default {
   methods: {
     exportToJson () {
       let file = {
-        configItems: this.ledgerConfigItems,
-        dataItems: this.ledgerDataItems,
+        configItems: this.fileConfigItems,
+        dataItems: this.fileDataItems,
         delimiter: this.delimiter,
         includeHeaders: this.includeHeaders
       }
 
       let jsonContent = JSON.stringify(file)
-      this.$emit('export-file', `Test Utility Ledger file ${new Date(Date.now()).toISOString().substring(0, 10)}.tul`, jsonContent, 'TU Ledger File', 'tul', 'Template File')
+      this.$emit('export-file', `Test Utility File file ${new Date(Date.now()).toISOString().substring(0, 10)}.tul`, jsonContent, 'TU File File', 'tul', 'Template File')
     },
 
     // Import
     importFromJson (importData) {
       remote.dialog.showOpenDialog({
         filters: [
-          { name: 'TU Ledger File', extensions: ['tul'] }
+          { name: 'TU File File', extensions: ['tul'] }
         ]
       },
       (fileName) => {
@@ -112,7 +112,7 @@ export default {
             let configData = []
 
             parsedData.configItems.forEach(element => {
-              configData.push(new LedgerConfigItemObject(element.id, element.fieldName, element.linePosition.value, element.charLength.value, element.type, element.options))
+              configData.push(new FileConfigItemObject(element.id, element.fieldName, element.linePosition.value, element.charLength.value, element.type, element.options))
             })
 
             this.$emit('update-config', configData, parsedData.delimiter)
@@ -131,7 +131,7 @@ export default {
 
       configLine.forEach(element => {
         let columns = element.split('\t')
-        configData.push(new LedgerConfigItemObject(configData.length + 1, columns[0], parseInt(columns[1]), parseInt(columns[2]), 'text', []))
+        configData.push(new FileConfigItemObject(configData.length + 1, columns[0], parseInt(columns[1]), parseInt(columns[2]), 'text', []))
       })
 
       this.$emit('update-config', configData)
@@ -173,7 +173,7 @@ export default {
               if (!parsedData[index][0] && !parsedData[index][1] && !parsedData[index][0]) {
                 continue
               }
-              configData.push(new LedgerConfigItemObject(configData.length + 1, parsedData[index][0], parseInt(parsedData[index][1]), parseInt(parsedData[index][2]), 'text', []))
+              configData.push(new FileConfigItemObject(configData.length + 1, parsedData[index][0], parseInt(parsedData[index][1]), parseInt(parsedData[index][2]), 'text', []))
             }
             this.$emit('update-config', configData)
           }

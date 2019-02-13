@@ -7,58 +7,63 @@
     </td>
 
     <td class="align-middle">
-      {{ ledgerConfigData.id }}
+      {{ fileConfigData.id }}
     </td>
 
     <td class="align-middle">
       <vs-input placeholder="Field Name" class="w-100"
       :maxLength="editFieldName.max"
       danger-text="Cannot be empty"
-      :danger="ledgerConfigData.fieldName === ''"
+      :danger="fileConfigData.fieldName === ''"
       @focus="editFieldName.edit = true"
       @blur="editFieldName.edit = false"
-      v-model="ledgerConfigData.fieldName"
+      v-model="fileConfigData.fieldName"
       @input="$emit('editing', false)"/>
       <small v-if="editFieldName.edit" class="float-right">{{fieldNameRemainingChars}}/{{editFieldName.max}}</small>
     </td>
 
-    <td class="align-middle">
+    <td v-if="delimiter !== ''" class="align-middle">
+      <small>Config set to delimiter,
+        Use the order of each item to determine its column position</small>
+    </td>
+
+    <td class="align-middle" v-if="delimiter === ''">
       <vs-row>
         <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="12">
-          <vs-input-number max="999999" min="1" step="1" v-model="ledgerConfigData.linePosition.value" @input="$emit('editing', false)"/>
+          <vs-input-number max="999999" min="1" step="1" v-model="fileConfigData.linePosition.value" @input="$emit('editing', false)"/>
         </vs-col>
       </vs-row>
       <small>
-        <vs-list v-for="(error, index) in ledgerConfigData.linePosition.errors" :key="index">
+        <vs-list v-for="(error, index) in fileConfigData.linePosition.errors" :key="index">
           <vs-list-item><vs-chip color="danger">{{error.message}}</vs-chip></vs-list-item>
         </vs-list>
       </small>
     </td>
 
-    <td class="align-middle">
+    <td v-if="delimiter === ''" class="align-middle">
       <vs-row>
         <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="6">
-          <vs-input-number max="999999" min="1" step="1" v-model="ledgerConfigData.charLength.value" @input="$emit('editing', false, true, ledgerConfigData.id, ledgerConfigData.type)"/>
+          <vs-input-number max="999999" min="1" step="1" v-model="fileConfigData.charLength.value" @input="$emit('editing', false, true, fileConfigData.id, fileConfigData.type)"/>
         </vs-col>
         <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="6">
-          <small>Character Range: {{ledgerConfigData.linePosition.value}} - {{ledgerConfigData.endLinePosition}}</small>
+          <small>Character Range: {{fileConfigData.linePosition.value}} - {{fileConfigData.endLinePosition}}</small>
         </vs-col>
       </vs-row>
-            <small>
-        <vs-list v-for="(error, index) in ledgerConfigData.charLength.errors" :key="index">
+      <small>
+        <vs-list v-for="(error, index) in fileConfigData.charLength.errors" :key="index">
           <vs-list-item><vs-chip color="danger">{{error.message}}</vs-chip></vs-list-item>
         </vs-list>
       </small>
     </td>
 
     <td class="align-middle">
-      <vs-select autocomplete placeholder="Type" v-model="ledgerConfigData.type" class="w-100" @input="$emit('editing', true)">
+      <vs-select autocomplete placeholder="Type" v-model="fileConfigData.type" class="w-100" @input="$emit('editing', true)">
         <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in { Text: 'text', Date: 'date', Number: 'number' }" />
       </vs-select>  
     </td>
 
     <td class="align-middle">
-      <vs-select autocomplete multiple placeholder="Options" v-model="ledgerConfigData.options" class="w-100" @input="$emit('editing', false);">
+      <vs-select autocomplete multiple placeholder="Options" v-model="fileConfigData.options" class="w-100" @input="$emit('editing', false);">
         <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in options" />
       </vs-select>  
     </td>
@@ -73,9 +78,9 @@
 
 <script>
   export default {
-    name: 'ledger-config-item',
+    name: 'file-config-item',
 
-    props: ['ledgerConfigData', 'totalNumberOfLedgerConfigItems', 'order', 'ledgerConfigItems'],
+    props: ['fileConfigData', 'totalNumberOfFileConfigItems', 'order', 'fileConfigItems', 'delimiter'],
 
     data: function () {
       return {
@@ -94,18 +99,18 @@
 
     computed: {
       canMoveUp () {
-        return (this.ledgerConfigData.id !== 1 && this.order === true)
+        return (this.fileConfigData.id !== 1 && this.order === true)
       },
       canMoveDown () {
-        return (this.ledgerConfigData.id !== this.totalNumberOfLedgerConfigItems && this.order === true)
+        return (this.fileConfigData.id !== this.totalNumberOfFileConfigItems && this.order === true)
       },
       fieldNameRemainingChars () {
-        return this.editFieldName.max - this.ledgerConfigData.fieldName.length
+        return this.editFieldName.max - this.fileConfigData.fieldName.length
       },
       configItems () {
         let items = {}
-        this.ledgerConfigItems.forEach(element => {
-          if (element.id !== this.ledgerConfigData.id) {
+        this.fileConfigItems.forEach(element => {
+          if (element.id !== this.fileConfigData.id) {
             items[`(${element.id})-${element.fieldName}`] = element.id
           }
         })
