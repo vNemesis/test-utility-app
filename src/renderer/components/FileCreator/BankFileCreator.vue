@@ -78,7 +78,7 @@
           </div>
           <div class="col-sm-9 text-center">
             <small>Amount</small>
-            <vs-input-number v-model="addItemsPopup.amount" size="mini" min="1"/>
+            <vs-input-number v-model="addItemsPopup.amount" size="mini" min="1" max="500"/>
           </div>
         </div>
       </vs-popup>

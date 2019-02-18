@@ -82,7 +82,7 @@
           </vs-col>
           <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="9">
             <small>Amount</small>
-            <vs-input-number v-model="addItemsPopup.amount" size="mini" min="1"/>
+            <vs-input-number v-model="addItemsPopup.amount" size="mini" min="1" max="500"/>
           </vs-col>
         </vs-row>
       </vs-popup>

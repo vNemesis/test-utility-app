@@ -77,7 +77,6 @@
 <script>
 /**
  * Todos
- * TODO: Create logic to switch between delimiters and Fixed Width
  * TODO: Configuration import Validation
  * TODO: Date Conversion
  * TODO: Duplicate Column Identifier
@@ -249,6 +248,12 @@ export default {
           }
         }
       }
+
+      this.fileConfigItems.forEach(configItem => {
+        if (configItem.fieldName === '') {
+          errored++
+        }
+      })
 
       if (errored === 0) {
         this.adjustDataItems()
