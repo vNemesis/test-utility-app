@@ -56,13 +56,18 @@ const defaultSettings = {
   settings: {
     editor: {
       autoLine: false,
-      showEditor: false
+      showEditor: false,
+      showGherkinPreview: false
     },
     planCreator: {
       defaultAssignee: '',
       defaultPlanExportDir: '',
       jiraNewLine: false,
-      jiraNewLineAmount: 50
+      jiraNewLineAmount: 50,
+      jiraUsername: ''
+    },
+    api: {
+      vstsPAT: ''
     },
     notifPos: 'bottom-right',
     theme: {
@@ -149,13 +154,18 @@ const store = new Vuex.Store({
     settings: {
       editor: {
         autoLine: false,
-        showEditor: false
+        showEditor: false,
+        showGherkinPreview: false
       },
       planCreator: {
         defaultAssignee: '',
         defaultPlanExportDir: '',
         jiraNewLine: false,
-        jiraNewLineAmount: 50
+        jiraNewLineAmount: 50,
+        jiraUsername: ''
+      },
+      api: {
+        vstsPAT: ''
       },
       notifPos: 'bottom-right',
       theme: {
@@ -238,13 +248,18 @@ new Vue({
         settings: {
           editor: {
             autoLine: false,
-            showEditor: false
+            showEditor: false,
+            showGherkinPreview: false
           },
           planCreator: {
             defaultAssignee: '',
             defaultPlanExportDir: '',
             jiraNewLine: false,
-            jiraNewLineAmount: ''
+            jiraNewLineAmount: '',
+            jiraUsername: ''
+          },
+          api: {
+            vstsPAT: ''
           },
           notifPos: 'bottom-right',
           theme: {

@@ -25,10 +25,14 @@
         </vs-sidebar-item>
 
         <vs-sidebar-item index="4" icon="create" @click="navigate('/filecreator')">
-          File Creator
+          File Creator <small class="ml-1 mb-2 text-primary">Beta</small>
         </vs-sidebar-item>
 
-        <vs-sidebar-item index="5" icon="settings" @click="navigate('/settings')">
+        <vs-sidebar-item index="5" icon="donut_large" @click="navigate('/citests')">
+          CI Tests <small class="ml-1 mb-2 text-primary">Beta</small>
+        </vs-sidebar-item>
+
+        <vs-sidebar-item index="6" icon="settings" @click="navigate('/settings')">
           Settings
         </vs-sidebar-item>
 

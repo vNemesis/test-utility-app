@@ -8,27 +8,26 @@
       <!-- General Tab -->
       <vs-tab vs-label="General">
 
-        <div class="row">
-          <div class="col-sm-12">
+        <div class="row justify-content-center mt-3">
+          <div class="col-sm-8">
 
             <!-- General Settings -->
-            <h3 class="mt-3">General</h3>
+            <h3>General</h3>
             <div class="row">
-              <div class="col-sm-6">
+              <div class="col-sm-12">
 
                 <!-- Notification Position -->
                 <div class="row justify-content-center mt-2">
-                  <div class="col-sm-12">
+                  <div class="col-sm-6">
                     <vs-select label="Notification Position" class="w-100" v-model="settings.notifPos" @input="checkNotifPosChanged()">
                       <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in notifPosOptions" />
                     </vs-select>
                   </div>
+                  <div class="col-sm-6">
+                    <vs-input id="vstsPAT" v-model="settings.api.vstsPAT" label="VSTS Personal Access Token" @input="isTyping = true" class="w-100"/>
+                  </div>
                 </div>
                 <!-- Notification Position -->
-
-                <div class="col-sm-6">
-
-                </div>
 
               </div>
             </div>
@@ -48,6 +47,7 @@
                   <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="3">
                     <vs-input label="HEX" placeholder="#1f74ff" v-model="settings.theme.primary" @input="isTyping = true"
                     :danger="this.validationErrors.themePrimary" danger-text="Incorrect Format"/>
+                    <vs-button type="flat" color="primary" @click="settings.theme.primary = '#1f74ff'; isTyping = true" style="margin-top: 30px;" class="ml-2">Reset</vs-button>
                   </vs-col>
                 </vs-row>
 
@@ -70,26 +70,31 @@
       <!-- Test Plan Creator Tab -->
       <vs-tab vs-label="Test Plan Creator">
         <!-- Test Plan Creator Settings -->
-        <div class="row mt-5">
-          <div class="col-sm-12">
+        <div class="row justify-content-center mt-3">
+          <div class="col-sm-8">
+
+            <h3>General</h3>
 
             <!-- Other Settings -->
-            <div class="row justify-content-center">
-              <div class="col-sm-8">
+            <div class="row">
+              <div class="col-sm-12">
 
-                  <!-- Default Assignee -->
+                  <!-- Default Assignee & Jira Username -->
                   <div class="row">
-                    <div class="col-sm-12">
-                      <vs-input id="autoNewLine" v-model="settings.planCreator.defaultAssignee" label="Default Assignee" @input="isTyping = true" class="w-100"/>
+                    <div class="col-sm-6">
+                      <vs-input id="defualtAssignee" v-model="settings.planCreator.defaultAssignee" label="Default Assignee" @input="isTyping = true" class="w-100"/>
+                    </div>
+                    <div class="col-sm-6">
+                      <vs-input id="jiraUsername" v-model="settings.planCreator.jiraUsername" label="Jira Username" @input="isTyping = true" class="w-100"/>
                     </div>
                   </div>
-                  <!-- Default Assignee -->
+                  <!-- Default Assignee & Jira Username -->
 
                   <!-- defaultPlanExportDir -->
                   <div class="row mt-4">
                     <div class="col-sm-12">
-                      <vs-input id="autoNewLine" v-model="settings.planCreator.defaultPlanExportDir" label="Default Export Location"
-                      @input="isTyping = true" class="w-100" description-text="Set a defualt location for your test plan exports"/>
+                      <vs-input id="exportLocation" v-model="settings.planCreator.defaultPlanExportDir" label="Default Export Location"
+                      @input="isTyping = true" class="w-100" description-text="Set a defualt location for your file and testplan exports"/>
                     </div>
                   </div>
                   <!-- defaultPlanExportDir -->
@@ -100,7 +105,7 @@
 
             <!-- Toggles -->
             <div class="row justify-content-center mt-3">
-              <div class="col-sm-8">
+              <div class="col-sm-12">
                 <vs-list>
 
                   <vs-list-header title="Editor"></vs-list-header>
@@ -120,6 +125,13 @@
                       </vs-switch>
                     </vs-list-item>
                   </span>
+
+                  <vs-list-item title="Show Preview" subtitle="Show Gherkin preview bar when editing Gherkin">
+                    <vs-switch id="showEditor" v-model="settings.editor.showGherkinPreview" @input="isTyping = true">
+                      <span slot="on">Yes</span>
+                      <span slot="off">No</span>
+                    </vs-switch>
+                  </vs-list-item>
 
                   <vs-list-header title="Generators"></vs-list-header>
 

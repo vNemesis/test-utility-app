@@ -84,7 +84,7 @@ export default {
     importFromJson (importData) {
       remote.dialog.showOpenDialog({
         filters: [
-          { name: 'TU File File', extensions: ['tul'] }
+          { name: 'CFT File File', extensions: ['cft'] }
         ]
       },
       (fileName) => {
@@ -168,6 +168,8 @@ export default {
     importFromSSMSDelimited () {
       let configLine = this.textConfig.split('\n')
       let configData = []
+      let ids = []
+      let hasConflicts = false
 
       for (let i = 0; i < configLine.length; ++i) {
         let columns = configLine[i].split('\t')
@@ -192,11 +194,31 @@ export default {
           })
           configData = []
         } else {
-          configData.push(new FileConfigItemObject(parseInt(columns[1]), columns[0], 0, 10, 'text', []))
+          let conflicts = ids.includes(parseInt(columns[1]))
+
+          // configData.sort((a, b) => a.id - b.id)
+
+          if (conflicts) {
+            hasConflicts = true
+            continue
+          } else {
+            ids.push(parseInt(columns[1]))
+            configData.push(new FileConfigItemObject(parseInt(columns[1]), columns[0], 0, 10, 'text', []))
+          }
         }
       }
 
-      this.$emit('update-config', configData)
+      if (hasConflicts) {
+        this.$vs.notify({
+          title: 'Error!',
+          text: `The file had columns that conflicted, please check the column order and add in nay columns that are missing`,
+          color: 'danger',
+          position: this.$store.state.settings.notifPos,
+          time: 8000
+        })
+      }
+
+      this.$emit('update-config', configData, ',')
     },
 
     importFromSSMSFixedWidthCSV () {
@@ -298,7 +320,7 @@ export default {
                 configData.push(new FileConfigItemObject(parseInt(parsedData[i][1]), parsedData[i][0], 0, 10, 'text', []))
               }
             }
-            this.$emit('update-config', configData)
+            this.$emit('update-config', configData, ',')
           }
         })
       })

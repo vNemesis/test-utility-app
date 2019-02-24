@@ -62,18 +62,18 @@
     <!-- Gherkin -->
     <td class="align-middle">
 
-      <div class="btn-toolbar" role="toolbar" ref="toolbar" v-if="gherkinToolbar">
+      <div class="btn-toolbar" role="toolbar" ref="toolbar" v-if="toggleGherkin">
         <div class="btn-group btn-group-sm mr-2" role="group" aria-label="First group">
           <button type="button" class="btn btn-info" @click="$emit('show-preview', { syntax: 'gherkin', code: testdata.gherkin})">Preview</button>
         </div>
 
         <div class="btn-group btn-group-sm" role="group" aria-label="Third group">
-          <button type="button" class="btn btn-danger" @click="gherkinToolbar = false">X</button>
+          <button type="button" class="btn btn-danger" @click="toggleGherkin = false">X</button>
         </div>
       </div>
 
       <vs-tooltip text="Only paste Gherkin code. Formatting for Jira is done Automatically">
-        <textarea v-model="testdata.gherkin" class="form-control" style="height: 100px;" placeholder="Gherkin code for test" @focus="gherkinToolbar = true"></textarea>
+        <textarea v-model="testdata.gherkin" class="form-control" style="height: 100px;" placeholder="Gherkin code for test" @focus="toggleGherkin = true"></textarea>
       </vs-tooltip>
 
     </td>
@@ -122,7 +122,7 @@
 
     data: function () {
       return {
-        gherkinToolbar: false,
+        gherkinState: false,
         types: {
           API: 'API',
           UI: 'UI'
@@ -158,12 +158,27 @@
     computed: {
       toggleEditor: {
         get () {
-          if (this.$store.state.settings.editor.showEditor) {
+          if (this.settings.editor.showEditor) {
             return this.editorState
           }
         },
         set (value) {
           this.editorState = value
+        }
+      },
+      toggleGherkin: {
+        get () {
+          if (this.settings.editor.showGherkinPreview) {
+            return this.gherkinState
+          }
+        },
+        set (value) {
+          this.gherkinState = value
+        }
+      },
+      settings: {
+        get () {
+          return this.$store.state.settings
         }
       },
       canMoveUp () {

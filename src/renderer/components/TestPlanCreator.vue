@@ -48,6 +48,10 @@
                 <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
                   <vs-button type="line" :color="tabColour" @click="activePromptImportFromExcel = true">Import from Excel Clipboard</vs-button>
                 </vs-col>
+
+                <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
+                  <vs-button type="line" :color="danger" @click="exportToJiraPopup.active = true">Export to Jira</vs-button>
+                </vs-col>
               </vs-row>
 
               <vs-row class="justify-content-center mt-2">
@@ -273,6 +277,12 @@
            
       </vs-popup>
       <!-- Jira Preview -->
+
+      <!-- Preview -->
+      <vs-popup title="Code Preview" :active.sync="previewPopup.active">
+        <highlight-code class="text-left" :lang="previewPopup.syntax" :code="previewPopup.code"></highlight-code>
+      </vs-popup>
+      <!-- Preview -->
   </div>
 
 </div>
@@ -355,6 +365,9 @@ export default {
       JiraPreviewPopup: {
         active: false
       },
+      exportToJiraPopup: {
+        active: false
+      },
       // HotTable
       hotTableSettings: {
         startRows: 5,
@@ -371,12 +384,15 @@ export default {
   computed: {
     allTestPlans () {
       return this.$root.getTestPlans()
+    },
+    settings () {
+      return this.$store.state.settings
     }
   },
 
   mounted () {
-    if (this.assignee === '' && this.$store.state.settings.defaultAssignee !== '') {
-      this.assignee = this.$store.state.settings.defaultAssignee
+    if (this.assignee === '' && this.settings.planCreator.defaultAssignee !== '') {
+      this.assignee = this.settings.planCreator.defaultAssignee
     }
   },
 
@@ -474,7 +490,7 @@ export default {
         text: 'Items added successfully',
         color: 'success',
         // icon: 'publish',
-        position: this.$store.state.settings.notifPos,
+        position: this.settings.notifPos,
         time: 4000
       })
     },
@@ -487,7 +503,7 @@ export default {
           title: 'Error!',
           text: 'Please specify a Jira Task ID',
           color: 'danger',
-          position: this.$store.state.settings.notifPos,
+          position: this.settings.notifPos,
           time: 4000
         })
         return
@@ -510,7 +526,7 @@ export default {
           title: 'Error!',
           text: 'Please specify a Jira Task ID',
           color: 'danger',
-          position: this.$store.state.settings.notifPos,
+          position: this.settings.notifPos,
           time: 4000
         })
         return
@@ -563,7 +579,7 @@ export default {
           text: `Plan ${this.jiraTask} was saved to app${externalSave ? ' and external file' : ' '} successfully`,
           color: 'success',
           // icon: 'publish',
-          position: this.$store.state.settings.notifPos,
+          position: this.settings.notifPos,
           time: 4000
         })
       }
@@ -607,7 +623,7 @@ export default {
         text: `Plan "${key}" was deleted successfully`,
         color: 'success',
         // icon: 'delete_forever',
-        position: this.$store.state.settings.notifPos,
+        position: this.settings.notifPos,
         time: 4000
       })
 
@@ -636,7 +652,7 @@ export default {
               text: `An error ocurred creating the file: ${err.message}`,
               color: 'danger',
               // icon: 'error_outline',
-              position: this.$store.state.settings.notifPos,
+              position: this.settings.notifPos,
               time: 4000
             })
           } else {
@@ -650,7 +666,7 @@ export default {
               text: `File "${fileName[0]}" was imported successfully`,
               color: 'success',
               // icon: 'publish',
-              position: this.$store.state.settings.notifPos,
+              position: this.settings.notifPos,
               time: 4000
             })
             let parsedData = JSON.parse(data)
@@ -683,7 +699,7 @@ export default {
               text: `An error ocurred loading the file: ${err.message}`,
               color: 'danger',
               // icon: 'error_outline',
-              position: this.$store.state.settings.notifPos,
+              position: this.settings.notifPos,
               time: 4000
             })
           } else {
@@ -697,7 +713,7 @@ export default {
               text: `File "${fileName[0]}" was imported successfully`,
               color: 'success',
               // icon: 'publish',
-              position: this.$store.state.settings.notifPos,
+              position: this.settings.notifPos,
               time: 4000
             })
             let parsedData = Papa.parse(data).data
@@ -740,7 +756,7 @@ export default {
         text: 'A Test Plan has been created from your excel data',
         color: 'success',
         // icon: 'publish',
-        position: this.$store.state.settings.notifPos,
+        position: this.settings.notifPos,
         time: 4000
       })
 
@@ -791,7 +807,7 @@ export default {
         text: `SpecFlow ${type.toUpperCase()} scenario definitions have been copied to your clipboard`,
         color: 'success',
         // icon: 'assignment',
-        position: this.$store.state.settings.notifPos,
+        position: this.settings.notifPos,
         time: 4000
       })
     },
@@ -808,7 +824,7 @@ export default {
             title: 'Error',
             text: 'You do not have any Tests to update',
             color: 'danger',
-            position: this.$store.state.settings.notifPos,
+            position: this.settings.notifPos,
             time: 4000
           })
           this.bulkOpPopup.changeJiraID.startID = ''
@@ -830,7 +846,7 @@ export default {
               title: 'Error',
               text: `Error occured: ${error}`,
               color: 'error',
-              position: this.$store.state.settings.notifPos,
+              position: this.settings.notifPos,
               time: 4000
             })
           }
@@ -841,7 +857,7 @@ export default {
           title: 'Operation completed',
           text: 'Bulk operation completed with no errors',
           color: 'success',
-          position: this.$store.state.settings.notifPos,
+          position: this.settings.notifPos,
           time: 4000
         })
       } else {
@@ -857,7 +873,7 @@ export default {
             title: 'Error',
             text: 'You do not have any Tests to update',
             color: 'danger',
-            position: this.$store.state.settings.notifPos,
+            position: this.settings.notifPos,
             time: 4000
           })
           this.bulkOpPopup.changePriorities.priority = ''
@@ -914,7 +930,7 @@ export default {
         title: 'Operation completed',
         text: 'Bulk operation completed with no errors',
         color: 'success',
-        position: this.$store.state.settings.notifPos,
+        position: this.settings.notifPos,
         time: 4000
       })
     },
@@ -1000,7 +1016,7 @@ export default {
             text: `An error ocurred creating the file: ${err.message}`,
             color: 'danger',
             icon: 'error_outline',
-            position: this.$store.state.settings.notifPos,
+            position: this.settings.notifPos,
             time: 4000
           })
         } else {
@@ -1011,7 +1027,7 @@ export default {
               text: `File '${filename}' was exported successfully`,
               color: 'success',
               icon: 'save',
-              position: this.$store.state.settings.notifPos,
+              position: this.settings.notifPos,
               time: 10000
             })
             setTimeout(remote.shell.showItemInFolder(path), 3000)

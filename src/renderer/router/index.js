@@ -26,6 +26,11 @@ export default new Router({
       component: require('@/components/FileCreator/FileCreatorMain').default
     },
     {
+      path: '/citests',
+      name: 'ci-tests',
+      component: require('@/components/ci/CITests').default
+    },
+    {
       path: '/settings',
       name: 'settings',
       component: require('@/components/Settings').default
