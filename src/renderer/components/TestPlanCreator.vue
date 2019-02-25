@@ -4,7 +4,6 @@
   <vs-progress indeterminate color="success" v-if="autoSaving"></vs-progress>
   <div class="row" :class="autoSaving ? 'my-4' : 'my-5'">
     <div class="col-md-12 text-center">
-      <h1>Test Plan Creator</h1>
 
 
       <br>

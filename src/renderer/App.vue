@@ -1,5 +1,6 @@
 <template>
   <div id="app" :class="this.$store.state.settings.theme.darkMode === true ? 'dark-mode' : ''">
+    <span v-shortkey="['ctrl', 'meta']" @shortkey="active = true"></span>
     <!-- Side Menu -->
     <div id="parentx" :class="this.$store.state.settings.theme.darkMode === true ? 'dark-mode-side-menu' : ''">
       <vs-sidebar ref="sidemenu" parent="#parentx" default-index="1"  color="primary" class="sidebarx" spacer v-model="active">
@@ -44,9 +45,11 @@
     <!-- Side Menu -->
 
     <vs-navbar type="gradient" v-model="activeItem" class="nabarx">
-      <vs-button @click="onOpenMenu" type="flat" vs-radius="50%"  icon="menu">Menu</vs-button>
 
-      <vs-spacer></vs-spacer>
+      <div slot="title">
+        <vs-button @click="onOpenMenu" type="flat" vs-radius="50%"  icon="menu">Menu</vs-button>
+        <h5 class="float-right mt-2 ml-5 pl-5">{{ pageLoadedName }}</h5>
+      </div>
 
       <vs-navbar-item index="1">
         <a @click="onOpenUrl('https://rimilia.atlassian.net/projects/AZCI/issues?filter=myopenissues')" class="nav-bar-link"><font-awesome-icon icon="book" size="lg"/> Jira</a>
@@ -87,7 +90,8 @@
     data: () => ({
       activeItem: 4,
       name: 'Test Plan Utility',
-      active: false
+      active: false,
+      pageLoadedName: 'Home'
     }),
 
     computed: {
@@ -109,21 +113,52 @@
         this.$electron.shell.openExternal(link)
       },
       navigate (path) {
+        let cancelled = false
+
         if (this.$route.path === '/testplancreator') {
           if (confirm('Any unsaved changes will be lost. Please export your test plan if you wish to save it.')) {
             this.$router.push({ path: path })
           } else {
+            cancelled = true
             this.$refs.sidemenu.currentIndex = 2
           }
         } else if (this.$route.path === '/filecreator') {
           if (confirm('Any unsaved changes will be lost. Please export your file config and data if you wish to save it.')) {
             this.$router.push({ path: path })
           } else {
+            cancelled = true
             this.$refs.sidemenu.currentIndex = 4
           }
         } else {
           this.$router.push({ path: path })
         }
+
+        if (!cancelled) {
+          switch (path) {
+            case '/':
+              this.pageLoadedName = 'Home'
+              break
+            case '/testplancreator':
+              this.pageLoadedName = 'Test Plan Creator'
+              break
+            case '/formatter':
+              this.pageLoadedName = 'Text Formatter'
+              break
+            case '/filecreator':
+              this.pageLoadedName = 'File Creator'
+              break
+            case '/citests':
+              this.pageLoadedName = 'CI Tests'
+              break
+            case '/settings':
+              this.pageLoadedName = 'Settings'
+              break
+            default:
+              break
+          }
+        }
+
+        document.getElementsByClassName('vs-sidebar--background').item(0).click()
       }
     },
 

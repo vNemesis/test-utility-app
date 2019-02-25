@@ -10942,10 +10942,10 @@ vue@^2.5.16, vue@^2.5.17:
   resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.17.tgz#0f8789ad718be68ca1872629832ed533589c6ada"
   integrity sha512-mFbcWoDIJi0w0Za4emyLiW72Jae0yjANHbCVquMKijcavBGypqlF7zHRgMa5k4sesdv7hv2rB4JPdZfR+TPfhQ==
 
-vuesax@^3.5.7:
-  version "3.7.1"
-  resolved "https://registry.yarnpkg.com/vuesax/-/vuesax-3.7.1.tgz#640869407ab26d18a6e6ee6d80995e622d8accc6"
-  integrity sha512-DluD0qdTf1Di1ig1Tlx35uoAzp1HRdpE34Naq17j4kdQrUH3vYrA75t+cYLMDfH0IzNme+V1m95KfgCVpAaxYg==
+vuesax@^3.8.21:
+  version "3.8.21"
+  resolved "https://registry.yarnpkg.com/vuesax/-/vuesax-3.8.21.tgz#cf594fd14f1256fc93f557227a375ac8ecc7047f"
+  integrity sha512-tCxw3AXbeKIGtX9+6HIas/jA9bqbyin/+C3Er+tAv+6afBHpWXreutOBfYUuy91uVSCpEDJkrqbMiz578sG7ow==
   dependencies:
     vue "^2.5.17"
 
