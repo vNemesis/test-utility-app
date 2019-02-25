@@ -100,8 +100,11 @@
       },
       darkModeWatcher: {
         get () {
-          return this.$store.state.settings.theme.darkMode
+          return this.settings.theme.darkMode
         }
+      },
+      settings () {
+        return this.$store.state.settings
       }
     },
 
@@ -130,7 +133,23 @@
             this.$refs.sidemenu.currentIndex = 4
           }
         } else {
-          this.$router.push({ path: path })
+          if (path === '/citests') {
+            if (this.settings.api.vstsPAT !== '') {
+              this.$router.push({ path: path })
+            } else {
+              this.$vs.notify({
+                title: 'Error!',
+                text: `Please enter your VSTS Personal Access Token with READ Permissions in the Settings Screen`,
+                color: 'danger',
+                icon: 'error_outline',
+                position: this.settings.notifPos,
+                time: 15000
+              })
+              cancelled = true
+            }
+          } else {
+            this.$router.push({ path: path })
+          }
         }
 
         if (!cancelled) {
