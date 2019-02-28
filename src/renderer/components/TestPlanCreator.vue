@@ -49,7 +49,7 @@
                 </vs-col>
 
                 <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
-                  <vs-button type="line" :color="danger" @click="exportToJiraPopup.active = true">Export to Jira</vs-button>
+                  <vs-button type="line" color="danger" @click="exportToJiraPopup.active = true">Export to Jira</vs-button>
                 </vs-col>
               </vs-row>
 
@@ -128,9 +128,15 @@
           </thead>
           <tbody>
               <tr is="test-item" v-for="(test, index) in testItems" :key="test.id"
-              v-bind:testdata="test" v-bind:totalNumberOfTestItems="testItems.length" v-bind:order="order"
-              v-on:remove-self="removeTestItem(index)" v-on:move-up="moveTestItem(index, index - 1)" v-on:move-down="moveTestItem(index, index + 1)"
-              v-on:show-preview="showPreview" v-on:duplicate="addTestItem(test)"></tr>
+              v-bind:testdata="test"
+              v-bind:totalNumberOfTestItems="testItems.length"
+              v-bind:order="order"
+              v-bind:priorities="project.priorites"
+              v-on:remove-self="removeTestItem(index)"
+              v-on:move-up="moveTestItem(index, index - 1)"
+              v-on:move-down="moveTestItem(index, index + 1)"
+              v-on:show-preview="showPreview"
+              v-on:duplicate="addTestItem(test)"></tr>
           </tbody>
         </table>
       </div>
@@ -140,148 +146,178 @@
   </div>
 
   <div id="globals">
-     <vs-popup title="Load Test Plan" :active.sync="activePromptLoadPlan">
-        <div class="row m-0">
-          <div class="col-sm-12">
-            <vs-select label="Select a test plan to load" vs-autocomplete v-model="planID" :danger="LoadPlanWarning" danger-text="Please select a test plan" class="w-100">
-              <vs-select-item :key="index" :value="index" :text="`${index} - ${item.planDesc}`" v-for="(item,index) in allTestPlans" />
-            </vs-select>
-            <br>
-            <vs-button @click="load(planID)" color="primary" type="border">Load Test Plan</vs-button>
-            <vs-button @click="deletePlan(planID)" color="danger" type="border">Delete</vs-button>
-          </div>
-       </div>
-      </vs-popup>
-
-      <vs-popup fullscreen title="Import for Excel" :active.sync="activePromptImportFromExcel">
-        <div class="row justify-content-center m-0">
-          <div class="col-sm-12">
-            <small>You may need to click inside this window for the table to appear!</small>
-            <div id="hot-preview">
-              <HotTable ref="excelTable" :settings="hotTableSettings"></HotTable>
-            </div>
-            <vs-button @click="importFromExcelData()" color="primary" type="border" class="mt-3">Import</vs-button>
-          </div>
-       </div>
-      </vs-popup>
-
-      <!-- Add Items -->
-      <vs-popup title="Add Test Items" :active.sync="addItemsPopup.active">
-
-        <vs-input label="Jira Subtask ID" placeholder="AZCI-XXX" v-model="addItemsPopup.item.jiraTaskId" class="mb-3"/>
-
-        <vs-textarea v-model="addItemsPopup.item.testName" label="Test Name (Summary)"/>
-
-        <vs-select label="Type" v-model="addItemsPopup.item.testType" class="w-100 mb-3">
-          <vs-select-item :key="index" :value="item" :text="item" v-for="(item,index) in {API: 'API', UI: 'UI'}" />
-        </vs-select>
-
-        <vs-textarea v-model="addItemsPopup.item.testPurpose" label="Test Purpose"/>
-
-        <vs-textarea v-model="addItemsPopup.item.gherkin" label="Gherkin code for test"/>
-
-        <vs-select label="Priority" v-model="addItemsPopup.item.priority" class="w-100 mb-3">
-          <vs-select-item :key="index" :value="item" :text="item" v-for="(item,index) in {Trivial: 'Trivial', Minor: 'Minor', Major: 'Major', Critical: 'Critical'}" />
-        </vs-select>
-
-        <div class="row">
-          <div class="col-sm-3">
-            <vs-button @click="bulkAdd()" color="primary" type="border">Add Items</vs-button>
-          </div>
-          <div class="col-sm-9 text-center">
-            <small>Amount</small>
-            <vs-input-number v-model="addItemsPopup.amount" size="mini" min="1"/>
-          </div>
+    <!-- Load Test Plan -->
+    <vs-popup title="Load Test Plan" :active.sync="activePromptLoadPlan">
+      <div class="row m-0">
+        <div class="col-sm-12">
+          <vs-select label="Select a test plan to load" vs-autocomplete v-model="planID" :danger="LoadPlanWarning" danger-text="Please select a test plan" class="w-100">
+            <vs-select-item :key="index" :value="index" :text="`${index} - ${item.planDesc}`" v-for="(item,index) in allTestPlans" />
+          </vs-select>
+          <br>
+          <vs-button @click="load(planID)" color="primary" type="border">Load Test Plan</vs-button>
+          <vs-button @click="deletePlan(planID)" color="danger" type="border">Delete</vs-button>
         </div>
-      </vs-popup>
-      <!-- Add Items -->
+      </div>
+    </vs-popup>
+    <!-- Load Test Plane -->
 
-      <!-- Bulk Op -->
-      <vs-popup title="Bulk Operations" :active.sync="bulkOpPopup.active">
+    <!-- Import from Excel -->
+    <vs-popup fullscreen title="Import for Excel" :active.sync="activePromptImportFromExcel">
+      <div class="row justify-content-center m-0">
+        <div class="col-sm-12">
+          <small>You may need to click inside this window for the table to appear!</small>
+          <div id="hot-preview">
+            <HotTable ref="excelTable" :settings="hotTableSettings"></HotTable>
+          </div>
+          <vs-button @click="importFromExcelData()" color="primary" type="border" class="mt-3">Import</vs-button>
+        </div>
+      </div>
+    </vs-popup>
+    <!-- Import from Excel -->
 
-        <vs-row>
-          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="9">
-            <vs-input label="Start ID" placeholder="AZCI-123" :danger="!this.bulkOpPopup.changeJiraID.valid" danger-text="Jira ID format is invalid"
-              description-text="This will change all ticket id's to sequential id's starting from this one" v-model="bulkOpPopup.changeJiraID.startID"
-              class="mb-3 w-75"/>
-          </vs-col>
+    <!-- Add Items -->
+    <vs-popup title="Add Test Items" :active.sync="addItemsPopup.active">
 
-          <vs-col vs-type="flex" vs-justify="center" vs-align="flex-start" vs-w="3">
-            <vs-button @click="bulkChangeJiraIds()" color="primary" type="line" class="mt-4 w-100">Start</vs-button>
-          </vs-col>
-        </vs-row>
+      <vs-input label="Jira Subtask ID" placeholder="AZCI-XXX" v-model="addItemsPopup.item.jiraTaskId" class="mb-3"/>
 
-        <vs-row>
-          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="9">
-            <vs-select label="Priority" v-model="bulkOpPopup.changePriorities.priority" class="w-75 mb-3"
-            :danger="!this.bulkOpPopup.changePriorities.valid" danger-text="Please Select a Priority" 
-            description-text="This will change all ticket priorities to the selected value">
-              <vs-select-item :key="index" :value="item" :text="item" v-for="(item,index) in {Trivial: 'Trivial', Minor: 'Minor', Major: 'Major', Critical: 'Critical'}" />
-            </vs-select>
-          </vs-col>
+      <vs-textarea v-model="addItemsPopup.item.testName" label="Test Name (Summary)"/>
 
-          <vs-col vs-type="flex" vs-justify="center" vs-align="flex-start" vs-w="3">
-            <vs-button @click="bulkChangePriorities()" color="primary" type="line" class="w-100 mt-4">Start</vs-button>
-          </vs-col>
-        </vs-row>
+      <vs-select label="Type" v-model="addItemsPopup.item.testType" class="w-100 mb-3">
+        <vs-select-item :key="index" :value="item" :text="item" v-for="(item,index) in {API: 'API', UI: 'UI'}" />
+      </vs-select>
 
-        <vs-row>
-          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="9">
-            <vs-select label="Test Type" v-model="bulkOpPopup.changeTestType.testType" class="w-75 mb-3"
-            :danger="!this.bulkOpPopup.changeTestType.valid" danger-text="Please Select a Test Type" 
-            description-text="This will change all test types to the selected value">
-              <vs-select-item :key="index" :value="item" :text="item" v-for="(item,index) in {API: 'API', UI: 'UI'}" />
-            </vs-select>
-          </vs-col>
+      <vs-textarea v-model="addItemsPopup.item.testPurpose" label="Test Purpose"/>
 
-          <vs-col vs-type="flex" vs-justify="center" vs-align="flex-start" vs-w="3">
-            <vs-button @click="bulkChangeTestType()" color="primary" type="line" class="w-100 mt-4">Start</vs-button>
-          </vs-col>
-        </vs-row>
+      <vs-textarea v-model="addItemsPopup.item.gherkin" label="Gherkin code for test"/>
 
-      </vs-popup>
-      <!--  Bulk Op  -->
+      <vs-select label="Priority" v-model="addItemsPopup.item.priority" class="w-100 mb-3">
+        <vs-select-item :key="index" :value="item.id" :text="item.name" v-for="(item,index) in project.priorities" />
+      </vs-select>
 
-      <!-- Preview -->
-      <vs-popup title="Code Preview" :active.sync="previewPopup.active">
-        <highlight-code class="text-left" :lang="previewPopup.syntax" :code="previewPopup.code"></highlight-code>
-      </vs-popup>
-      <!-- Preview -->
+      <div class="row">
+        <div class="col-sm-3">
+          <vs-button @click="bulkAdd()" color="primary" type="border">Add Items</vs-button>
+        </div>
+        <div class="col-sm-9 text-center">
+          <small>Amount</small>
+          <vs-input-number v-model="addItemsPopup.amount" size="mini" min="1"/>
+        </div>
+      </div>
+    </vs-popup>
+    <!-- Add Items -->
 
-      <!-- Jira Preview -->
-      <vs-popup fullscreen title="Jira Table Preview" :active.sync="JiraPreviewPopup.active">
-            <div class="table-responsive">
-               <table class="table">
-                <thead>
-                  <tr>
-                    <td>
-                      Jira Issue ID
-                    </td>
-                    <td>
-                      Type
-                    </td>
-                    <td>
-                      Test Name  
-                    </td>
-                    <td>
-                      Test Purpose
-                    </td>
-                  </tr>
-                </thead>
-                <tbody v-html="JiraPreviewPopup.text">
+    <!-- Bulk Op -->
+    <vs-popup title="Bulk Operations" :active.sync="bulkOpPopup.active">
 
-                </tbody>
-              </table>
-            </div>
-           
-      </vs-popup>
-      <!-- Jira Preview -->
+      <vs-row>
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="9">
+          <vs-input label="Start ID" placeholder="AZCI-123" :danger="!this.bulkOpPopup.changeJiraID.valid" danger-text="Jira ID format is invalid"
+            description-text="This will change all ticket id's to sequential id's starting from this one" v-model="bulkOpPopup.changeJiraID.startID"
+            class="mb-3 w-75"/>
+        </vs-col>
 
-      <!-- Preview -->
-      <vs-popup title="Code Preview" :active.sync="previewPopup.active">
-        <highlight-code class="text-left" :lang="previewPopup.syntax" :code="previewPopup.code"></highlight-code>
-      </vs-popup>
-      <!-- Preview -->
+        <vs-col vs-type="flex" vs-justify="center" vs-align="flex-start" vs-w="3">
+          <vs-button @click="bulkChangeJiraIds()" color="primary" type="line" class="mt-4 w-100">Start</vs-button>
+        </vs-col>
+      </vs-row>
+
+      <vs-row>
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="9">
+          <vs-select label="Priority" v-model="bulkOpPopup.changePriorities.priority" class="w-75 mb-3"
+          :danger="!this.bulkOpPopup.changePriorities.valid" danger-text="Please Select a Priority" 
+          description-text="This will change all ticket priorities to the selected value">
+            <vs-select-item :key="index" :value="item.id" :text="item.name" v-for="(item,index) in project.priorities" />
+          </vs-select>
+        </vs-col>
+
+        <vs-col vs-type="flex" vs-justify="center" vs-align="flex-start" vs-w="3">
+          <vs-button @click="bulkChangePriorities()" color="primary" type="line" class="w-100 mt-4">Start</vs-button>
+        </vs-col>
+      </vs-row>
+
+      <vs-row>
+        <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="9">
+          <vs-select label="Test Type" v-model="bulkOpPopup.changeTestType.testType" class="w-75 mb-3"
+          :danger="!this.bulkOpPopup.changeTestType.valid" danger-text="Please Select a Test Type" 
+          description-text="This will change all test types to the selected value">
+            <vs-select-item :key="index" :value="item" :text="item" v-for="(item,index) in {API: 'API', UI: 'UI'}" />
+          </vs-select>
+        </vs-col>
+
+        <vs-col vs-type="flex" vs-justify="center" vs-align="flex-start" vs-w="3">
+          <vs-button @click="bulkChangeTestType()" color="primary" type="line" class="w-100 mt-4">Start</vs-button>
+        </vs-col>
+      </vs-row>
+
+    </vs-popup>
+    <!--  Bulk Op  -->
+
+    <!-- Preview -->
+    <vs-popup title="Code Preview" :active.sync="previewPopup.active">
+      <highlight-code class="text-left" :lang="previewPopup.syntax" :code="previewPopup.code"></highlight-code>
+    </vs-popup>
+    <!-- Preview -->
+
+    <!-- Jira Preview -->
+    <vs-popup fullscreen title="Jira Table Preview" :active.sync="JiraPreviewPopup.active">
+          <div class="table-responsive">
+              <table class="table">
+              <thead>
+                <tr>
+                  <td>
+                    Jira Issue ID
+                  </td>
+                  <td>
+                    Type
+                  </td>
+                  <td>
+                    Test Name  
+                  </td>
+                  <td>
+                    Test Purpose
+                  </td>
+                </tr>
+              </thead>
+              <tbody v-html="JiraPreviewPopup.text">
+
+              </tbody>
+            </table>
+          </div>
+          
+    </vs-popup>
+    <!-- Jira Preview -->
+
+    <!-- Preview -->
+    <vs-popup title="Code Preview" :active.sync="previewPopup.active">
+      <highlight-code class="text-left" :lang="previewPopup.syntax" :code="previewPopup.code"></highlight-code>
+    </vs-popup>
+    <!-- Preview -->
+
+    <!-- Jira Upload -->
+    <vs-popup title="Upload to Jira" :active.sync="exportToJiraPopup.active">
+      <div class="row m-0">
+        <div class="col-sm-12">
+          <vs-input label-placeholder="Username" type="text" v-model="exportToJiraPopup.username"/>
+          <vs-input label-placeholder="Password" type="password" class="mt-4" v-model="exportToJiraPopup.password"/>
+        </div>
+      </div>
+      <div class="row mt-3 mx-0">
+        <div class="col-sm-12">
+          <vs-button id="jiraUploadButton" class="vs-con-loading__container" :disabled="exportToJiraPopup.working"
+                     @click="uploadToJira()" color="primary" type="border">
+                     Upload
+          </vs-button>
+        </div>
+      </div>
+      <hr>
+      <div class="row mt-2 mx-0">
+        <div class="col-sm-12">
+          <vs-textarea v-if="exportToJiraPopup.log" label="Log" rows="15" class="w-100" v-model="exportToJiraPopup.log" readonly />
+        </div>
+      </div>
+    </vs-popup>
+    <!-- Jira Upload -->
+
   </div>
 
 </div>
@@ -291,7 +327,7 @@ import TestItem from './TestItem'
 import { HotTable } from '@handsontable/vue'
 import Papa from 'papaparse'
 import _ from 'lodash'
-import $ from 'jquery'
+import axios from 'axios'
 
 const remote = require('electron').remote
 var fs = require('fs')
@@ -336,7 +372,7 @@ export default {
           testName: '',
           testPurpose: '',
           gherkin: '',
-          priority: ''
+          priority: 5
         },
         amount: 1
       },
@@ -365,7 +401,12 @@ export default {
         active: false
       },
       exportToJiraPopup: {
-        active: false
+        active: false,
+        username: '',
+        password: '',
+        log: '',
+        complete: false,
+        working: false
       },
       // HotTable
       hotTableSettings: {
@@ -376,7 +417,19 @@ export default {
       },
       // Menu
       tabColour: 'rgb(204, 98, 0)',
-      order: false
+      order: false,
+      // Project Data
+      project: {
+        id: 0,
+        subTaskId: 0,
+        taskId: 0,
+        priorities: [
+          { id: 2, name: 'Critical' },
+          { id: 3, name: 'Major' },
+          { id: 4, name: 'Minor' },
+          { id: 5, name: 'Trivial' }
+        ]
+      }
     }
   },
 
@@ -392,6 +445,10 @@ export default {
   mounted () {
     if (this.assignee === '' && this.settings.planCreator.defaultAssignee !== '') {
       this.assignee = this.settings.planCreator.defaultAssignee
+    }
+
+    if (this.exportToJiraPopup.username === '' && this.settings.api.jiraUsername !== '') {
+      this.exportToJiraPopup.username = this.settings.api.jiraUsername
     }
   },
 
@@ -429,6 +486,7 @@ export default {
           this.autoSaveHandler()
           this.autoSaving = true
         }
+        // TODO: Add method to check for duplicate Jira Task ID's
       },
       deep: true
     }
@@ -453,6 +511,7 @@ export default {
         this.testItems[i].id = i + 1
       }
     },
+    // TODO: convert into an object class
     addTestItem (testItem = null) {
       if (testItem === null) {
         this.testItems.push({
@@ -462,11 +521,11 @@ export default {
           testName: '',
           testPurpose: '',
           gherkin: '',
-          priority: ''
+          priority: 5
         }
         )
       } else {
-        let duplicate = $.extend(true, {}, testItem)
+        let duplicate = _.cloneDeep(testItem)
         duplicate.id = this.testItems.length + 1
         this.testItems.push(duplicate)
       }
@@ -494,6 +553,105 @@ export default {
       })
     },
 
+    // -----------------------------------------------   API  -----------------------------------------------
+
+    // Get AZCI project metadata
+    apiGetJiraProjectData (auth) {
+      return axios.get(`https://rimilia.atlassian.net/rest/api/3/issue/createmeta?projectKeys=AZCI`,
+        {
+          headers: {
+            Authorization: `Basic ${auth}`,
+            Accept: 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          responseType: 'json'
+        })
+        .then(response => {
+          // Check issue retrived is a task
+          if (response.data.projects.length === 0) {
+            this.$vs.notify({
+              title: `No Projects found`,
+              text: 'Please check the AZCI project is visible and that you have permission to view it.',
+              color: 'danger',
+              position: this.settings.notifPos,
+              time: 8000
+            })
+            this.$vs.loading.close('#jiraUploadButton > .con-vs-loading')
+            this.exportToJiraPopup.working = false
+            return
+          }
+
+          this.project.id = parseInt(response.data.projects[0].id)
+          this.project.subTaskId = parseInt(response.data.projects[0].issuetypes.find(x => x.name === 'Sub-task' && x.subtask === true).id)
+          this.project.taskId = parseInt(response.data.projects[0].issuetypes.find(x => x.name === 'Task' && x.subtask === false).id)
+        })
+        .catch(error => {
+          // If Unauthorised
+          if (error.response.status === 401) {
+            this.$vs.notify({
+              title: 'Unauthorised',
+              text: 'Please check you entered the password correctly and that you have permission to view the AZCI Project.',
+              color: 'danger',
+              position: this.settings.notifPos,
+              time: 8000
+            })
+          // if project not found
+          } else if (error.response.status === 404) {
+            this.$vs.notify({
+              title: 'No response was found',
+              text: 'Please check the AZCI project is visible and that you have permission to view it.',
+              color: 'danger',
+              position: this.settings.notifPos,
+              time: 8000
+            })
+          }
+        })
+    },
+
+    apiGetJiraPriorities (auth) {
+      return axios.get('https://rimilia.atlassian.net/rest/api/3/priority',
+        {
+          headers: {
+            Authorization: `Basic ${auth}`,
+            Accept: 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          responseType: 'json'
+        })
+        .then(response => {
+          let data = response.data
+          data.forEach(element => {
+            let index = data.findIndex((e) => e.id === element.id)
+            if (index === -1) {
+              this.project.priorities.push({ id: element.id, name: element.name })
+            } else {
+              this.project.priorities[index] = { id: element.id, name: element.name }
+            }
+          })
+        })
+        .catch(error => {
+          // If Unauthorised
+          if (error.response.status === 401) {
+            this.$vs.notify({
+              title: 'Unauthorised',
+              text: 'Please check you entered the password correctly and that you have permission to view the AZCI Project.',
+              color: 'danger',
+              position: this.settings.notifPos,
+              time: 8000
+            })
+          // if project not found
+          } else if (error.response.status === 404) {
+            this.$vs.notify({
+              title: 'No response was found',
+              text: 'Please check the AZCI project is visible and that you have permission to view it.',
+              color: 'danger',
+              position: this.settings.notifPos,
+              time: 8000
+            })
+          }
+        })
+    },
+
     // ----------------------------------------------- Export -----------------------------------------------
 
     exportToJiraCSV (showDialog) {
@@ -513,7 +671,7 @@ export default {
       this.testItems.forEach(element => {
         let title = `"${element.testName}"`
         let description = `"Test Description: ${element.testPurpose} \r\n\r\nTest Type: ${element.testType} \r\n\r\n{code}\r\n${element.gherkin}\r\n{code}"`
-        let row = [title, description, this.jiraTask, 'sub-task', this.assignee, element.priority, this.app].join(',')
+        let row = [title, description, this.jiraTask, 'sub-task', this.assignee, this.projectpriorities.find(x => x.id === element.priority).name, this.app].join(',')
         csvContent += row + '\r\n'
       })
 
@@ -541,6 +699,217 @@ export default {
 
       let jsonContent = JSON.stringify(plan)
       this.exportFile(`Test Plan ${this.jiraTask}.json`, jsonContent, 'JSON File', 'json', showDialog)
+    },
+
+    uploadToJira () {
+      this.exportToJiraPopup.working = true
+      if (!this.jiraTask) {
+        this.$vs.notify({
+          title: 'Error!',
+          text: 'Please specify a Jira Task ID',
+          color: 'danger',
+          position: this.settings.notifPos,
+          time: 4000
+        })
+        return
+      }
+
+      this.$vs.loading({
+        color: '#000',
+        container: '#jiraUploadButton',
+        scale: 0.45,
+        type: 'sound'
+      })
+
+      /**
+       * 1. Fetch AZCI metadata
+       * 2. Fetch AZCI Issue
+       * 3. check for existing sub-tasks
+       * 4. create new sub-task if ticket it does not exist
+       * 5. update sub-tasks with information
+       */
+
+      // Create Base64 auth value
+      let auth = btoa(`${this.exportToJiraPopup.username}:${this.exportToJiraPopup.password}`)
+
+      axios.all([this.apiGetJiraProjectData(auth), this.apiGetJiraPriorities(auth)])
+        .then(axios.spread(function (acct, perms) {
+        }))
+
+      // call for jira task
+      axios.get(`https://rimilia.atlassian.net/rest/api/3/issue/${this.jiraTask}`,
+        {
+          headers: {
+            Authorization: `Basic ${auth}`,
+            Accept: 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          responseType: 'json'
+        })
+        .then(response => {
+          // Check issue retrived is a task
+          if (parseInt(response.data.fields.issuetype.id) !== this.project.taskId) {
+            this.$vs.notify({
+              title: 'Error',
+              text: `The issue <strong>${this.jiraTask}</strong> is not a task, pleae check you have the correct issue ID.`,
+              color: 'danger',
+              position: this.settings.notifPos,
+              time: 8000
+            })
+            this.exportToJiraPopup.log += `Specified Task ID ${this.jiraTask} is not of type 'Task'\n`
+            return
+          }
+
+          // get sub tasks
+          let subTasks = response.data.fields.subtasks
+
+          // Create sub-tasks that do not exist, update current ones
+          let grammer = subTasks.length === 1 ? 's' : ''
+          this.exportToJiraPopup.log += `Found ${subTasks.length} sub-task${grammer} for ${this.jiraTask}.\n`
+          this.exportToJiraPopup.log += `Updating exisiting sub-task${grammer}${this.testItems.length > subTasks.length ? ' and adding new tasks' : ''}`
+
+          let subTaskKeys = subTasks.map(item => item.key)
+
+          /**
+           * id, jiraTaskId, testType, testName, testPurpose, gherkin, priority
+           */
+
+          /** let issues = {
+                issueUpdates: [
+                  {
+                    update: {},
+                    fields: {
+                      project: {
+                        id: '1000'
+                      },
+                      summary: 'something\'s very wrong',
+                      issuetype: {
+                        id: '10000'
+                      },
+                      assignee: {
+                        name: 'jerry'
+                      },
+                      priority: {
+                        id: '20000'
+                      },
+                      labels: [
+                        'new_release'
+                      ],
+                      timetracking: {
+                        originalEstimate: '15',
+                        remainingEstimate: '5'
+                      },
+                      security: {
+                        id: '10000'
+                      },
+                      versions: [
+                        {
+                          id: '10000'
+                        }
+                      ],
+                      environment: {
+                        type: 'doc',
+                        version: 1,
+                        content: [
+                          {
+                            type: 'paragraph',
+                            content: [
+                              {
+                                type: 'text',
+                                text: 'environment'
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      description: {
+                        type: 'doc',
+                        version: 1,
+                        content: [
+                          {
+                            type: 'paragraph',
+                            content: [
+                              {
+                                type: 'text',
+                                text: 'description'
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      duedate: '2011-04-16',
+                      fixVersions: [
+                        {
+                          id: '10001'
+                        }
+                      ],
+                      components: [
+                        {
+                          id: '10000'
+                        }
+                      ],
+                      customfield_30000: [
+                        '10000',
+                        '10002'
+                      ],
+                      customfield_80000: {
+                        value: 'red'
+                      },
+                      customfield_20000: '06/Jul/11 3:25 PM',
+                      customfield_40000: 'this is a text field',
+                      customfield_70000: [
+                        'jira-administrators',
+                        'jira-software-users'
+                      ],
+                      customfield_60000: 'jira-software-users',
+                      customfield_50000: 'this is a text area. big text.',
+                      customfield_10000: '09/Jun/81'
+                    }
+                  }
+                ]
+                }
+                */
+
+          this.testItems.forEach(element => {
+            if (subTaskKeys.includes(element.jiraTaskId)) {
+            }
+          })
+
+          // axios.post('/user', {
+          // })
+          //   .then(function (response) {
+          //     console.log(response)
+          //   })
+          //   .catch(function (error) {
+          //     console.log(error)
+          //   })
+        })
+        .catch(function (error) {
+          // If Unauthorised
+          if (error.response.status === 401) {
+            this.$vs.notify({
+              title: 'Unauthorised',
+              text: `Please check you entered the password correctly and that you have permission to view issue ${this.jiraTask}.`,
+              color: 'danger',
+              position: this.settings.notifPos,
+              time: 8000
+            })
+          // if issue not found
+          } else if (error.response.status === 404) {
+            this.$vs.notify({
+              title: `Task ${this.jiraTask} was not found`,
+              text: 'Please check you entered the correct <strong>Jira Task ID</strong> and that you have permission to view it.',
+              color: 'danger',
+              position: this.settings.notifPos,
+              time: 8000
+            })
+          }
+        }.bind(this))
+        .then(function () {
+          // close loading, set working to false
+          this.$vs.loading.close('#jiraUploadButton > .con-vs-loading')
+          this.exportToJiraPopup.working = false
+        }.bind(this))
     },
 
     // ----------------------------------------------- App Saving / Loading -----------------------------------------------
@@ -577,6 +946,15 @@ export default {
           title: 'Plan Saved',
           text: `Plan ${this.jiraTask} was saved to app${externalSave ? ' and external file' : ' '} successfully`,
           color: 'success',
+          // icon: 'publish',
+          position: this.settings.notifPos,
+          time: 4000
+        })
+      } else {
+        this.$vs.notify({
+          title: 'Validation Errors',
+          text: `Please first resolve all current validation errors before saving`,
+          color: 'danger',
           // icon: 'publish',
           position: this.settings.notifPos,
           time: 4000
@@ -727,7 +1105,7 @@ export default {
                 testName: parsedData[index][0],
                 testPurpose: testPurposeSplit[0].substring(18).trim(),
                 gherkin: testPurposeSplit[2].split('{code}').join('').trim(),
-                priority: parsedData[index][5]
+                priority: parseInt(parsedData[index][5])
               }
 
               this.testItems.push(testItem)
@@ -745,7 +1123,7 @@ export default {
           testName: element[2] == null ? 'Enter a Test name' : element[2],
           testPurpose: element[3] == null ? 'Enter Description' : element[3],
           gherkin: '',
-          priority: ''
+          priority: 0
         }
         )
       })
@@ -864,7 +1242,7 @@ export default {
       }
     },
     bulkChangePriorities () {
-      if (this.bulkOpPopup.changePriorities.priority !== '') {
+      if (this.bulkOpPopup.changePriorities.priority !== 0) {
         this.bulkOpPopup.changePriorities.valid = true
 
         if (this.testItems.length === 0) {
@@ -875,7 +1253,7 @@ export default {
             position: this.settings.notifPos,
             time: 4000
           })
-          this.bulkOpPopup.changePriorities.priority = ''
+          this.bulkOpPopup.changePriorities.priority = 0
           this.bulkOpPopup.active = false
           return
         }
@@ -885,7 +1263,7 @@ export default {
           element.priority = this.bulkOpPopup.changePriorities.priority
         }
 
-        this.bulkOpPopup.changePriorities.priority = ''
+        this.bulkOpPopup.changePriorities.priority = 0
         this.bulkOpPopup.active = false
       } else {
         this.bulkOpPopup.changePriorities.valid = false
@@ -967,7 +1345,7 @@ export default {
         } else {
           // if not adding new lines then just proceed as normal
 
-          formattedPurpose = element.testPurpose.replace('\n', '</br>')
+          formattedPurpose = element.testPurpose.replace('\n', '</hr>')
         }
         formattedPurpose = formattedPurpose.replace(/\*(.*?)\*/gi, '<strong>$1</strong>')
         formattedPurpose = formattedPurpose.replace(/_(.*?)_/gi, '<i>$1</i>')

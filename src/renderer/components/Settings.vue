@@ -12,7 +12,7 @@
           <div class="col-sm-8">
 
             <!-- General Settings -->
-            <h3>General</h3>
+            <vs-divider color="dark"><h3>General</h3></vs-divider>
             <div class="row">
               <div class="col-sm-12">
 
@@ -25,6 +25,7 @@
                   </div>
                   <div class="col-sm-6">
                     <vs-input id="vstsPAT" v-model="settings.api.vstsPAT" label="VSTS Personal Access Token" @input="isTyping = true" class="w-100"/>
+                    <small class="text-danger">Token is stored as plain text, use at own risk!</small>
                   </div>
                 </div>
                 <!-- Notification Position -->
@@ -34,7 +35,7 @@
             <!-- General Settings -->
 
             <!-- Theme Settings -->
-            <h3 class="mt-4">Theme</h3>      
+            <vs-divider color="dark"><h3 class="mt-3">Theme</h3></vs-divider>    
             <div class="row">
               <div class="col-sm-12">
 
@@ -73,7 +74,7 @@
         <div class="row justify-content-center mt-3">
           <div class="col-sm-8">
 
-            <h3>General</h3>
+            <vs-divider color="dark"><h3>General</h3></vs-divider>
 
             <!-- Other Settings -->
             <div class="row">
@@ -85,7 +86,7 @@
                       <vs-input id="defualtAssignee" v-model="settings.planCreator.defaultAssignee" label="Default Assignee" @input="isTyping = true" class="w-100"/>
                     </div>
                     <div class="col-sm-6">
-                      <vs-input id="jiraUsername" v-model="settings.planCreator.jiraUsername" label="Jira Username" @input="isTyping = true" class="w-100"/>
+                      <vs-input id="jiraUsername" v-model="settings.api.jiraUsername" label="Jira Username" @input="isTyping = true" class="w-100"/>
                     </div>
                   </div>
                   <!-- Default Assignee & Jira Username -->
@@ -170,7 +171,7 @@
         <!-- Info -->
         <div class="row">
           <div class="col-sm-12">
-            <h1 class="mt-3">Log</h1>
+            <h3 class="mt-3">Log</h3>
             <vs-button type="line" @click="openLog()">Open Log File</vs-button>
             <!-- <vs-button type="line" color="danger" @click="resetSettings()">Reset Settings</vs-button> -->
           </div>
@@ -178,7 +179,7 @@
 
         <div class="row">
           <div class="col-sm-12">
-            <h1 class="mt-3">Advanced</h1>
+            <h3 class="mt-3">Advanced</h3>
             <vs-button type="line" @click="openConfig()">Open Config File</vs-button>
             <vs-button type="line" color="danger" @click="resetSettings()">Reset Settings</vs-button>
           </div>

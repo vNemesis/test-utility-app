@@ -63,11 +63,11 @@ const defaultSettings = {
       defaultAssignee: '',
       defaultPlanExportDir: '',
       jiraNewLine: false,
-      jiraNewLineAmount: 50,
-      jiraUsername: ''
+      jiraNewLineAmount: 50
     },
     api: {
-      vstsPAT: ''
+      vstsPAT: '',
+      jiraUsername: ''
     },
     notifPos: 'bottom-right',
     theme: {
@@ -161,11 +161,11 @@ const store = new Vuex.Store({
         defaultAssignee: '',
         defaultPlanExportDir: '',
         jiraNewLine: false,
-        jiraNewLineAmount: 50,
-        jiraUsername: ''
+        jiraNewLineAmount: 50
       },
       api: {
-        vstsPAT: ''
+        vstsPAT: '',
+        jiraUsername: ''
       },
       notifPos: 'bottom-right',
       theme: {
@@ -244,34 +244,7 @@ new Vue({
       appStore.openInEditor()
     },
     resetSettings () {
-      appStore.store = {
-        settings: {
-          editor: {
-            autoLine: false,
-            showEditor: false,
-            showGherkinPreview: false
-          },
-          planCreator: {
-            defaultAssignee: '',
-            defaultPlanExportDir: '',
-            jiraNewLine: false,
-            jiraNewLineAmount: '',
-            jiraUsername: ''
-          },
-          api: {
-            vstsPAT: ''
-          },
-          notifPos: 'bottom-right',
-          theme: {
-            primary: '#1f74ff',
-            darkMode: false
-          }
-        },
-        quickLinks: [
-          { text: 'Example Website Bookmark', url: 'www.google.co.uk' },
-          { text: 'Example Local Bookmark', url: 'c://' }
-        ]
-      }
+      appStore.store = _.cloneDeep(defaultSettings)
       remote.app.relaunch()
       remote.app.exit(0)
     },

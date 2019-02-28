@@ -30,7 +30,7 @@
         </vs-sidebar-item>
 
         <vs-sidebar-item index="5" icon="donut_large" @click="navigate('/citests')">
-          CI Tests <small class="ml-1 mb-2 text-primary">Beta</small>
+          CI Test Analyser <small class="ml-1 mb-2 text-primary">Beta</small>
         </vs-sidebar-item>
 
         <vs-sidebar-item index="6" icon="settings" @click="navigate('/settings')">
@@ -48,7 +48,7 @@
 
       <div slot="title">
         <vs-button @click="onOpenMenu" type="flat" vs-radius="50%"  icon="menu">Menu</vs-button>
-        <h5 class="float-right mt-2 ml-5 pl-5">{{ pageLoadedName }}</h5>
+        <h5 class="mt-2 ml-3 float-left">| {{ pageLoadedName }}</h5>
       </div>
 
       <vs-navbar-item index="1">
@@ -167,7 +167,7 @@
               this.pageLoadedName = 'File Creator'
               break
             case '/citests':
-              this.pageLoadedName = 'CI Tests'
+              this.pageLoadedName = 'CI Test Analyser'
               break
             case '/settings':
               this.pageLoadedName = 'Settings'

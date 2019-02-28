@@ -81,7 +81,7 @@
 
     <td class="align-middle">
       <vs-select label="Priority" v-model="testdata.priority" class="w-100">
-        <vs-select-item :key="index" :value="item" :text="item" v-for="(item,index) in priorities" />
+        <vs-select-item :key="index" :value="item.id" :text="item.name" v-for="(item,index) in priorities" />
       </vs-select>
     </td>
     <td class="align-middle">
@@ -118,7 +118,7 @@
   export default {
     name: 'test-item',
 
-    props: ['testdata', 'totalNumberOfTestItems', 'order'],
+    props: ['testdata', 'totalNumberOfTestItems', 'order', 'priorities'],
 
     data: function () {
       return {
@@ -126,12 +126,6 @@
         types: {
           API: 'API',
           UI: 'UI'
-        },
-        priorities: {
-          Trivial: 'Trivial',
-          Minor: 'Minor',
-          Major: 'Major',
-          Critical: 'Critical'
         },
         editorState: false,
         editor: {
@@ -240,7 +234,6 @@
           title: 'Copied to clipboard',
           text: 'Sub-task Description has been copied to your clipboard',
           color: 'success',
-          // icon: 'publish',
           position: this.$store.state.settings.notifPos,
           time: 4000
         })

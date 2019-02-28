@@ -29,12 +29,26 @@
 
           <small class="text-danger" v-if="!validDate.valid">{{ validDate.message }}</small>
 
-          <vs-input type="text" class="mt-2" label="Release Filter" :disabled="this.runs.length === 0" v-model="releaseFilter"/>
+          <vs-input type="text" class="mt-2 w-100" label="Release Filter" :disabled="this.runs.length === 0" v-model="releaseFilter"/>
 
           <br>
 
           <div class="row">
             <div class="col-md-12">
+
+              <div class="row">
+                <!-- <div class="col-md-6">
+                  <h5>Test Runs returned: <span :class="runs.length === 0 ? 'text-danger' : ''">{{ runs.length === 0 ? 'No Results' : runs.length }}</span></h5>
+                </div> -->
+                <div class="col-md-12">
+                  <h5>
+                    <span :class="releaseFilter !== '' ? 'text-primary' : ''">
+                      Showing: {{ runs.length === 0 ? 'No Results' : releaseFilter === '' ? `${runs.length}/${runs.length}` : `${filteredRuns.length}/${runs.length}` }}
+                     runs
+                    </span>
+                  </h5>
+                </div>
+              </div>
 
               <div class="table-responsive">
                 <table class="table">
@@ -70,11 +84,20 @@
               </vs-select>
             </div>
             <div class="col-md-6">
-              <vs-button @click="getTests()" :disabled="filteredRuns.length === 0 && releaseFilter !== ''" color="primary" type="filled" class="mt-4 w-100" >Get Tests</vs-button>
+                 <vs-select autocomplete multiple placeholder="Select fields" label="Fields" class="w-100" v-model="selectedFields" >
+                <vs-select-item :key="index" :value="item.id" :text="item.name" v-for="(item, index) in availableFieldsSorted" />
+              </vs-select>
             </div>
           </div>
 
-          <vs-button @click="exportToCSV()" :disabled="results.data.length === 0" color="success" type="filled" class="mt-2 w-100" >Export to CSV</vs-button>
+          <div class="row">
+            <div class="col-md-6">
+              <vs-button @click="getTests()" :disabled="filteredRuns.length === 0 && releaseFilter !== ''" color="primary" type="filled" class="mt-4 w-100" >Get Tests</vs-button>
+            </div>
+            <div class="col-md-6">
+              <vs-button @click="exportToCSV()" :disabled="results.data.length === 0" color="success" type="filled" class="mt-4 w-100" >Export to CSV</vs-button>
+            </div>
+          </div>
 
           <br>
 
@@ -83,16 +106,16 @@
 
               <h5>Tests returned: <span :class="results.data.length === 0 ? 'text-danger' : ''">{{ results.data.length === 0 ? 'No Results' : results.data.length }}</span></h5>
 
-              <div class="table-responsive">
+              <div class="table-responsive" style="margin-top: 10px">
                 <table class="table">
                   <thead>
                     <tr>
-                      <th>Test Title</th>
+                      <th>Test Case Name</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(test, index) in results.data" :key="index" class="text-left">
-                      <td>{{ test[0] }}</td>
+                    <tr v-for="(name, index) in testNames" :key="index" class="text-left">
+                      <td>{{ name }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -112,11 +135,13 @@
 <script>
 import axios from 'axios'
 import Papa from 'papaparse'
+import _ from 'lodash'
 
 const remote = require('electron').remote
 var fs = require('fs')
 
 // const {clipboard} = require('electron')
+// TODO: Add customisable columns
 
 export default {
   name: 'ci-tests',
@@ -127,12 +152,62 @@ export default {
         fields: [],
         data: []
       },
+      testNames: [],
       fromDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().substring(0, 10),
       toDate: new Date(Date.now()).toISOString().substring(0, 10),
       releaseFilter: '',
       runs: [],
       filteredRuns: [],
-      outcome: 'Failed'
+      outcome: 'Failed',
+      selectedFields: [21, 11],
+      availableFields: [
+        { id: 0, name: 'ID', value: 'id' },
+        { id: 1, name: 'Started Date', value: 'startedDate' },
+        { id: 2, name: 'Completed Date', value: 'completedDate' },
+        { id: 3, name: 'Duration In Ms', value: 'durationInMs' },
+        { id: 4, name: 'Outcome', value: 'outcome' },
+        { id: 5, name: 'Revision', value: 'revision' },
+        { id: 6, name: 'State', value: 'state' },
+        { id: 7, name: 'Last Updated Date', value: 'lastUpdatedDate' },
+        { id: 9, name: 'Priority', value: 'priority' },
+        { id: 10, name: 'Computer Name', value: 'computerName' },
+        { id: 11, name: 'Error Message', value: 'errorMessage' },
+        { id: 12, name: 'Created Date', value: 'createdDate' },
+        { id: 13, name: 'URL', value: 'url' },
+        { id: 14, name: 'Failure Type', value: 'failureType' },
+        { id: 15, name: 'Automated Test Storage', value: 'automatedTestStorage' },
+        { id: 16, name: 'Automated Test Type', value: 'automatedTestType' },
+        { id: 17, name: 'Test Case Title', value: 'testCaseTitle' },
+        { id: 18, name: 'Stack Trace', value: 'stackTrace' },
+        { id: 19, name: 'Test Case Reference ID', value: 'testCaseReferenceId' },
+        { id: 20, name: 'Result Group Type', value: 'resultGroupType' },
+        { id: 21, name: 'Automated Test Name', value: 'automatedTestName' },
+        { id: 22, name: 'Test Case Name', value: 'testCase.name' },
+        { id: 23, name: 'Test Run - ID', value: 'testRun.id' },
+        { id: 24, name: 'Test Run - Name', value: 'testRun.name' },
+        { id: 25, name: 'Test Run - URL', value: 'testRun.url' },
+        { id: 26, name: 'Build - ID', value: 'build.id' },
+        { id: 27, name: 'Build - Name', value: 'build.name' },
+        { id: 28, name: 'Failing Since - Date', value: 'failingSince.date' },
+        { id: 29, name: 'Failing Since - Build - Id', value: 'failingSince.build.id' },
+        { id: 30, name: 'Failing Since - Build - Definition ID', value: 'failingSince.build.definitionId' },
+        { id: 31, name: 'Failing Since - Build - Branch Name', value: 'failingSince.build.branchName' },
+        { id: 32, name: 'Failing Since - Release - Id', value: 'failingSince.release.id' },
+        { id: 33, name: 'Failing Since - Release - Name', value: 'failingSince.release.name' },
+        { id: 34, name: 'Failing Since - Release - Environment ID', value: 'failingSince.release.environmentId' },
+        { id: 35, name: 'Failing Since - Release - Environment Name', value: 'failingSince.release.environmentName' },
+        { id: 36, name: 'Failing Since - Release - Definition ID', value: 'failingSince.release.definitionId' },
+        { id: 37, name: 'Failing Since - Release - Environment Definition ID', value: 'failingSince.release.environmentDefinitionId' },
+        { id: 38, name: 'Failing Since - Release - Environment Definition Name', value: 'failingSince.release.environmentDefinitionName' },
+        { id: 39, name: 'Release Reference - ID', value: 'releaseReference.id' },
+        { id: 40, name: 'Release Reference - Name', value: 'releaseReference.name' },
+        { id: 41, name: 'Release Reference - Environment ID', value: 'releaseReference.environmentId' },
+        { id: 42, name: 'Release Reference - Environment Name', value: 'releaseReference.environmentName' },
+        { id: 43, name: 'Release Reference - Definition ID', value: 'releaseReference.definitionId' },
+        { id: 44, name: 'Release Reference - Environment Definition Id', value: 'releaseReference.environmentDefinitionId' },
+        { id: 45, name: 'Release Reference - Environment Definition Name', value: 'releaseReference.environmentDefinitionName' },
+        { id: 46, name: 'Last Updated By - Display Name', value: 'lastUpdatedBy.displayName' }
+      ]
     }
   },
 
@@ -155,6 +230,21 @@ export default {
       }
 
       return result
+    },
+    availableFieldsSorted () {
+      return this.availableFields.sort(function (a, b) {
+        let nameA = a.name.toUpperCase() // ignore upper and lowercase
+        let nameB = b.name.toUpperCase() // ignore upper and lowercase
+        if (nameA < nameB) {
+          return -1
+        }
+        if (nameA > nameB) {
+          return 1
+        }
+
+        // names must be equal
+        return 0
+      })
     }
   },
 
@@ -163,7 +253,8 @@ export default {
 
   watch: {
     releaseFilter (val) {
-      this.filteredRuns = this.runs.filter(element => element.runTitle.split('-').includes(val))
+      // TODO: Look at this again
+      this.filteredRuns = this.runs.filter(element => element.runTitle.includes(val))
     }
   },
 
@@ -200,15 +291,16 @@ export default {
 
     getTests () {
       let output = {
-        fields: [
-          'Test Name',
-          'Error Message'
-        ],
+        fields: [],
         data: []
       }
 
-      let data = this.releaseFilter === '' ? this.runs : this.filteredResults
+      let data = this.releaseFilter === '' ? this.runs : this.filteredRuns
 
+      // Set fields to be the names selected
+      this.selectedFields.forEach(fieldID => { output.fields.push(this.availableFields.find(field => field.id === fieldID).name) })
+
+      // foreach test run
       data.forEach(run => {
         axios.get(`https://rimilia.visualstudio.com/Alloc8%20Tests/_apis/test/runs/${run.runID}/results?outcome=Failed&api-version=5.0`,
           {
@@ -218,9 +310,24 @@ export default {
           })
           .then(response => {
             // Fetch results
+
+            // Next loops through each response
             response.data.value.forEach(result => {
+              // if the outcome matches the desired one
               if (result.outcome === this.outcome) {
-                output.data.push([result.automatedTestName, result.errorMessage])
+                let dataFields = []
+                this.testNames.push(result.testCase.name)
+
+                // for each selected field
+                this.selectedFields.forEach(fieldID => {
+                  // get the object reference path
+                  let jsonField = this.availableFields.find(field => field.id === fieldID).value
+
+                  // then push the data to to the data fields ready for export
+                  dataFields.push(_.get(result, jsonField, ''))
+                })
+
+                output.data.push(dataFields)
               }
             })
           })
@@ -236,7 +343,7 @@ export default {
     // ----------------------------------------------- Export -----------------------------------------------
     exportToCSV () {
       let csv = Papa.unparse(this.results)
-      this.exportFile(`CI Test Results ${Date.now()}.csv`, csv, 'CSV File', 'csv')
+      this.exportFile(`CI Test Results ${this.releaseFilter} - ${new Date(Date.now()).toISOString().substring(0, 10)}.csv`, csv, 'CSV File', 'csv')
     },
     /**
      * Will begin the download of a file
@@ -260,12 +367,21 @@ export default {
 
       // fileName is a string that contains the path and filename created in the save file dialog.
       fs.writeFile(path, content, (err) => {
-        if (err) {
+        console.log(err)
+        if (err.code === 'EBUSY') {
+          this.$vs.notify({
+            title: 'Error!',
+            text: 'File is locaked or in use. please ensure the file is not open in another program and try again.',
+            color: 'danger',
+            position: this.settings.notifPos,
+            time: 4000,
+            click: () => { remote.shell.showItemInFolder(err.path) }
+          })
+        } else if (err) {
           this.$vs.notify({
             title: 'Error!',
             text: `An error ocurred creating the file: ${err.message}`,
             color: 'danger',
-            icon: 'error_outline',
             position: this.settings.notifPos,
             time: 4000
           })
@@ -274,7 +390,6 @@ export default {
             title: 'File Exported!',
             text: `File was exported successfully`,
             color: 'success',
-            icon: 'save',
             position: this.settings.notifPos,
             time: 10000
           })
