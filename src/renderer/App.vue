@@ -243,10 +243,10 @@
       checkLicense () {
         axios({
           method: 'get',
-          url: 'https://portal.shockwaveinteractive.co.uk/api/license/check',
+          url: 'http://portal.shockwaveinteractive.co.uk/api/license/check',
           auth: {
             username: 'testuser@shockwaveinteractive.co.uk',
-            password: 'testpassword'
+            password: 'password'
           }
         })
           .then(Response => {
