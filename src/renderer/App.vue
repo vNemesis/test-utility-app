@@ -243,16 +243,16 @@
       checkLicense () {
         axios({
           method: 'get',
-          // url: 'https://portal.shockwaveinteractive.co.uk/api/license/check'
-          url: 'http://portal.localhost/api/license/check',
+          url: 'https://portal.shockwaveinteractive.co.uk/api/license/check',
           auth: {
-            username: '',
-            password: ''
+            username: 'testuser@shockwaveinteractive.co.uk',
+            password: 'testpassword'
           }
         })
           .then(Response => {
             if (Response.data.type === 'success') {
-              alert('successfully authenticated license')
+              // alert('successfully authenticated license')
+              console.log('successfully authenticated')
             } else {
               // alert('unsuccessfully authenticated license')
             }
