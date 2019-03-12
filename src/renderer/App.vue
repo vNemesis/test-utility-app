@@ -239,6 +239,27 @@
         let appVersion = window.require('electron').remote.app.getVersion().replace(/\./g, '')
         let releaseVersion = releaseTag.substring(1).replace(/\./g, '')
         this.isDevelopmentBuild = releaseVersion < appVersion
+      },
+      checkLicense () {
+        axios({
+          method: 'get',
+          // url: 'https://portal.shockwaveinteractive.co.uk/api/license/check'
+          url: 'http://portal.localhost/api/license/check',
+          auth: {
+            username: '',
+            password: ''
+          }
+        })
+          .then(Response => {
+            if (Response.data.type === 'success') {
+              alert('successfully authenticated license')
+            } else {
+              // alert('unsuccessfully authenticated license')
+            }
+          })
+          .catch(Response => {
+            // alert(Response)
+          })
       }
     },
 
@@ -262,6 +283,7 @@
         document.getElementsByTagName('html').item(0).className -= ' dark-mode'
       }
       this.getLatestRelease()
+      this.checkLicense()
     }
   }
 </script>
