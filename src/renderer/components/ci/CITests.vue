@@ -159,7 +159,16 @@ export default {
       runs: [],
       filteredRuns: [],
       outcome: 'Failed',
-      selectedFields: [21, 11],
+      selectedFields: [
+        20, 10, 14, 15, 25,
+        26, 2, 9, 11, 3, 30,
+        29, 28, 27, 35, 36,
+        37, 33, 34, 31, 32,
+        13, 0, 45, 7, 4, 8,
+        42, 43, 44, 40, 41,
+        38, 39, 19, 5, 17, 1,
+        6, 21, 18, 16, 22, 23,
+        24, 12],
       availableFields: [
         { id: 0, name: 'ID', value: 'id' },
         { id: 1, name: 'Started Date', value: 'startedDate' },
@@ -169,44 +178,44 @@ export default {
         { id: 5, name: 'Revision', value: 'revision' },
         { id: 6, name: 'State', value: 'state' },
         { id: 7, name: 'Last Updated Date', value: 'lastUpdatedDate' },
-        { id: 9, name: 'Priority', value: 'priority' },
-        { id: 10, name: 'Computer Name', value: 'computerName' },
-        { id: 11, name: 'Error Message', value: 'errorMessage' },
-        { id: 12, name: 'Created Date', value: 'createdDate' },
-        { id: 13, name: 'URL', value: 'url' },
-        { id: 14, name: 'Failure Type', value: 'failureType' },
-        { id: 15, name: 'Automated Test Storage', value: 'automatedTestStorage' },
-        { id: 16, name: 'Automated Test Type', value: 'automatedTestType' },
-        { id: 17, name: 'Test Case Title', value: 'testCaseTitle' },
-        { id: 18, name: 'Stack Trace', value: 'stackTrace' },
-        { id: 19, name: 'Test Case Reference ID', value: 'testCaseReferenceId' },
-        { id: 20, name: 'Result Group Type', value: 'resultGroupType' },
-        { id: 21, name: 'Automated Test Name', value: 'automatedTestName' },
-        { id: 22, name: 'Test Case Name', value: 'testCase.name' },
-        { id: 23, name: 'Test Run - ID', value: 'testRun.id' },
-        { id: 24, name: 'Test Run - Name', value: 'testRun.name' },
-        { id: 25, name: 'Test Run - URL', value: 'testRun.url' },
-        { id: 26, name: 'Build - ID', value: 'build.id' },
-        { id: 27, name: 'Build - Name', value: 'build.name' },
-        { id: 28, name: 'Failing Since - Date', value: 'failingSince.date' },
-        { id: 29, name: 'Failing Since - Build - Id', value: 'failingSince.build.id' },
-        { id: 30, name: 'Failing Since - Build - Definition ID', value: 'failingSince.build.definitionId' },
-        { id: 31, name: 'Failing Since - Build - Branch Name', value: 'failingSince.build.branchName' },
-        { id: 32, name: 'Failing Since - Release - Id', value: 'failingSince.release.id' },
-        { id: 33, name: 'Failing Since - Release - Name', value: 'failingSince.release.name' },
-        { id: 34, name: 'Failing Since - Release - Environment ID', value: 'failingSince.release.environmentId' },
-        { id: 35, name: 'Failing Since - Release - Environment Name', value: 'failingSince.release.environmentName' },
-        { id: 36, name: 'Failing Since - Release - Definition ID', value: 'failingSince.release.definitionId' },
-        { id: 37, name: 'Failing Since - Release - Environment Definition ID', value: 'failingSince.release.environmentDefinitionId' },
-        { id: 38, name: 'Failing Since - Release - Environment Definition Name', value: 'failingSince.release.environmentDefinitionName' },
-        { id: 39, name: 'Release Reference - ID', value: 'releaseReference.id' },
-        { id: 40, name: 'Release Reference - Name', value: 'releaseReference.name' },
-        { id: 41, name: 'Release Reference - Environment ID', value: 'releaseReference.environmentId' },
-        { id: 42, name: 'Release Reference - Environment Name', value: 'releaseReference.environmentName' },
-        { id: 43, name: 'Release Reference - Definition ID', value: 'releaseReference.definitionId' },
-        { id: 44, name: 'Release Reference - Environment Definition Id', value: 'releaseReference.environmentDefinitionId' },
-        { id: 45, name: 'Release Reference - Environment Definition Name', value: 'releaseReference.environmentDefinitionName' },
-        { id: 46, name: 'Last Updated By - Display Name', value: 'lastUpdatedBy.displayName' }
+        { id: 8, name: 'Priority', value: 'priority' },
+        { id: 9, name: 'Computer Name', value: 'computerName' },
+        { id: 10, name: 'Error Message', value: 'errorMessage' },
+        { id: 11, name: 'Created Date', value: 'createdDate' },
+        { id: 12, name: 'URL', value: 'url' },
+        { id: 13, name: 'Failure Type', value: 'failureType' },
+        { id: 14, name: 'Automated Test Storage', value: 'automatedTestStorage' },
+        { id: 15, name: 'Automated Test Type', value: 'automatedTestType' },
+        { id: 16, name: 'Test Case Title', value: 'testCaseTitle' },
+        { id: 17, name: 'Stack Trace', value: 'stackTrace' },
+        { id: 18, name: 'Test Case Reference ID', value: 'testCaseReferenceId' },
+        { id: 19, name: 'Result Group Type', value: 'resultGroupType' },
+        { id: 20, name: 'Automated Test Name', value: 'automatedTestName' },
+        { id: 21, name: 'Test Case Name', value: 'testCase.name' },
+        { id: 22, name: 'Test Run - ID', value: 'testRun.id' },
+        { id: 23, name: 'Test Run - Name', value: 'testRun.name' },
+        { id: 24, name: 'Test Run - URL', value: 'testRun.url' },
+        { id: 25, name: 'Build - ID', value: 'build.id' },
+        { id: 26, name: 'Build - Name', value: 'build.name' },
+        { id: 27, name: 'Failing Since - Date', value: 'failingSince.date' },
+        { id: 28, name: 'Failing Since - Build - Id', value: 'failingSince.build.id' },
+        { id: 29, name: 'Failing Since - Build - Definition ID', value: 'failingSince.build.definitionId' },
+        { id: 30, name: 'Failing Since - Build - Branch Name', value: 'failingSince.build.branchName' },
+        { id: 31, name: 'Failing Since - Release - Id', value: 'failingSince.release.id' },
+        { id: 32, name: 'Failing Since - Release - Name', value: 'failingSince.release.name' },
+        { id: 33, name: 'Failing Since - Release - Environment ID', value: 'failingSince.release.environmentId' },
+        { id: 34, name: 'Failing Since - Release - Environment Name', value: 'failingSince.release.environmentName' },
+        { id: 35, name: 'Failing Since - Release - Definition ID', value: 'failingSince.release.definitionId' },
+        { id: 36, name: 'Failing Since - Release - Environment Definition ID', value: 'failingSince.release.environmentDefinitionId' },
+        { id: 37, name: 'Failing Since - Release - Environment Definition Name', value: 'failingSince.release.environmentDefinitionName' },
+        { id: 38, name: 'Release Reference - ID', value: 'releaseReference.id' },
+        { id: 39, name: 'Release Reference - Name', value: 'releaseReference.name' },
+        { id: 40, name: 'Release Reference - Environment ID', value: 'releaseReference.environmentId' },
+        { id: 41, name: 'Release Reference - Environment Name', value: 'releaseReference.environmentName' },
+        { id: 42, name: 'Release Reference - Definition ID', value: 'releaseReference.definitionId' },
+        { id: 43, name: 'Release Reference - Environment Definition Id', value: 'releaseReference.environmentDefinitionId' },
+        { id: 44, name: 'Release Reference - Environment Definition Name', value: 'releaseReference.environmentDefinitionName' },
+        { id: 45, name: 'Last Updated By - Display Name', value: 'lastUpdatedBy.displayName' }
       ]
     }
   },
@@ -266,6 +275,8 @@ export default {
         scale: 1
       })
 
+      this.runs = []
+      this.releaseFilter = ''
       axios.get(`https://rimilia.visualstudio.com/Alloc8%20Tests/_apis/test/runs?minLastUpdatedDate=${this.fromDate}&maxLastUpdatedDate=${this.toDate}&api-version=5.0`,
         {
           headers: {
@@ -298,7 +309,10 @@ export default {
       let data = this.releaseFilter === '' ? this.runs : this.filteredRuns
 
       // Set fields to be the names selected
-      this.selectedFields.forEach(fieldID => { output.fields.push(this.availableFields.find(field => field.id === fieldID).name) })
+      this.selectedFields.forEach(fieldID => {
+        console.log(this.availableFields.find(field => field.id === fieldID))
+        output.fields.push(this.availableFields.find(field => field.id === fieldID).name)
+      })
 
       // foreach test run
       data.forEach(run => {
@@ -367,8 +381,7 @@ export default {
 
       // fileName is a string that contains the path and filename created in the save file dialog.
       fs.writeFile(path, content, (err) => {
-        console.log(err)
-        if (err.code === 'EBUSY') {
+        if (err && err.code === 'EBUSY') {
           this.$vs.notify({
             title: 'Error!',
             text: 'File is locaked or in use. please ensure the file is not open in another program and try again.',
@@ -391,9 +404,12 @@ export default {
             text: `File was exported successfully`,
             color: 'success',
             position: this.settings.notifPos,
-            time: 10000
+            time: 10000,
+            click: () => { remote.shell.showItemInFolder(path) }
           })
-          setTimeout(remote.shell.showItemInFolder(path), 3000)
+          if (this.settings.autoOpenOnExport) {
+            setTimeout(remote.shell.showItemInFolder(path), 3000)
+          }
         }
       })
     }

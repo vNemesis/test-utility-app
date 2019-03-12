@@ -1,6 +1,9 @@
 <template>
   <div id="app" :class="this.$store.state.settings.theme.darkMode === true ? 'dark-mode' : ''">
-    <span v-shortkey="['ctrl', 'meta']" @shortkey="active = true"></span>
+    <span v-shortkey="['ctrl', 'meta']" @shortkey="active = !active"></span>
+    <vs-alert title="Development Build" :active="isDevelopmentBuild" color="danger">
+      Development build, somethings may be broken or not finished!
+    </vs-alert>
     <!-- Side Menu -->
     <div id="parentx" :class="this.$store.state.settings.theme.darkMode === true ? 'dark-mode-side-menu' : ''">
       <vs-sidebar ref="sidemenu" parent="#parentx" default-index="1"  color="primary" class="sidebarx" spacer v-model="active">
@@ -85,13 +88,15 @@
 </template>
 
 <script>
+  import axios from 'axios'
   export default {
     name: 'test-plan-utility',
     data: () => ({
       activeItem: 4,
       name: 'Test Plan Utility',
       active: false,
-      pageLoadedName: 'Home'
+      pageLoadedName: 'Home',
+      isDevelopmentBuild: false
     }),
 
     computed: {
@@ -105,6 +110,12 @@
       },
       settings () {
         return this.$store.state.settings
+      },
+      changingConfig () {
+        return this.$store.state.changingConfig
+      },
+      changingQuickLinks () {
+        return this.$store.state.changingQuickLinks
       }
     },
 
@@ -117,6 +128,39 @@
       },
       navigate (path) {
         let cancelled = false
+
+        if (this.changingConfig || this.changingQuickLinks) {
+          alert('Please wait until any unsaved changes are complete before navigating to a different page')
+          switch (this.$route.path) {
+            case '/':
+              this.$refs.sidemenu.currentIndex = 1
+              this.pageLoadedName = 'Home'
+              break
+            case '/testplancreator':
+              this.$refs.sidemenu.currentIndex = 2
+              this.pageLoadedName = 'Test Plan Creator'
+              break
+            case '/formatter':
+              this.$refs.sidemenu.currentIndex = 3
+              this.pageLoadedName = 'Text Formatter'
+              break
+            case '/filecreator':
+              this.$refs.sidemenu.currentIndex = 4
+              this.pageLoadedName = 'File Creator'
+              break
+            case '/citests':
+              this.$refs.sidemenu.currentIndex = 5
+              this.pageLoadedName = 'CI Test Analyser'
+              break
+            case '/settings':
+              this.$refs.sidemenu.currentIndex = 6
+              this.pageLoadedName = 'Settings'
+              break
+            default:
+              break
+          }
+          return
+        }
 
         if (this.$route.path === '/testplancreator') {
           if (confirm('Any unsaved changes will be lost. Please export your test plan if you wish to save it.')) {
@@ -178,6 +222,23 @@
         }
 
         document.getElementsByClassName('vs-sidebar--background').item(0).click()
+      },
+      getLatestRelease () {
+        axios({
+          method: 'get',
+          url: 'https://api.github.com/repos/HarmanU/test-utility-app/releases/latest'
+        })
+          .then(Response => {
+            this.checkDevBuild(Response.data.tag_name)
+          })
+          .catch(Response => {
+            this.checkDevBuild('v.0.0.1')
+          })
+      },
+      checkDevBuild (releaseTag) {
+        let appVersion = window.require('electron').remote.app.getVersion().replace(/\./g, '')
+        let releaseVersion = releaseTag.substring(1).replace(/\./g, '')
+        this.isDevelopmentBuild = releaseVersion < appVersion
       }
     },
 
@@ -200,6 +261,7 @@
       } else {
         document.getElementsByTagName('html').item(0).className -= ' dark-mode'
       }
+      this.getLatestRelease()
     }
   }
 </script>
@@ -248,6 +310,14 @@ a:not(.text-danger):hover.nav-bar-link {
 .dark-mode li:not(.activeChild).vs-tabs--li > button {
   color: rgb(245, 245, 245) !important;
   border-color: rgba(255,255,255,0.3) !important;
+}
+
+/* Background for dividers */
+.dark-mode .vs-divider--text,
+.dark-mode .vs-divider-border {
+  color: rgb(245, 245, 245) !important;
+  background-color: #212529 !important;
+  border-color: rgba(245, 245, 245, 0.3) !important;
 }
 
 /** Popups */

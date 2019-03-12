@@ -16,7 +16,7 @@
             <div class="row">
               <div class="col-sm-12">
 
-                <!-- Notification Position -->
+                <!-- Notification Position and VSTS PAT -->
                 <div class="row justify-content-center mt-2">
                   <div class="col-sm-6">
                     <vs-select label="Notification Position" class="w-100" v-model="settings.notifPos" @input="checkNotifPosChanged()">
@@ -28,7 +28,21 @@
                     <small class="text-danger">Token is stored as plain text, use at own risk!</small>
                   </div>
                 </div>
-                <!-- Notification Position -->
+                <!-- Notification Position and VSTS PAT-->
+
+                <!-- Notification Position and VSTS PAT -->
+                <div class="row justify-content-center mt-2">
+                  <div class="col-sm-6">
+                    <p class="mt-3">Toggle Auto-Open File Location On Export</p>
+                    <vs-switch id="autoJiraNewLine" v-model="settings.autoOpenOnExport" @input="isTyping = true">
+                        <span slot="on">On</span>
+                        <span slot="off">Off</span>
+                    </vs-switch>
+                  </div>
+                  <div class="col-sm-6">
+                  </div>
+                </div>
+                <!-- Notification Position and VSTS PAT-->
 
               </div>
             </div>

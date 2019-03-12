@@ -12,6 +12,9 @@
         <vs-tab vs-label="Bank File">
           <bank-file-creator v-on:export-file="exportFile"></bank-file-creator>
         </vs-tab>
+        <vs-tab vs-label="SQL File">
+          <sql-file-creator v-on:export-file="exportFile"></sql-file-creator>
+        </vs-tab>
 
       </vs-tabs>
       <!-- Tabs -->
@@ -27,13 +30,14 @@
 <script>
 import BankFileCreator from './BankFileCreator'
 import FileCreator from './File/FileCreator'
+import SQLFileCreator from './SQL/SQLFileCreator'
 
 const remote = require('electron').remote
 const fs = require('fs')
 
 export default {
   name: 'file-creator-main',
-  components: { BankFileCreator, FileCreator },
+  components: { BankFileCreator, FileCreator, SQLFileCreator },
 
   data: function () {
     return {
@@ -41,6 +45,9 @@ export default {
   },
 
   computed: {
+    settings () {
+      return this.$store.state.settings
+    }
   },
 
   methods: {
@@ -67,7 +74,7 @@ export default {
             text: `An error ocurred creating the file: ${err.message}`,
             color: 'danger',
             // icon: 'error_outline',
-            position: this.$store.state.settings.notifPos,
+            position: this.settings.notifPos,
             time: 4000
           })
         } else {
@@ -76,10 +83,12 @@ export default {
             text: `File '${filename}' was exported successfully`,
             color: 'success',
             // icon: 'save',
-            position: this.$store.state.settings.notifPos,
+            position: this.settings.notifPos,
             time: 10000
           })
-          setTimeout(remote.shell.showItemInFolder(path), 3000)
+          if (this.settings.autoOpenOnExport) {
+            setTimeout(remote.shell.showItemInFolder(path), 3000)
+          }
         }
       })
     }

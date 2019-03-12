@@ -92,6 +92,12 @@
           })
           .catch(Response => {
             log.info(Response.data)
+            let release = {}
+            release.body = converter.makeHtml('<p class="text-danger">An Netwrok error occured, please contact admin</p>')
+            release.version = 'Error'
+            release.url = 'www.shockwaveinteractive.co.uk'
+            this.releases.push(release)
+            this.$vs.loading.close('#div-with-loading > .con-vs-loading')
           })
       },
       checkOutdated () {

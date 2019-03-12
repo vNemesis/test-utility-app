@@ -1407,7 +1407,9 @@ export default {
               position: this.settings.notifPos,
               time: 10000
             })
-            setTimeout(remote.shell.showItemInFolder(path), 3000)
+            if (this.settings.autoOpenOnExport) {
+              setTimeout(remote.shell.showItemInFolder(path), 3000)
+            }
           }
         }
       })

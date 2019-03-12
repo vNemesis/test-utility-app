@@ -74,10 +74,16 @@ const defaultSettings = {
       primary: '#1f74ff',
       darkMode: false
     },
-    allowDevTools: false
+    allowDevTools: false,
+    autoOpenOnExport: true
   },
   quickLinks: [
-    { id: 1, text: 'Example Website Bookmark', url: 'www.google.co.uk', colour: '#51d5ef' },
+    {
+      id: 1,
+      text: 'Example Website Bookmark',
+      url: 'www.google.co.uk',
+      colour: '#51d5ef'
+    },
     { id: 2, text: 'Example Local Bookmark', url: 'c://', colour: '#51d5ef' }
   ]
 }
@@ -132,22 +138,6 @@ Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.component('test-item', './components/TestItem.vue')
 Vue.component('payment-item', './components/FileCreator/PaymentItem.vue')
 Vue.component('quick-links', './components/LandingPage/QuickLinks.vue')
-// Vue.component('number-text-input', {
-//   props: ['number'],
-//   template: `
-//     <input type="text" :value="number" @input="updateSelf($event.target.value)" @keydown="onKeyDown" />
-//   `,
-//   methods: {
-//     updateSelf (number) {
-//       this.$emit('input', number)
-//     },
-//     onKeyDown (evt) {
-//       if (evt.keyCode < 48 || evt.keyCode > 57) {
-//         evt.preventDefault()
-//       }
-//     }
-//   }
-// })
 
 const store = new Vuex.Store({
   state: {
@@ -171,7 +161,8 @@ const store = new Vuex.Store({
       theme: {
         primary: '#1f74ff',
         darkMode: false
-      }
+      },
+      autoOpenOnExport: true
     },
     changingConfig: false,
     changingQuickLinks: false,
