@@ -252,13 +252,14 @@
           .then(Response => {
             if (Response.data.type === 'success') {
               // alert('successfully authenticated license')
-              console.log('successfully authenticated')
+              console.log(Response.data.message)
             } else {
               // alert('unsuccessfully authenticated license')
             }
           })
           .catch(Response => {
             // alert(Response)
+            console.log(Response)
           })
       }
     },
