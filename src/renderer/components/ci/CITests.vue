@@ -23,7 +23,7 @@
               <vs-input type="date" class="w-100" label="To Date" v-model="toDate"/>
             </div>
             <div class="col-md-4">
-              <vs-button @click="getRuns()" :disabled="!validDate.valid" color="dark" type="border" class="mt-4 w-100" >Get Test Runs</vs-button>
+              <vs-button @click="getRuns()" :disabled="!validDate.valid" :color="settings.theme.darkMode ?  'primary' : 'dark'" type="border" class="mt-4 w-100" >Get Test Runs</vs-button>
             </div>
           </div>
 
@@ -293,8 +293,17 @@ export default {
         })
         .catch(function (error) {
           // handle error
-          console.log(error)
-        })
+          if (error.response.status === 401) {
+            this.$vs.notify({
+              title: '401: Unauthorised',
+              text: 'Please check your VSTS Personal Access token has the correct permissions.',
+              color: 'danger',
+              position: this.settings.notifPos,
+              time: 4000
+            })
+            console.log(error)
+          }
+        }.bind(this))
         .then(() => {
           this.$vs.loading.close('#results-div > .con-vs-loading')
         })

@@ -119,7 +119,9 @@ export default {
         'Comma Seperated List': {delimiter: ',', list: true},
         'Whitespace Seperated': {delimiter: ' ', list: false},
         'Tab Seperated': {delimiter: '\t', list: false},
-        'New Line Seperated': {delimiter: '\n', list: true}
+        'New Line Seperated': {delimiter: '\n', list: true},
+        'Pipe Seperated': {delimiter: '|', list: false},
+        'Jira Table': {delimiter: 'jira-Table', list: false}
       },
       wrappers: {
         'No Wrapping': 'none',
@@ -143,20 +145,20 @@ export default {
       this.Seperate(this.conversionType.list, this.conversionType.delimiter)
     },
     Seperate (list, delimiter) {
-      let values = this.input.split(this.inputDelimiter)
-      let result = ''
-
-      if (this.quote !== '') {
-        values = values.map(i => `${this.quote}${i}${this.quote}`)
-      }
-
-      if (list) {
-        result = values.join(`${delimiter}\n`)
+      if (this.conversionType.delimiter === 'jira-table') {
       } else {
-        result = values.join(this.seperateWithSpace ? `${delimiter} ` : delimiter)
+        let values = this.input.split(this.inputDelimiter)
+        let result = ''
+        if (this.quote !== '') {
+          values = values.map(i => `${this.quote}${i}${this.quote}`)
+        }
+        if (list) {
+          result = values.join(`${delimiter}\n`)
+        } else {
+          result = values.join(this.seperateWithSpace ? `${delimiter} ` : delimiter)
+        }
+        this.output = this.wrap(result)
       }
-
-      this.output = this.wrap(result)
     },
     wrap (content) {
       switch (this.wrapper) {
