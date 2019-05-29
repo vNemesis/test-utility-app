@@ -1,7 +1,7 @@
 <template>
   <div id="app" :class="this.$store.state.settings.theme.darkMode === true ? 'dark-mode' : ''">
     <span v-shortkey="['ctrl', 'meta']" @shortkey="active = !active"></span>
-    <vs-alert title="Development Build" :active="isDevelopmentBuild" color="danger">
+    <vs-alert :title="`Development Build - v${version}`" :active="isDevelopmentBuild" color="danger">
       Development build, somethings may be broken or not finished!
     </vs-alert>
     <!-- Side Menu -->
@@ -36,7 +36,11 @@
           CI Test Analyser <small class="ml-1 mb-2 text-primary">Beta</small>
         </vs-sidebar-item>
 
-        <vs-sidebar-item index="6" icon="settings" @click="navigate('/settings')">
+        <vs-sidebar-item index="6" @click="navigate('/jira')" class="custom-icon">
+          <font-awesome-icon :icon="['fab', 'jira']" size="lg" class="mr-2"/> Jira Card Exporter
+        </vs-sidebar-item>
+
+        <vs-sidebar-item index="7" icon="settings" @click="navigate('/settings')">
           Settings
         </vs-sidebar-item>
 
@@ -55,11 +59,11 @@
       </div>
 
       <vs-navbar-item index="1">
-        <a @click="onOpenUrl('https://rimilia.atlassian.net/projects/AZCI/issues?filter=myopenissues')" class="nav-bar-link"><font-awesome-icon icon="book" size="lg"/> Jira</a>
+        <a @click="onOpenUrl('https://rimilia.atlassian.net/projects/AZCI/issues?filter=myopenissues')" class="nav-bar-link"><font-awesome-icon :icon="['fab', 'jira']" size="lg"/> Jira</a>
       </vs-navbar-item>
 
       <vs-navbar-item index="2">
-        <a @click="onOpenUrl('https://rimilia.atlassian.net/wiki/spaces/AZURE/pages/454426652')" class="nav-bar-link"><font-awesome-icon icon="book" size="lg"/> CI Subspace</a>
+        <a @click="onOpenUrl('https://rimilia.atlassian.net/wiki/spaces/AZURE/pages/454426652')" class="nav-bar-link"><font-awesome-icon :icon="['fab', 'confluence']" size="lg"/> CI Subspace</a>
       </vs-navbar-item>
 
       |
@@ -152,8 +156,12 @@
               this.$refs.sidemenu.currentIndex = 5
               this.pageLoadedName = 'CI Test Analyser'
               break
-            case '/settings':
+            case '/jira':
               this.$refs.sidemenu.currentIndex = 6
+              this.pageLoadedName = 'Jira Card Exporter'
+              break
+            case '/settings':
+              this.$refs.sidemenu.currentIndex = 7
               this.pageLoadedName = 'Settings'
               break
             default:
@@ -213,6 +221,9 @@
             case '/citests':
               this.pageLoadedName = 'CI Test Analyser'
               break
+            case '/jira':
+              this.pageLoadedName = 'Jira Card Exporter'
+              break
             case '/settings':
               this.pageLoadedName = 'Settings'
               break
@@ -238,7 +249,11 @@
       checkDevBuild (releaseTag) {
         let appVersion = window.require('electron').remote.app.getVersion().replace(/\./g, '')
         let releaseVersion = releaseTag.substring(1).replace(/\./g, '')
-        this.isDevelopmentBuild = releaseVersion < appVersion
+        if (releaseVersion.includes('pre')) {
+          this.isDevelopmentBuild = true
+        } else {
+          this.isDevelopmentBuild = releaseVersion < appVersion
+        }
       },
       checkLicense () {
         axios({
@@ -290,6 +305,10 @@
 </script>
 
 <style>
+.custom-icon > a {
+  padding-left: 1px !important;
+}
+
 .text-dark {
   color: #212529 !important;
 }

@@ -1,30 +1,20 @@
 Arguments: 
-  D:\Programs\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js install
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add vue-template-compiler
 
 PATH: 
-  C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\Intel\WiFi\bin\;C:\Program Files\Common Files\Intel\WirelessCommon\;C:\Program Files (x86)\GtkSharp\2.12\bin;C:\Program Files\Git\cmd;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;D:\Programs\Git LFS;D:\xampp\php;C:\ProgramData\ComposerSetup\bin;C:\WINDOWS\System32\OpenSSH\;D:\Programs\nodejs\;D:\Programs\Microsoft VS Code\bin;D:\Programs\ShoreTel\Connect\;D:\Programs\Mitel\Connect\;C:\Program Files (x86)\Yarn\bin\;C:\ProgramData\Oracle\Java\javapath;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Users\harma\AppData\Local\Microsoft\WindowsApps;C:\Users\harma\AppData\Local\atom\bin;C:\Users\harma\adb;C:\Program Files\Intel\WiFi\bin\;C:\Program Files\Common Files\Intel\WirelessCommon\;C:\Users\harma\AppData\Local\GitHubDesktop\bin;C:\Users\harma\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Java\jdk1.8.0_161\bin;C:\Users\harma\AppData\Roaming\Composer\vendor\bin;C:\Users\harma\AppData\Roaming\npm;C:\Users\harma\AppData\Local\Yarn\bin
+  C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\HP\HP Performance Advisor;C:\Program Files (x86)\Microsoft SQL Server\Client SDK\ODBC\130\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\140\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files (x86)\Microsoft SQL Server\140\Tools\Binn\ManagementStudio\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Symantec.cloud\PlatformAgent\;C:\Program Files\Git\cmd;C:\Program Files (x86)\Yarn\bin\;C:\Program Files\nodejs\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\130\Tools\Binn\;C:\Program Files\Microsoft SQL Server\140\Tools\Binn\;C:\Program Files\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Users\Harman.Uppal\AppData\Local\Microsoft\WindowsApps;C:\Users\Harman.Uppal\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Harman.Uppal\AppData\Local\GitHubDesktop\bin;C:\Users\Harman.Uppal\AppData\Local\Yarn\bin;C:\Users\Harman.Uppal\AppData\Roaming\npm;C:\Users\Harman.Uppal\.dotnet\tools;C:\Users\Harman.Uppal\docfx;C:\Program Files (x86)\Sophos\Sophos SSL VPN Client\bin
 
 Yarn version: 
-  1.13.0
+  1.15.2
 
 Node version: 
-  8.11.3
+  10.15.3
 
 Platform: 
   win32 x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@fortawesome/free-solid-svg-icons/-/free-solid-svg-icons-5.4.1.tgz: ESOCKETTIMEDOUT
-      at ClientRequest.<anonymous> (C:\Program Files (x86)\Yarn\lib\cli.js:130024:19)
-      at Object.onceWrapper (events.js:313:30)
-      at emitNone (events.js:106:13)
-      at ClientRequest.emit (events.js:208:7)
-      at TLSSocket.emitTimeout (_http_client.js:706:34)
-      at Object.onceWrapper (events.js:313:30)
-      at emitNone (events.js:106:13)
-      at TLSSocket.emit (events.js:208:7)
-      at TLSSocket.Socket._onTimeout (net.js:410:8)
-      at ontimeout (timers.js:498:11)
+  Error: EBUSY: resource busy or locked, unlink 'C:\Users\Harman.Uppal\Documents\GitHub\test-utility-app\node_modules\electron\dist\blink_image_resources_200_percent.pak'
 
 npm manifest: 
   {
@@ -96,6 +86,7 @@ npm manifest:
       "electron-dl": "^1.12.0",
       "electron-log": "^2.2.17",
       "electron-store": "^2.0.0",
+      "element-ui": "^2.5.4",
       "es6-promise": "^4.2.5",
       "handsontable": "^6.1.0",
       "highlight.js": "^9.13.1",
@@ -113,7 +104,7 @@ npm manifest:
       "vue-paginate": "^3.6.0",
       "vue-router": "^3.0.1",
       "vue-shortkey": "^3.1.6",
-      "vuesax": "^3.5.7",
+      "vuesax": "^3.8.21",
       "vuex": "^3.0.1"
     },
     "devDependencies": {
@@ -902,6 +893,13 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/async-limiter/-/async-limiter-1.0.0.tgz#78faed8c3d074ab81f22b4e985d79e8738f720f8"
     integrity sha512-jp/uFnooOiO+L211eZOoSyzpOITMXx1rBITauYykG3BRYPu8h0UcxsPNB04RR5vo4Tyz3+ay17tR6JVf9qzYWg==
   
+  async-validator@~1.8.1:
+    version "1.8.5"
+    resolved "https://registry.yarnpkg.com/async-validator/-/async-validator-1.8.5.tgz#dc3e08ec1fd0dddb67e60842f02c0cd1cec6d7f0"
+    integrity sha512-tXBM+1m056MAX0E8TL2iCjg8WvSyXu0Zc8LNtYqrVeyoL3+esHRZ4SieE9fKQyyU09uONjnMEjrNBMqT0mbvmA==
+    dependencies:
+      babel-runtime "6.x"
+  
   async@1.x, async@^1.5.2:
     version "1.5.2"
     resolved "https://registry.yarnpkg.com/async/-/async-1.5.2.tgz#ec6a61ae56480c0c3cb241c95618e20892f9672a"
@@ -1189,6 +1187,11 @@ Lockfile:
     version "0.1.1"
     resolved "https://registry.yarnpkg.com/babel-helper-to-multiple-sequence-expressions/-/babel-helper-to-multiple-sequence-expressions-0.1.1.tgz#5f1b832b39e4acf954e9137f0251395c71196b35"
     integrity sha1-XxuDKznkrPlU6RN/AlE5XHEZazU=
+  
+  babel-helper-vue-jsx-merge-props@^2.0.0:
+    version "2.0.3"
+    resolved "https://registry.yarnpkg.com/babel-helper-vue-jsx-merge-props/-/babel-helper-vue-jsx-merge-props-2.0.3.tgz#22aebd3b33902328e513293a8e4992b384f9f1b6"
+    integrity sha512-gsLiKK7Qrb7zYJNgiXKpXblxbV5ffSwR0f5whkPAaBAR4fhi6bwRZxX9wBlIc5M/v8CCkXUbXZL4N/nSE97cqg==
   
   babel-helpers@^6.24.1:
     version "6.24.1"
@@ -1841,7 +1844,7 @@ Lockfile:
       mkdirp "^0.5.1"
       source-map-support "^0.4.15"
   
-  babel-runtime@^6.0.0, babel-runtime@^6.18.0, babel-runtime@^6.22.0, babel-runtime@^6.26.0:
+  babel-runtime@6.x, babel-runtime@^6.0.0, babel-runtime@^6.18.0, babel-runtime@^6.22.0, babel-runtime@^6.26.0:
     version "6.26.0"
     resolved "https://registry.yarnpkg.com/babel-runtime/-/babel-runtime-6.26.0.tgz#965c7058668e82b55d7bfe04ff2337bc8b5647fe"
     integrity sha1-llxwWGaOgrVde/4E/yM3vItWR/4=
@@ -3459,6 +3462,11 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/deep-is/-/deep-is-0.1.3.tgz#b369d6fb5dbc13eecf524f91b070feedc357cf34"
     integrity sha1-s2nW+128E+7PUk+RsHD+7cNXzzQ=
   
+  deepmerge@^1.2.0:
+    version "1.5.2"
+    resolved "https://registry.yarnpkg.com/deepmerge/-/deepmerge-1.5.2.tgz#10499d868844cdad4fee0842df8c7f6f0c95a753"
+    integrity sha512-95k0GDqvBjZavkuvzx/YqVLv/6YYa17fz6ILMSf7neqQITCPbnfEnQvEgMPNjH4kgobe7+WIL0yJEHku+H3qtQ==
+  
   deepmerge@~2.0.1:
     version "2.0.1"
     resolved "https://registry.yarnpkg.com/deepmerge/-/deepmerge-2.0.1.tgz#25c1c24f110fb914f80001b925264dd77f3f4312"
@@ -3996,6 +4004,18 @@ Lockfile:
       "@types/node" "^8.0.24"
       electron-download "^3.0.1"
       extract-zip "^1.0.3"
+  
+  element-ui@^2.5.4:
+    version "2.5.4"
+    resolved "https://registry.yarnpkg.com/element-ui/-/element-ui-2.5.4.tgz#1e051032026a144bc18f7920f0be927977541cb8"
+    integrity sha512-VlyPZ1A2VtVJdnu9nUV+u/eGhKaEF+IoENbDgNlUza0Slj6Jb0bC9mzK95JK2g7QSe8YXUWhQVy+d2kZUE2oKQ==
+    dependencies:
+      async-validator "~1.8.1"
+      babel-helper-vue-jsx-merge-props "^2.0.0"
+      deepmerge "^1.2.0"
+      normalize-wheel "^1.0.1"
+      resize-observer-polyfill "^1.5.0"
+      throttle-debounce "^1.0.1"
   
   elliptic@^6.0.0:
     version "6.4.1"
@@ -7783,6 +7803,11 @@ Lockfile:
       query-string "^4.1.0"
       sort-keys "^1.0.0"
   
+  normalize-wheel@^1.0.1:
+    version "1.0.1"
+    resolved "https://registry.yarnpkg.com/normalize-wheel/-/normalize-wheel-1.0.1.tgz#aec886affdb045070d856447df62ecf86146ec45"
+    integrity sha1-rsiGr/2wRQcNhWRH32Ls+GFG7EU=
+  
   npm-bundled@^1.0.1:
     version "1.0.5"
     resolved "https://registry.yarnpkg.com/npm-bundled/-/npm-bundled-1.0.5.tgz#3c1732b7ba936b3a10325aef616467c0ccbcc979"
@@ -9429,6 +9454,11 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/requires-port/-/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
     integrity sha1-kl0mAdOaxIXgkc8NpcbmlNw9yv8=
   
+  resize-observer-polyfill@^1.5.0:
+    version "1.5.1"
+    resolved "https://registry.yarnpkg.com/resize-observer-polyfill/-/resize-observer-polyfill-1.5.1.tgz#0e9020dd3d21024458d4ebd27e23e40269810464"
+    integrity sha512-LwZrotdHOo12nQuZlHEmtuXdqGoOD0OhaxopaNFxWzInpEgaLWoVuAMbTzixuosCx2nEG58ngzW3vxdWoxIgdg==
+  
   resolve-cwd@^2.0.0:
     version "2.0.0"
     resolved "https://registry.yarnpkg.com/resolve-cwd/-/resolve-cwd-2.0.0.tgz#00a9f7387556e27038eae232caa372a6a59b665a"
@@ -10491,6 +10521,11 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
     integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
   
+  throttle-debounce@^1.0.1:
+    version "1.1.0"
+    resolved "https://registry.yarnpkg.com/throttle-debounce/-/throttle-debounce-1.1.0.tgz#51853da37be68a155cb6e827b3514a3c422e89cd"
+    integrity sha512-XH8UiPCQcWNuk2LYePibW/4qL97+ZQ1AN3FNXwZRBNPPowo/NRU5fAlDCSNBJIYCKbioZfuYtMhG4quqoJhVzg==
+  
   throttleit@0.0.2:
     version "0.0.2"
     resolved "https://registry.yarnpkg.com/throttleit/-/throttleit-0.0.2.tgz#cfedf88e60c00dd9697b61fdd2a8343a9b680eaf"
@@ -11131,10 +11166,10 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.17.tgz#0f8789ad718be68ca1872629832ed533589c6ada"
     integrity sha512-mFbcWoDIJi0w0Za4emyLiW72Jae0yjANHbCVquMKijcavBGypqlF7zHRgMa5k4sesdv7hv2rB4JPdZfR+TPfhQ==
   
-  vuesax@^3.5.7:
-    version "3.7.1"
-    resolved "https://registry.yarnpkg.com/vuesax/-/vuesax-3.7.1.tgz#640869407ab26d18a6e6ee6d80995e622d8accc6"
-    integrity sha512-DluD0qdTf1Di1ig1Tlx35uoAzp1HRdpE34Naq17j4kdQrUH3vYrA75t+cYLMDfH0IzNme+V1m95KfgCVpAaxYg==
+  vuesax@^3.8.21:
+    version "3.8.21"
+    resolved "https://registry.yarnpkg.com/vuesax/-/vuesax-3.8.21.tgz#cf594fd14f1256fc93f557227a375ac8ecc7047f"
+    integrity sha512-tCxw3AXbeKIGtX9+6HIas/jA9bqbyin/+C3Er+tAv+6afBHpWXreutOBfYUuy91uVSCpEDJkrqbMiz578sG7ow==
     dependencies:
       vue "^2.5.17"
   

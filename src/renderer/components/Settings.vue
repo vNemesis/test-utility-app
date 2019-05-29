@@ -16,7 +16,7 @@
             <div class="row">
               <div class="col-sm-12">
 
-                <!-- Notification Position and VSTS PAT -->
+                <!-- Notification Position and open on export -->
                 <div class="row justify-content-center mt-2">
                   <div class="col-sm-6">
                     <vs-select label="Notification Position" class="w-100" v-model="settings.notifPos" @input="checkNotifPosChanged()">
@@ -24,25 +24,37 @@
                     </vs-select>
                   </div>
                   <div class="col-sm-6">
-                    <vs-input id="vstsPAT" v-model="settings.api.vstsPAT" label="VSTS Personal Access Token" @input="isTyping = true" class="w-100"/>
-                    <small class="text-danger">Token is stored as plain text, use at own risk!</small>
-                  </div>
-                </div>
-                <!-- Notification Position and VSTS PAT-->
-
-                <!-- Notification Position and VSTS PAT -->
-                <div class="row justify-content-center mt-2">
-                  <div class="col-sm-6">
                     <p class="mt-3">Toggle Auto-Open File Location On Export</p>
-                    <vs-switch id="autoJiraNewLine" v-model="settings.autoOpenOnExport" @input="isTyping = true">
+                    <vs-switch id="autoOpenOnExport" v-model="settings.autoOpenOnExport" @input="isTyping = true">
                         <span slot="on">On</span>
                         <span slot="off">Off</span>
                     </vs-switch>
                   </div>
+                </div>
+                <!-- Notification Position and Open on export-->
+
+                <!-- Jira Username and Token -->
+                <div class="row justify-content-center mt-2">
+                  <div class="col-sm-6">
+                    <vs-input id="jiraUsername" v-model="settings.api.jiraUsername" label="Jira Username" @input="isTyping = true" class="w-100"/>
+                  </div>
+                  <div class="col-sm-6">
+                    <vs-input id="jiraToken" v-model="settings.api.jiraToken" label="Jira API Token" @input="isTyping = true" class="w-100"/>
+                    <small class="text-danger">Token is stored as plain text, use at own risk!</small>
+                  </div>
+                </div>
+                <!-- Jira Username and Token-->
+
+                <!-- VSTS PAT -->
+                <div class="row justify-content-center mt-2">
+                  <div class="col-sm-6">
+                    <vs-input id="vstsPAT" v-model="settings.api.vstsPAT" label="VSTS Personal Access Token" @input="isTyping = true" class="w-100"/>
+                    <small class="text-danger">Token is stored as plain text, use at own risk!</small>
+                  </div>
                   <div class="col-sm-6">
                   </div>
                 </div>
-                <!-- Notification Position and VSTS PAT-->
+                <!-- VSTS PAT-->
 
               </div>
             </div>
@@ -100,7 +112,6 @@
                       <vs-input id="defualtAssignee" v-model="settings.planCreator.defaultAssignee" label="Default Assignee" @input="isTyping = true" class="w-100"/>
                     </div>
                     <div class="col-sm-6">
-                      <vs-input id="jiraUsername" v-model="settings.api.jiraUsername" label="Jira Username" @input="isTyping = true" class="w-100"/>
                     </div>
                   </div>
                   <!-- Default Assignee & Jira Username -->

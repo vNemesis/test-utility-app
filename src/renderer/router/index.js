@@ -31,6 +31,11 @@ export default new Router({
       component: require('@/components/ci/CITests').default
     },
     {
+      path: '/jira',
+      name: 'jira',
+      component: require('@/components/jira/Jira').default
+    },
+    {
       path: '/settings',
       name: 'settings',
       component: require('@/components/Settings').default

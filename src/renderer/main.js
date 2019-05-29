@@ -19,9 +19,35 @@ import 'highlight.js/styles/default.css'
 
 // Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone, faAlignLeft, faFileExport, faFileImport, faCopy, faPaste } from '@fortawesome/free-solid-svg-icons'
+import {
+  faBook,
+  faBug,
+  faPlus,
+  faTrash,
+  faHome,
+  faEllipsisH,
+  faListUl,
+  faListOl,
+  faArrowDown,
+  faArrowUp,
+  faEdit,
+  faClone,
+  faAlignLeft,
+  faFileExport,
+  faFileImport,
+  faCopy,
+  faPaste
+} from '@fortawesome/free-solid-svg-icons'
+
+import {
+  faJira,
+  faConfluence
+} from '@fortawesome/free-brands-svg-icons'
+
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone, faAlignLeft, faFileExport, faFileImport, faCopy, faPaste)
+
+library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit,
+  faClone, faAlignLeft, faFileExport, faFileImport, faCopy, faPaste, faJira, faConfluence)
 
 // Load Plugins
 const remote = require('electron').remote
@@ -67,7 +93,8 @@ const defaultSettings = {
     },
     api: {
       vstsPAT: '',
-      jiraUsername: ''
+      jiraUsername: '',
+      jiraToken: ''
     },
     notifPos: 'bottom-right',
     theme: {
@@ -155,7 +182,8 @@ const store = new Vuex.Store({
       },
       api: {
         vstsPAT: '',
-        jiraUsername: ''
+        jiraUsername: '',
+        jiraToken: ''
       },
       notifPos: 'bottom-right',
       theme: {
@@ -262,6 +290,86 @@ new Vue({
         time: 4000
       })
       return clipboard.readText()
+    },
+    exportToPdf (html) {
+      let win = new remote.BrowserWindow({
+        width: 1280,
+        height: 720
+      })
+      win.loadURL(`data:text/html;charset=UTF-8,${html}`)
+
+      win.webContents.on('did-finish-load', () => {
+        win.webContents.insertCSS('div { page-break-before: avoid; }')
+        win.webContents.printToPDF({
+          marginsType: 1
+        }, (err, data) => {
+          if (err) {
+            this.$vs.notify({
+              title: 'An unknown error occured',
+              color: 'danger',
+              position: this.$store.state.settings.notifPos,
+              time: 4000
+            })
+            return
+          }
+
+          this.exportFile(`Jira Tickets - ${new Date(Date.now()).toISOString().substring(0, 10)}.pdf`, data, 'PDF File', 'pdf')
+        })
+      })
+    },
+    /**
+     * Will begin the download of a file
+     * @param {string} filename name of file
+     * @param {string} content content of file
+     */
+    exportFile (filename, content, extensionName, extension) {
+      let path = remote.dialog.showSaveDialog({
+        title: `Export ${extension} file`,
+        filters: [{
+          name: extensionName,
+          extensions: [extension]
+        }],
+        defaultPath: filename,
+        buttonLabel: 'Export'
+      })
+
+      if (!path) {
+        return
+      }
+
+      // fileName is a string that contains the path and filename created in the save file dialog.
+      fs.writeFile(path, content, (err) => {
+        if (err && err.code === 'EBUSY') {
+          this.$vs.notify({
+            title: 'Error!',
+            text: 'File is locaked or in use. please ensure the file is not open in another program and try again.',
+            color: 'danger',
+            position: this.$store.state.settings.notifPos,
+            time: 4000,
+            click: () => { remote.shell.showItemInFolder(err.path) }
+          })
+        } else if (err) {
+          this.$vs.notify({
+            title: 'Error!',
+            text: `An error ocurred creating the file: ${err.message}`,
+            color: 'danger',
+            position: this.$store.state.settings.notifPos,
+            time: 4000
+          })
+        } else {
+          this.$vs.notify({
+            title: 'File Exported!',
+            text: `File was exported successfully`,
+            color: 'success',
+            position: this.$store.state.settings.notifPos,
+            time: 10000,
+            click: () => { remote.shell.showItemInFolder(path) }
+          })
+          if (this.$store.state.settings.autoOpenOnExport) {
+            setTimeout(remote.shell.showItemInFolder(path), 3000)
+          }
+        }
+      })
     }
   }
 }).$mount('#app')
