@@ -6,7 +6,7 @@
     </vs-alert>
     <!-- Side Menu -->
     <div id="parentx" :class="this.$store.state.settings.theme.darkMode === true ? 'dark-mode-side-menu' : ''">
-      <vs-sidebar ref="sidemenu" parent="#parentx" default-index="1"  color="primary" class="sidebarx" spacer v-model="active">
+      <vs-sidebar ref="sidemenu" parent="body" default-index="1"  color="primary" class="sidebarx" spacer v-model="active">
 
         <div class="header-sidebar" slot="header">
           <h4>{{name}}</h4>
@@ -54,16 +54,21 @@
     <vs-navbar type="gradient" v-model="activeItem" class="nabarx">
 
       <div slot="title">
-        <vs-button @click="onOpenMenu" type="flat" vs-radius="50%"  icon="menu">Menu</vs-button>
+        <vs-tooltip class="float-left ml-2" text="Tooltip position Right" position="right" >
+          <vs-switch style="margin-top: 12px;" v-model="active">
+            <span slot="on">Close menu</span>
+            <span slot="off">Open Menu</span>
+          </vs-switch>
+        </vs-tooltip>
         <h5 class="mt-2 ml-3 float-left">| {{ pageLoadedName }}</h5>
       </div>
 
       <vs-navbar-item index="1">
-        <a @click="onOpenUrl('https://rimilia.atlassian.net/projects/AZCI/issues?filter=myopenissues')" class="nav-bar-link"><font-awesome-icon :icon="['fab', 'jira']" size="lg"/> Jira</a>
+        <a @click="onOpenUrl('https://rimilia.atlassian.net')" class="nav-bar-link"><font-awesome-icon :icon="['fab', 'jira']" size="lg"/> Jira</a>
       </vs-navbar-item>
 
       <vs-navbar-item index="2">
-        <a @click="onOpenUrl('https://rimilia.atlassian.net/wiki/spaces/AZURE/pages/454426652')" class="nav-bar-link"><font-awesome-icon :icon="['fab', 'confluence']" size="lg"/> CI Subspace</a>
+        <a @click="onOpenUrl('https://rimilia.atlassian.net/wiki/spaces')" class="nav-bar-link"><font-awesome-icon :icon="['fab', 'confluence']" size="lg"/> CI Subspace</a>
       </vs-navbar-item>
 
       |
@@ -99,6 +104,7 @@
       activeItem: 4,
       name: 'Test Plan Utility',
       active: false,
+      test: false,
       pageLoadedName: 'Home',
       isDevelopmentBuild: false
     }),

@@ -5,6 +5,7 @@ import VueHighlightJS from 'vue-highlight.js'
 import 'es6-promise/auto'
 import VuePaginate from 'vue-paginate'
 import VueShortKey from 'vue-shortkey'
+import VueEditor from 'vue2-editor'
 
 import axios from 'axios'
 
@@ -91,6 +92,15 @@ const defaultSettings = {
       jiraNewLine: false,
       jiraNewLineAmount: 50
     },
+    jiraCardExport: {
+      template: '',
+      htmlTemplate: `
+      <h2 class="card-title" :class="cardColour(issue.type.id)">{{ issue.key }}</h2>
+      <h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
+      <h5 class="mt-2">Story Points: {{ issue.storyPoints }}</h5>
+      <h3><span class="badge badge-secondary">{{ issue.epic }}</span></h3>`,
+      useHtml: true
+    },
     api: {
       vstsPAT: '',
       jiraUsername: '',
@@ -155,6 +165,7 @@ Vue.use(Vuesax, {
   }
 })
 
+Vue.use(VueEditor)
 Vue.use(Vuex)
 Vue.use(VueHighlightJS)
 Vue.use(VuePaginate)
@@ -179,6 +190,15 @@ const store = new Vuex.Store({
         defaultPlanExportDir: '',
         jiraNewLine: false,
         jiraNewLineAmount: 50
+      },
+      jiraCardExport: {
+        template: '',
+        htmlTemplate: `
+        <h2 class="card-title" :class="cardColour(issue.type.id)">{{ issue.key }}</h2>
+        <h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
+        <h5 class="mt-2">Story Points: {{ issue.storyPoints }}</h5>
+        <h3><span class="badge badge-secondary">{{ issue.epic }}</span></h3>`,
+        useHtml: true
       },
       api: {
         vstsPAT: '',

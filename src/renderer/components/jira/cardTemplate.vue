@@ -16,10 +16,7 @@
                 <div v-for="(issue, index) in splitCards(true)" :key="index">
                   <div class="card w-100" style="height: 300px; border-color: black;">
                     <div class="card-body">
-                      <h2 class="card-title" :class="cardColour(issue.type.id)">{{ issue.key }}</h2>
-                      <h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
-                      <h5>Story Points: {{ issue.storyPoints }}</h5>
-                      <span class="badge badge-secondary">{{ issue.epic }}</span>
+                      <user-template :projectData="projectData" :issue="issue"></user-template>
                     </div>
                   </div>
 
@@ -37,10 +34,11 @@
                 <div v-for="(issue, index) in splitCards(false)" :key="index">
                   <div class="card w-100" style="height: 300px; border-color: black;">
                     <div class="card-body">
-                      <h2 class="card-title" :class="cardColour(issue.type.id)">{{ issue.key }}</h2>
+                      <!-- <h2 class="card-title" :class="cardColour(issue.type.id)">{{ issue.key }}</h2>
                       <h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
-                      <h5>Story Points: {{ issue.storyPoints }}</h5>
-                      <span class="badge badge-secondary">{{ issue.epic }}</span>
+                      <h5 class="mt-2">Story Points: {{ issue.storyPoints }}</h5>
+                      <h3<span class="badge badge-secondary">{{ issue.epic }}</span></h3> -->
+                      <user-template :projectData="projectData" :issue="issue"></user-template>
                     </div>
                   </div>
 

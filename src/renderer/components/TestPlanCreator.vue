@@ -49,7 +49,7 @@
                 </vs-col>
 
                 <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="3">
-                  <vs-button type="line" color="danger" @click="exportToJiraPopup.active = true">Export to Jira</vs-button>
+                  <vs-button type="line" color="danger" :disabled="true" @click="exportToJiraPopup.active = true">Export to Jira</vs-button>
                 </vs-col>
               </vs-row>
 

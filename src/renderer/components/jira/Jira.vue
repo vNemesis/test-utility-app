@@ -40,11 +40,16 @@
             
             <div class="col-md-2">
               <button type="button" class="btn btn-info w-100" @click="previewIssues()">Preview</button>
+              <small>{{ status }}</small>
             </div>
 
             <div class="col-md-2">
-              <button type="button" class="btn btn-primary w-100" @click="exportIssuesToPdf(issues)" :disabled="issues.length === 0">Export</button>
-              <small class="text-danger" v-if="issues.length === 0">Please previw the results before exporting</small>
+              <button type="button" class="btn btn-primary w-100" @click="exportIssuesToPdf(issues)" :disabled="!canExport">Export</button>
+              <small class="text-danger" v-if="!canExport">Please previw the results before exporting</small>
+            </div>
+
+            <div class="col-md-2 offset-md-6">
+              <button type="button" class="btn btn-dark w-100" @click="openEditor">Edit template</button>
             </div>
 
         
@@ -103,6 +108,91 @@
         
         </div>
 
+        <!-- Popups -->
+        <div>
+          <vs-popup title="Customise Card Template" :active.sync="template.popupActive" class="templateEditorPopup">
+            <vs-progress indeterminate color="success" v-if="isTyping"></vs-progress>
+            <div class="row">
+
+              <!-- Editor -->
+              <div class="col-md-6 border-right">
+
+                  <!-- Toolbar -->
+                  <div class="row mb-3">
+
+                    <div class="col-md-12">
+                      <span>HTML Template Overide</span>
+                      <vs-switch class="mt-2" v-model="settings.jiraCardExport.useHtml" @input="isTyping = true">
+                      </vs-switch>
+                    </div>
+
+                  </div>
+                    <!-- Toolbar -->
+
+                  <!-- Vue Editor -->
+                  <div v-if="!settings.jiraCardExport.useHtml">
+                  <div class="row mb-3">
+
+                    <div class="col-md-4">
+                      <vs-select
+                        label="Wildcards"
+                        v-model="template.editor.selectedWildcard"
+                        class="w-100">
+                        <vs-select-item :key="index" :value="item" :text="index" v-for="(item, index) in template.editor.wildcards" />
+                      </vs-select>
+                    </div>
+
+                    <div class="col-md-4">
+                      <vs-button color="primary" type="filled" class="w-100 mt-4" @click="insertWildcard()">Insert Wildcard</vs-button>  
+                    </div>
+
+                  </div>                  
+                    <vue-editor
+                    :class="settings.jiraCardExport.useHtml ? 'disable-section' : ''"
+                      v-model="settings.jiraCardExport.template"
+                      :editorToolbar="template.editor.toolbar"
+                      :editorOptions="template.editor.options"
+                      ref="editor"
+                      @input="isTyping = true">
+                    </vue-editor>
+                  </div>
+                  <!-- Vue Editor -->
+
+                  <!-- HTML Editor -->
+                  <div v-if="settings.jiraCardExport.useHtml">
+
+                    <p class="mb-0 pb-0">You can enter custom HTML here to render your own card.</p>
+                    <p>This uses Bootstrap 4 for styling, you can find out more <span class="text-info" @click="$electron.shell.openExternal('https://getbootstrap.com/docs/4.3/components/card/')">here</span></p>
+
+                    <div class="row">
+
+                      <!-- Toolbar -->
+                      <div class="col-md-6 offset-md-6 text-right mb-2">
+                        <vs-button color="primary" type="flat" class="py-0 my-0" @click="restoreHtmlTemplate()">Restore Standard Template</vs-button>  
+                      </div>
+                      <!-- Toolbar -->
+
+                    </div>
+
+                    <vs-textarea class="w-100" rows="9" v-model="settings.jiraCardExport.htmlTemplate" @input="isTyping = true" />
+
+                  </div>
+                  <!-- HTML Editor -->
+         
+              </div>
+
+              <div class="col-md-6">
+                <h2>Preview</h2>
+                <div class="card w-100" style="height: 300px; border-color: black;">
+                  <div class="card-body" v-html="templateToDisplay">
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </vs-popup>
+        </div>
+
     </div>
   </div>
 </div>
@@ -111,17 +201,10 @@
 import axios from 'axios'
 import templateComp from './cardTemplate'
 import Vue from 'vue'
-// import Papa from 'papaparse'
-// import _ from 'lodash'
-
-// const remote = require('electron').remote
-// var fs = require('fs')
-
-// const {clipboard} = require('electron')
-// TODO: Add customisable columns
+import _ from 'lodash'
 
 export default {
-  name: 'ci-tests',
+  name: 'jira-card-export',
 
   data: function () {
     return {
@@ -130,6 +213,45 @@ export default {
       queryString: '',
       projectKey: '',
       jsqlInfoPopup: false,
+      template: {
+        popupActive: false,
+        editor: {
+          toolbar: [
+            [{ header: [1, 2, 3, 4, 5, 6, false] }],
+            ['bold', 'italic', 'underline'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            [{ 'script': 'sub' }, { 'script': 'super' }],
+            [{ 'indent': '-1' }, { 'indent': '+1' }],
+            [{ 'direction': 'rtl' }],
+            [{ 'color': [] }],
+            [{ 'font': [] }],
+            [{ 'align': [] }],
+            ['clean']
+          ],
+          selectedWildcard: '',
+          wildcards: {
+            Key: '{{ issue.key }}',
+            Title: '{{ issue.title }}',
+            Epic: '{{ issue.epic }}',
+            'Story Points': '{{ issue.storyPoints }}',
+            'Issue Type': '{{ issue.type.name }}',
+            'Color Code': '<span :class="cardColour(issue.type.id)">Enter Text Here</span>'
+          },
+          options: {
+            modules: {
+              'history': {
+                'delay': 2500,
+                'userOnly': true
+              }
+            }
+          },
+          activeTab: 0
+        }
+      },
+      export: {
+        issuesLoaded: false,
+        epicNamesLoaded: false
+      },
       project: {
         id: 0,
         types: {
@@ -151,8 +273,21 @@ export default {
   },
 
   computed: {
-    settings () {
-      return this.$store.state.settings
+    settings: {
+      get () {
+        return this.$store.state.settings
+      },
+      set (value) {
+        this.$store.commit('setSettings', value)
+      }
+    },
+    isTyping: {
+      get () {
+        return this.$store.state.changingConfig
+      },
+      set (value) {
+        this.$store.commit('setChangeConfig', value)
+      }
     },
     password () {
       return (this.settings.api.jiraToken === undefined || this.settings.api.jiraToken === '') ? '' : this.settings.api.jiraToken
@@ -165,6 +300,37 @@ export default {
     },
     jsql () {
       return this.queryString.substring(this.queryString.indexOf('jqlQuery=') + 9)
+    },
+    canExport () {
+      return this.export.issuesLoaded === true && this.export.epicNamesLoaded === true
+    },
+    status () {
+      let status = ''
+
+      if (this.export.issuesLoaded === true && this.export.epicNamesLoaded === false) {
+        status = 'Issues Loaded, waiting for Epic\'s'
+      } else if (this.export.issuesLoaded === false && this.export.epicNamesLoaded === true) {
+        status = 'Epic\'s Loaded, waiting for issues'
+      } else {
+        status = ''
+      }
+
+      return status
+    },
+    templateToDisplay () {
+      let html = ''
+      if (this.settings.jiraCardExport.useHtml) {
+        html = this.settings.jiraCardExport.htmlTemplate
+      } else {
+        html = this.settings.jiraCardExport.template
+      }
+
+      html = html.replace('{{ issue.key }}', 'Jira-0001')
+      html = html.replace('{{ issue.title }}', 'Example Ticket Title - A very intresting story')
+      html = html.replace('{{ issue.storyPoints }}', '5')
+      html = html.replace('{{ issue.epic }}', 'An Epic Quest')
+
+      return html
     }
   },
 
@@ -172,6 +338,22 @@ export default {
   },
 
   watch: {
+    settings: {
+      handler: _.debounce(function () {
+        this.isTyping = false
+      }, 2000),
+      deep: true
+    },
+    isTyping (val) {
+      if (!val) {
+        this.$vs.notify({
+          title: 'Template Saved',
+          color: 'success',
+          position: this.settings.notifPos,
+          time: 3000
+        })
+      }
+    }
   },
 
   methods: {
@@ -188,8 +370,21 @@ export default {
       }
     },
 
+    insertWildcard () {
+      let instance = this.$refs.editor.quill
+      let selection = instance.getSelection()
+
+      instance.deleteText(selection.index, selection.length)
+      instance.insertText(selection.index, this.template.editor.selectedWildcard, 'user')
+    },
+
+    openEditor () {
+      this.template.popupActive = true
+      this.isTyping = false
+    },
+
     validate () {
-      if (this.projectKey === '' || this.project.id !== 0 || this.queryString === '') {
+      if (this.projectKey === '' || this.queryString === '') {
         this.$vs.notify({
           title: 'Validation Error',
           text: 'Please check you entered the required information',
@@ -200,6 +395,18 @@ export default {
         return false
       } else {
         return true
+      }
+    },
+
+    restoreHtmlTemplate () {
+      let defualtTemplate = `<h2 class="card-title" :class="cardColour(issue.type.id)">{{ issue.key }}</h2>
+<h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
+<h5 class="mt-2">Story Points: {{ issue.storyPoints }}</h5>
+<h3><span class="badge badge-secondary">{{ issue.epic }}</span></h3>`
+
+      if (this.settings.jiraCardExport.htmlTemplate !== defualtTemplate) {
+        this.isTyping = true
+        this.settings.jiraCardExport.htmlTemplate = defualtTemplate
       }
     },
 
@@ -277,6 +484,9 @@ export default {
       }
 
       this.issues = []
+      this.export.issuesLoaded = false
+      this.export.epicNamesLoaded = false
+      this.export.status = ''
       this.$vs.loading({
         container: this.$refs.resultsTable
       })
@@ -294,7 +504,8 @@ export default {
           // customfield_10400 epic link
           // customfield_10004 story points
 
-          response.data.issues.forEach(issue => {
+          for (let index = 0; index < response.data.issues.length; index++) {
+            let issue = response.data.issues[index]
             this.issues.push(
               {
                 key: issue.key,
@@ -307,7 +518,40 @@ export default {
                 epic: (issue.fields.customfield_10400 === undefined || issue.fields.customfield_10400 === null) ? 'No Epic Link' : issue.fields.customfield_10400
               }
             )
-          })
+
+            if (index === response.data.issues.length - 1) {
+              this.export.issuesLoaded = true
+            }
+          }
+
+          // get Epic Name
+          for (let index = 0; index < this.issues.length; index++) {
+            let issue = this.issues[index]
+
+            if (issue.epic === 'No Epic Link') {
+              continue
+            }
+            axios.get(`https://rimilia.atlassian.net/rest/api/2/issue/${issue.epic}`,
+              {
+                headers: {
+                  Authorization: `Basic ${this.auth}`,
+                  Accept: 'application/json',
+                  'Access-Control-Allow-Origin': '*'
+                },
+                responseType: 'json'
+              })
+              .then(response => {
+                issue.epic = response.data.fields.customfield_10401
+              })
+              .catch(error => {
+                this.processAxiosError(error)
+              })
+              .then(() => {
+                if (index === this.issues.length - 1) {
+                  this.export.epicNamesLoaded = true
+                }
+              })
+          }
         })
         .catch(error => {
           this.processAxiosError(error)
@@ -326,9 +570,37 @@ export default {
         })
     },
 
-    // TODO: Needs to be revised at a later date
     exportIssuesToPdf (issuesToPrint) {
-      // let Html = '<html><head><title>Jira Ticket Export</title></head><body></body></html>'
+      let html = ''
+      if (this.settings.jiraCardExport.useHtml) {
+        html = `
+        <div>
+          ${this.settings.jiraCardExport.htmlTemplate}
+        </div>`
+      } else {
+        html = `
+        <div>
+          ${this.settings.jiraCardExport.template}
+        </div>`
+      }
+
+      Vue.component('user-template', {
+        props: ['projectData', 'issue'],
+        template: html,
+        methods: {
+          cardColour (id) {
+            if (parseInt(id) === this.projectData.types.subTaskId || parseInt(id) === this.projectData.types.taskId) {
+              return 'text-primary'
+            } else if (parseInt(id) === this.projectData.types.storyId || parseInt(id) === this.projectData.types.improvementId || parseInt(id) === this.projectData.types.newFeatureId) {
+              return 'text-success'
+            } else if (parseInt(id) === this.projectData.types.bugId) {
+              return 'text-danger'
+            } else {
+              return 'text-info'
+            }
+          }
+        }
+      })
 
       var templateTing = new Vue({
         ...templateComp,
@@ -367,4 +639,16 @@ export default {
 </script>
 
 <style>
+.vs-popup {
+  width: 85% !important;
+}
+
+.vs-popup--content {
+  padding: 15px !important;
+}
+
+.disable-section {
+  pointer-events: none;
+  opacity: 0.4;
+}
 </style>
