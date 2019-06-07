@@ -60,6 +60,7 @@
             <span slot="off">Open Menu</span>
           </vs-switch>
         </vs-tooltip>
+        <small class="float-left ml-2" style="margin-top: 12px;">Ctrl + <font-awesome-icon :icon="['fab', 'windows']"/></small>
         <h5 class="mt-2 ml-3 float-left">| {{ pageLoadedName }}</h5>
       </div>
 
@@ -104,7 +105,6 @@
       activeItem: 4,
       name: 'Test Plan Utility',
       active: false,
-      test: false,
       pageLoadedName: 'Home',
       isDevelopmentBuild: false
     }),
@@ -139,40 +139,9 @@
       navigate (path) {
         let cancelled = false
 
-        if (this.changingConfig || this.changingQuickLinks) {
+        if ((this.changingConfig || this.changingQuickLinks) && this.$route.path !== '/jira') {
           alert('Please wait until any unsaved changes are complete before navigating to a different page')
-          switch (this.$route.path) {
-            case '/':
-              this.$refs.sidemenu.currentIndex = 1
-              this.pageLoadedName = 'Home'
-              break
-            case '/testplancreator':
-              this.$refs.sidemenu.currentIndex = 2
-              this.pageLoadedName = 'Test Plan Creator'
-              break
-            case '/formatter':
-              this.$refs.sidemenu.currentIndex = 3
-              this.pageLoadedName = 'Text Formatter'
-              break
-            case '/filecreator':
-              this.$refs.sidemenu.currentIndex = 4
-              this.pageLoadedName = 'File Creator'
-              break
-            case '/citests':
-              this.$refs.sidemenu.currentIndex = 5
-              this.pageLoadedName = 'CI Test Analyser'
-              break
-            case '/jira':
-              this.$refs.sidemenu.currentIndex = 6
-              this.pageLoadedName = 'Jira Card Exporter'
-              break
-            case '/settings':
-              this.$refs.sidemenu.currentIndex = 7
-              this.pageLoadedName = 'Settings'
-              break
-            default:
-              break
-          }
+          this.resetNavIndex()
           return
         }
 
@@ -191,6 +160,9 @@
             this.$refs.sidemenu.currentIndex = 4
           }
         } else {
+          if (this.$route.path === '/jira') {
+            this.$store.commit('setChangeConfig', false)
+          }
           if (path === '/citests') {
             if (this.settings.api.vstsPAT !== '') {
               this.$router.push({ path: path })
@@ -198,6 +170,20 @@
               this.$vs.notify({
                 title: 'Error!',
                 text: `Please enter your VSTS Personal Access Token with READ Permissions in the Settings Screen`,
+                color: 'danger',
+                icon: 'error_outline',
+                position: this.settings.notifPos,
+                time: 15000
+              })
+              cancelled = true
+            }
+          } else if (path === '/jira') {
+            if (this.settings.api.jiraUsername !== '' && this.settings.api.jiraToken !== '') {
+              this.$router.push({ path: path })
+            } else {
+              this.$vs.notify({
+                title: 'Error!',
+                text: `Please enter your Jira details in the Settings Screen`,
                 color: 'danger',
                 icon: 'error_outline',
                 position: this.settings.notifPos,
@@ -236,9 +222,47 @@
             default:
               break
           }
+        } else {
+          this.resetNavIndex()
         }
 
         document.getElementsByClassName('vs-sidebar--background').item(0).click()
+      },
+
+      // Resets the navigation active link if the request to hcnage page failed
+      resetNavIndex () {
+        switch (this.$route.path) {
+          case '/':
+            this.$refs.sidemenu.currentIndex = 1
+            this.pageLoadedName = 'Home'
+            break
+          case '/testplancreator':
+            this.$refs.sidemenu.currentIndex = 2
+            this.pageLoadedName = 'Test Plan Creator'
+            break
+          case '/formatter':
+            this.$refs.sidemenu.currentIndex = 3
+            this.pageLoadedName = 'Text Formatter'
+            break
+          case '/filecreator':
+            this.$refs.sidemenu.currentIndex = 4
+            this.pageLoadedName = 'File Creator'
+            break
+          case '/citests':
+            this.$refs.sidemenu.currentIndex = 5
+            this.pageLoadedName = 'CI Test Analyser'
+            break
+          case '/jira':
+            this.$refs.sidemenu.currentIndex = 6
+            this.pageLoadedName = 'Jira Card Exporter'
+            break
+          case '/settings':
+            this.$refs.sidemenu.currentIndex = 7
+            this.pageLoadedName = 'Settings'
+            break
+          default:
+            break
+        }
       },
       getLatestRelease () {
         axios({

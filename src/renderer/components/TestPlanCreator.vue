@@ -53,9 +53,9 @@
                 </vs-col>
               </vs-row>
 
-              <vs-row class="justify-content-center mt-2">
+              <vs-row class="justify-content-center mt-3">
                 <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="12">
-                  <p>Current file location: {{ fileLocation.location ? fileLocation.location : 'No location set'}}</p>
+                  <p><strong>Current file location:</strong> {{ fileSaveLocation}}</p>
                 </vs-col>
               </vs-row>
 
@@ -65,7 +65,7 @@
         </div>
       </div>
 
-      <div class="row justify-content-center mt-5">
+      <div class="row justify-content-center mt-3">
         <div class="col-md-3">
           <vs-select autocomplete placeholder="Search and select" label="Application" label-placeholder="vs-Autocomplete" :danger="validation.application" danger-text="Please select an application" class="w-100" v-model="app">
             <vs-select-item :key="index" :value="item.value" :text="item.text" v-for="(item,index) in appOptions" />
@@ -131,7 +131,7 @@
               v-bind:testdata="test"
               v-bind:totalNumberOfTestItems="testItems.length"
               v-bind:order="order"
-              v-bind:priorities="project.priorites"
+              v-bind:priorities="project.priorities"
               v-on:remove-self="removeTestItem(index)"
               v-on:move-up="moveTestItem(index, index - 1)"
               v-on:move-down="moveTestItem(index, index + 1)"
@@ -439,6 +439,13 @@ export default {
     },
     settings () {
       return this.$store.state.settings
+    },
+    fileSaveLocation () {
+      if (this.fileLocation.location) {
+        return `<a @click="$emit('open-url', ${this.fileLocation.location})"></a>`
+      } else {
+        return 'No Location Selected'
+      }
     }
   },
 
@@ -671,7 +678,7 @@ export default {
       this.testItems.forEach(element => {
         let title = `"${element.testName}"`
         let description = `"Test Description: ${element.testPurpose} \r\n\r\nTest Type: ${element.testType} \r\n\r\n{code}\r\n${element.gherkin}\r\n{code}"`
-        let row = [title, description, this.jiraTask, 'sub-task', this.assignee, this.projectpriorities.find(x => x.id === element.priority).name, this.app].join(',')
+        let row = [title, description, this.jiraTask, 'sub-task', this.assignee, this.project.priorities.find(x => x.id === element.priority).name, this.app].join(',')
         csvContent += row + '\r\n'
       })
 

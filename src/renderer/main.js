@@ -42,13 +42,14 @@ import {
 
 import {
   faJira,
-  faConfluence
+  faConfluence,
+  faWindows
 } from '@fortawesome/free-brands-svg-icons'
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit,
-  faClone, faAlignLeft, faFileExport, faFileImport, faCopy, faPaste, faJira, faConfluence)
+  faClone, faAlignLeft, faFileExport, faFileImport, faCopy, faPaste, faJira, faConfluence, faWindows)
 
 // Load Plugins
 const remote = require('electron').remote
@@ -99,7 +100,8 @@ const defaultSettings = {
       <h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
       <h5 class="mt-2">Story Points: {{ issue.storyPoints }}</h5>
       <h3><span class="badge badge-secondary">{{ issue.epic }}</span></h3>`,
-      useHtml: true
+      useHtml: true,
+      projectKey: ''
     },
     api: {
       vstsPAT: '',
@@ -198,7 +200,8 @@ const store = new Vuex.Store({
         <h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
         <h5 class="mt-2">Story Points: {{ issue.storyPoints }}</h5>
         <h3><span class="badge badge-secondary">{{ issue.epic }}</span></h3>`,
-        useHtml: true
+        useHtml: true,
+        projectKey: ''
       },
       api: {
         vstsPAT: '',

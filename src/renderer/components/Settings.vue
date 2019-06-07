@@ -40,6 +40,7 @@
                   </div>
                   <div class="col-sm-6">
                     <vs-input id="jiraToken" v-model="settings.api.jiraToken" label="Jira API Token" @input="isTyping = true" class="w-100"/>
+                    <small class="text-info mt-1 float-right" @click="$electron.shell.openExternal('https://id.atlassian.com/manage/api-tokens')">Don't have one? click here</small>
                     <small class="text-danger">Token is stored as plain text, use at own risk!</small>
                   </div>
                 </div>

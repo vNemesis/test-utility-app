@@ -1,78 +1,81 @@
 <template>
 <div>
-  <div id="results-div" class="row mt-5">
+  <div id="results-div" class="row mt-3 mx-3">
     <div class="col-md-12 text-center">
 
+
         <div class="row">
-    
-              <div class="col-md-4">
-                  <vs-input label-placeholder="Email" class="w-100" v-model="username"/>
-              </div>
-  
-              <div class="col-md-4">
-                  <vs-input label-placeholder="API Token" type="password" class="w-100" v-model="password"/>
-                  <small class="text-info float-right" @click="$electron.shell.openExternal('https://id.atlassian.com/manage/api-tokens')">Don't have one? click here</small>
-              </div>
-
-                <div class="col-md-4">
-                  <vs-input label-placeholder="Project" class="w-100" v-model="projectKey" :danger="projectKey === ''"
-                  danger-text="Please enter the Key for the project this will be used for. This will be used to fetch the ID for issue types etc. If you have multiple projects pick the most used one"/>    
-              </div>
-    
-        </div>
-
-        <div class="row mt-2">
         
-            <div class="col-md-12">
+            <div class="col-md-9">
               <vs-input label-placeholder="Jira Query" class="w-100" v-model="queryString" :danger="queryString === ''" danger-text="Please provide the Jira Query in URL form" />
               <small @click="jsqlInfoPopup = true" class="text-info float-right">Not sure where to find it? click here</small>
-                <vs-popup title="Find Jira Query URL" :active.sync="jsqlInfoPopup">
-                  <p>
-                    Using the advanced search in Jira, in the top-right hand side select the export button,
-                    right-click on <strong>Export XML</strong> and select <strong>Copy link address</strong>
-                  </p>
+                <vs-popup title="Find Jira Query URL" :active.sync="jsqlInfoPopup" class="info-popup">
+                  <div class="row">
+                    
+                    <div class="col-md-6 col-sm-3">
+                      <p>To get the correct link format follow these steps:</p>
+                      <ol class="ml-4">
+                        <li>Naviagte to the advanced search in Jira</li>
+                        <li>In the <b>Top-Right Corner</b> selected the <b>Export</b> button</li>
+                        <li><b>Right-click</b> on the <b>Export XML</b> button and select <b>Copy link Address</b></li>
+                      </ol>
+                    </div>
+
+                    <div class="col-md-6 col-sm-9">
+                      <img id="logo" src="~@/assets/cardExportExample1.png" alt="example1">
+                    </div>
+
+                  </div>
               </vs-popup>
+            </div>
+
+            <div class="col-md-2">
+              <vs-input label-placeholder="Project" class="w-100" v-model="projectKey" :danger="projectKey === ''"
+              danger-text="Please enter the Key for the project this will be used for. This will be used to fetch the ID for issue types etc. If you have multiple projects pick the most used one"/>
+            </div>
+
+            <div class="col-md-1 mt-3"> 
+              <button type="button" class="btn btn-primary w-100" @click="saveProjectKey" :disabled="projectKey == settings.jiraCardExport.projectKey">Save</button>
             </div>
         
         </div>
 
-        <div class="row mt-3">
-            
-            <div class="col-md-2">
-              <button type="button" class="btn btn-info w-100" @click="previewIssues()">Preview</button>
-              <small>{{ status }}</small>
-            </div>
+        <div class="row">
 
-            <div class="col-md-2">
-              <button type="button" class="btn btn-primary w-100" @click="exportIssuesToPdf(issues)" :disabled="!canExport">Export</button>
-              <small class="text-danger" v-if="!canExport">Please previw the results before exporting</small>
-            </div>
+              <div class="col-md-2 mt-3">
+                <button type="button" class="btn btn-info w-100" @click="previewIssues()">Fetch Tickets</button>
+                <small>{{ status }}</small>
+              </div>
 
-            <div class="col-md-2 offset-md-6">
-              <button type="button" class="btn btn-dark w-100" @click="openEditor">Edit template</button>
-            </div>
+              <div class="col-md-2 mt-3">
+                <button type="button" class="btn btn-primary w-100" @click="exportIssuesToPdf(issues)" :disabled="!canExport">Export</button>
+                <small class="text-danger" v-if="!canExport">Please previw the results before exporting</small>
+              </div>
 
-        
+              <div class="col-md-2 offset-md-6 mt-3">
+                <button type="button" class="btn btn-dark w-100" @click="openEditor">Edit template</button>
+              </div>
+    
         </div>
 
         <div class="row mt-3 text-center">
           <div class="col-md-2">
-            <h4 class="text-success">Stories: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.storyId).length }}</h4>
+            <h6 class="text-success">Stories: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.storyId).length }}</h6>
           </div>
           <div class="col-md-2">
-            <h4 class="text-success">Improvements: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.improvementId).length }}</h4>
+            <h6 class="text-success">Improvements: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.improvementId).length }}</h6>
           </div>
           <div class="col-md-2">
-            <h4 class="text-success">New Features: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.newFeatureId).length }}</h4>
+            <h6 class="text-success">New Features: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.newFeatureId).length }}</h6>
           </div>
           <div class="col-md-2">
-            <h4 class="text-danger">Bugs: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.bugId).length }}</h4>
+            <h6 class="text-danger">Bugs: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.bugId).length }}</h6>
           </div>
           <div class="col-md-2">
-            <h4 class="text-info">Tasks: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.taskId).length }}</h4>
+            <h6 class="text-info">Tasks: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.taskId).length }}</h6>
           </div>
           <div class="col-md-2">
-            <h4 >Total: {{ issues.length }}</h4>
+            <h6 >Total: {{ issues.length }}</h6>
           </div>
         </div>
 
@@ -183,7 +186,7 @@
 
               <div class="col-md-6">
                 <h2>Preview</h2>
-                <div class="card w-100" style="height: 300px; border-color: black;">
+                <div class="card w-100" style="max-height: 300px; min-height: 300px border-color: black;">
                   <div class="card-body" v-html="templateToDisplay">
                   </div>
                 </div>
@@ -326,7 +329,8 @@ export default {
       }
 
       html = html.replace('{{ issue.key }}', 'Jira-0001')
-      html = html.replace('{{ issue.title }}', 'Example Ticket Title - A very intresting story')
+      html = html.replace('{{ issue.type.name }}', 'Improvement')
+      html = html.replace('{{ issue.title }}', 'Example Ticket Title - A very intresting story. Tickets longer than 100 characters will be truncated')
       html = html.replace('{{ issue.storyPoints }}', '5')
       html = html.replace('{{ issue.epic }}', 'An Epic Quest')
 
@@ -335,6 +339,9 @@ export default {
   },
 
   mounted () {
+    if (this.projectKey === '' && this.settings.jiraCardExport.projectKey !== '') {
+      this.projectKey = this.settings.jiraCardExport.projectKey
+    }
   },
 
   watch: {
@@ -347,7 +354,7 @@ export default {
     isTyping (val) {
       if (!val) {
         this.$vs.notify({
-          title: 'Template Saved',
+          title: 'Changes Saved',
           color: 'success',
           position: this.settings.notifPos,
           time: 3000
@@ -357,6 +364,16 @@ export default {
   },
 
   methods: {
+
+    saveProjectKey () {
+      this.settings.jiraCardExport.projectKey = this.projectKey
+      this.$vs.notify({
+        title: 'Project Key Saved',
+        color: 'success',
+        position: this.settings.notifPos,
+        time: 3000
+      })
+    },
 
     cardColour (id) {
       if (parseInt(id) === this.project.types.subTaskId || parseInt(id) === this.project.types.taskId) {
@@ -399,9 +416,10 @@ export default {
     },
 
     restoreHtmlTemplate () {
-      let defualtTemplate = `<h2 class="card-title" :class="cardColour(issue.type.id)">{{ issue.key }}</h2>
+      let defualtTemplate = `<h5 class="mt-2">Story Points: {{ issue.storyPoints }}</h5>
+<h5 class="mt-2" :class="cardColour(issue.type.id)">{{ issue.type.name }}</h5>
+<h2 class="card-title" :class="cardColour(issue.type.id)">{{ issue.key }}</h2>
 <h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
-<h5 class="mt-2">Story Points: {{ issue.storyPoints }}</h5>
 <h3><span class="badge badge-secondary">{{ issue.epic }}</span></h3>`
 
       if (this.settings.jiraCardExport.htmlTemplate !== defualtTemplate) {
@@ -529,6 +547,9 @@ export default {
             let issue = this.issues[index]
 
             if (issue.epic === 'No Epic Link') {
+              if (index === this.issues.length - 1) {
+                this.export.epicNamesLoaded = true
+              }
               continue
             }
             axios.get(`https://rimilia.atlassian.net/rest/api/2/issue/${issue.epic}`,
@@ -602,6 +623,13 @@ export default {
         }
       })
 
+      // Truncate Titles
+      issuesToPrint.forEach(issue => {
+        if (issue.title.length > 100) {
+          issue.title = `${issue.title.substring(0, 99)}...`
+        }
+      })
+
       var templateTing = new Vue({
         ...templateComp,
         parent: this,
@@ -641,6 +669,18 @@ export default {
 <style>
 .vs-popup {
   width: 85% !important;
+}
+
+.info-popup .vs-popup {
+  width: 60% !important;
+}
+
+@media screen and (max-width: 1500px) {
+
+  .info-popup .vs-popup {
+    width: 70% !important;
+  }
+
 }
 
 .vs-popup--content {

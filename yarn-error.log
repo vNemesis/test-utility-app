@@ -1,8 +1,8 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add vue-template-compiler
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js upgrade vuessax@v3.6.61
 
 PATH: 
-  C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\HP\HP Performance Advisor;C:\Program Files (x86)\Microsoft SQL Server\Client SDK\ODBC\130\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\140\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files (x86)\Microsoft SQL Server\140\Tools\Binn\ManagementStudio\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Symantec.cloud\PlatformAgent\;C:\Program Files\Git\cmd;C:\Program Files (x86)\Yarn\bin\;C:\Program Files\nodejs\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\130\Tools\Binn\;C:\Program Files\Microsoft SQL Server\140\Tools\Binn\;C:\Program Files\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Users\Harman.Uppal\AppData\Local\Microsoft\WindowsApps;C:\Users\Harman.Uppal\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Harman.Uppal\AppData\Local\GitHubDesktop\bin;C:\Users\Harman.Uppal\AppData\Local\Yarn\bin;C:\Users\Harman.Uppal\AppData\Roaming\npm;C:\Users\Harman.Uppal\.dotnet\tools;C:\Users\Harman.Uppal\docfx;C:\Program Files (x86)\Sophos\Sophos SSL VPN Client\bin
+  C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\HP\HP Performance Advisor;C:\Program Files (x86)\Microsoft SQL Server\Client SDK\ODBC\130\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\140\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files (x86)\Microsoft SQL Server\140\Tools\Binn\ManagementStudio\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Symantec.cloud\PlatformAgent\;C:\Program Files\Git\cmd;C:\Program Files (x86)\Yarn\bin\;C:\Program Files\nodejs\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\130\Tools\Binn\;C:\Program Files\Microsoft SQL Server\140\Tools\Binn\;C:\Program Files\Microsoft SQL Server\140\DTS\Binn\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Users\Harman.Uppal\AppData\Local\Microsoft\WindowsApps;C:\Users\Harman.Uppal\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Harman.Uppal\AppData\Local\GitHubDesktop\bin;C:\Users\Harman.Uppal\AppData\Local\Yarn\bin;C:\Users\Harman.Uppal\AppData\Roaming\npm;C:\Users\Harman.Uppal\.dotnet\tools;C:\Users\Harman.Uppal\docfx;C:\Program Files (x86)\Sophos\Sophos SSL VPN Client\bin
 
 Yarn version: 
   1.15.2
@@ -14,15 +14,25 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: EBUSY: resource busy or locked, unlink 'C:\Users\Harman.Uppal\Documents\GitHub\test-utility-app\node_modules\electron\dist\blink_image_resources_200_percent.pak'
+  Error: https://registry.yarnpkg.com/vuessax: Not found
+      at Request.params.callback [as _callback] (C:\Program Files (x86)\Yarn\lib\cli.js:65167:18)
+      at Request.self.callback (C:\Program Files (x86)\Yarn\lib\cli.js:129541:22)
+      at Request.emit (events.js:189:13)
+      at Request.<anonymous> (C:\Program Files (x86)\Yarn\lib\cli.js:130513:10)
+      at Request.emit (events.js:189:13)
+      at IncomingMessage.<anonymous> (C:\Program Files (x86)\Yarn\lib\cli.js:130435:12)
+      at Object.onceWrapper (events.js:277:13)
+      at IncomingMessage.emit (events.js:194:15)
+      at endReadableNT (_stream_readable.js:1125:12)
+      at process._tickCallback (internal/process/next_tick.js:63:19)
 
 npm manifest: 
   {
     "name": "test-plan-utility",
-    "version": "1.7.0",
+    "version": "1.7.0-pre2",
     "author": "HarmanU <uppalhrs@aston.ac.uk>",
     "description": "Electron Vue App for Rimilia Test Plans",
-    "license": null,
+    "license": "",
     "main": "./dist/electron/main.js",
     "scripts": {
       "build": "node .electron-vue/build.js && electron-builder",
@@ -76,6 +86,7 @@ npm manifest:
     },
     "dependencies": {
       "@fortawesome/fontawesome-svg-core": "^1.2.4",
+      "@fortawesome/free-brands-svg-icons": "^5.8.2",
       "@fortawesome/free-solid-svg-icons": "^5.3.1",
       "@fortawesome/vue-fontawesome": "^0.1.1",
       "@handsontable/vue": "^3.0.0",
@@ -98,12 +109,13 @@ npm manifest:
       "quill": "^1.3.6",
       "showdown": "^1.8.7",
       "username": "^4.0.0",
-      "vue": "^2.5.16",
+      "vue": "^2.6.10",
       "vue-electron": "^1.0.6",
       "vue-highlight.js": "^2.2.0",
       "vue-paginate": "^3.6.0",
       "vue-router": "^3.0.1",
       "vue-shortkey": "^3.1.6",
+      "vue2-editor": "^2.7.2",
       "vuesax": "^3.8.21",
       "vuex": "^3.0.1"
     },
@@ -165,7 +177,7 @@ npm manifest:
       "vue-html-loader": "^1.2.4",
       "vue-loader": "^15.2.4",
       "vue-style-loader": "^4.1.0",
-      "vue-template-compiler": "^2.5.16",
+      "vue-template-compiler": "^2.6.10",
       "webpack": "^4.15.1",
       "webpack-cli": "^3.0.8",
       "webpack-dev-server": "^3.1.4",
@@ -277,6 +289,11 @@ Lockfile:
       lodash "^4.2.0"
       to-fast-properties "^2.0.0"
   
+  "@fortawesome/fontawesome-common-types@^0.2.18":
+    version "0.2.18"
+    resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-0.2.18.tgz#c0d8f073a5116b2de0a2c8a7aba66093a6956ce7"
+    integrity sha512-834DrzO2Ne3upCW+mJJPC/E6BsFcj+2Z1HmPIhbpbj8UaKmXWum4NClqLpUiMetugRlHuG4jbIHNdv2/lc3c1Q==
+  
   "@fortawesome/fontawesome-common-types@^0.2.6":
     version "0.2.6"
     resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-0.2.6.tgz#3f26b9d1bf2d057dfe0f448fe4a2c372508e97f0"
@@ -288,6 +305,13 @@ Lockfile:
     integrity sha512-784NAqscnUuMZmf7eNSOn2L71VecLQAkEhfyYzTYnh6i+ycxy7tvpw4Ys4wc6RiglKqTddWRkWBZZ9uGAtfoWg==
     dependencies:
       "@fortawesome/fontawesome-common-types" "^0.2.6"
+  
+  "@fortawesome/free-brands-svg-icons@^5.8.2":
+    version "5.8.2"
+    resolved "https://registry.yarnpkg.com/@fortawesome/free-brands-svg-icons/-/free-brands-svg-icons-5.8.2.tgz#e68a509c986d5d197cc5bd9ae8d966eff513468d"
+    integrity sha512-nhEWctDOP6f+Ka10LXAFoF+6mtWidC2iQgTBGRGgydmhBtcIEwyxWVx5wQHa86A1zAMi5TnipDAYQs2qn7DD6A==
+    dependencies:
+      "@fortawesome/fontawesome-common-types" "^0.2.18"
   
   "@fortawesome/free-solid-svg-icons@^5.3.1":
     version "5.4.1"
@@ -2509,6 +2533,15 @@ Lockfile:
     version "2.4.1"
     resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.1.tgz#18c49ab16a037b6eb0152cc83e3471338215b66e"
     integrity sha512-ObN6h1v2fTJSmUXoS3nMQ92LbDK9be4TV+6G+omQlGJFdcUX5heKi1LZ1YnRMIgwTLEj3E24bT6tYni50rlCfQ==
+    dependencies:
+      ansi-styles "^3.2.1"
+      escape-string-regexp "^1.0.5"
+      supports-color "^5.3.0"
+  
+  chalk@^2.4.2:
+    version "2.4.2"
+    resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.2.tgz#cd42541677a54333cf541a49108c1432b44c9424"
+    integrity sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==
     dependencies:
       ansi-styles "^3.2.1"
       escape-string-regexp "^1.0.5"
@@ -11138,10 +11171,10 @@ Lockfile:
       hash-sum "^1.0.2"
       loader-utils "^1.0.2"
   
-  vue-template-compiler@^2.5.16:
-    version "2.5.17"
-    resolved "https://registry.yarnpkg.com/vue-template-compiler/-/vue-template-compiler-2.5.17.tgz#52a4a078c327deb937482a509ae85c06f346c3cb"
-    integrity sha512-63uI4syCwtGR5IJvZM0LN5tVsahrelomHtCxvRkZPJ/Tf3ADm1U1wG6KWycK3qCfqR+ygM5vewUvmJ0REAYksg==
+  vue-template-compiler@^2.6.10:
+    version "2.6.10"
+    resolved "https://registry.yarnpkg.com/vue-template-compiler/-/vue-template-compiler-2.6.10.tgz#323b4f3495f04faa3503337a82f5d6507799c9cc"
+    integrity sha512-jVZkw4/I/HT5ZMvRnhv78okGusqe0+qH2A0Em0Cp8aq78+NK9TII263CDVz2QXZsIT+yyV/gZc/j/vlwa+Epyg==
     dependencies:
       de-indent "^1.0.2"
       he "^1.1.0"
@@ -11150,6 +11183,15 @@ Lockfile:
     version "1.6.0"
     resolved "https://registry.yarnpkg.com/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.6.0.tgz#dc42697133302ce3017524356a6c61b7b69b4a18"
     integrity sha512-x3LV3wdmmERhVCYy3quqA57NJW7F3i6faas++pJQWtknWT+n7k30F4TVdHvCLn48peTJFRvCpxs3UuFPqgeELg==
+  
+  vue2-editor@^2.7.2:
+    version "2.7.2"
+    resolved "https://registry.yarnpkg.com/vue2-editor/-/vue2-editor-2.7.2.tgz#8cb9bda9bc120aacab261b534dc2a871a9403e81"
+    integrity sha512-7wr0hd/OplcnFNeRLbEejTSrt/FUxNA64VAMW+cWn9a6ufhV38eufLfrbA4hU7zTfS1ywBprQpvGG0NP7KWgAQ==
+    dependencies:
+      lodash "^4.17.11"
+      quill "^1.3.6"
+      vue "^2.6.10"
   
   vue@2.3.3:
     version "2.3.3"
@@ -11161,17 +11203,18 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.21.tgz#3d33dcd03bb813912ce894a8303ab553699c4a85"
     integrity sha512-Aejvyyfhn0zjVeLvXd70h4hrE4zZDx1wfZqia6ekkobLmUZ+vNFQer53B4fu0EjWBSiqApxPejzkO1Znt3joxQ==
   
-  vue@^2.5.16, vue@^2.5.17:
-    version "2.5.17"
-    resolved "https://registry.yarnpkg.com/vue/-/vue-2.5.17.tgz#0f8789ad718be68ca1872629832ed533589c6ada"
-    integrity sha512-mFbcWoDIJi0w0Za4emyLiW72Jae0yjANHbCVquMKijcavBGypqlF7zHRgMa5k4sesdv7hv2rB4JPdZfR+TPfhQ==
+  vue@^2.6.10, vue@^2.6.9:
+    version "2.6.10"
+    resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.10.tgz#a72b1a42a4d82a721ea438d1b6bf55e66195c637"
+    integrity sha512-ImThpeNU9HbdZL3utgMCq0oiMzAkt1mcgy3/E6zWC/G6AaQoeuFdsl9nDhTDU3X1R6FK7nsIUuRACVcjI+A2GQ==
   
   vuesax@^3.8.21:
-    version "3.8.21"
-    resolved "https://registry.yarnpkg.com/vuesax/-/vuesax-3.8.21.tgz#cf594fd14f1256fc93f557227a375ac8ecc7047f"
-    integrity sha512-tCxw3AXbeKIGtX9+6HIas/jA9bqbyin/+C3Er+tAv+6afBHpWXreutOBfYUuy91uVSCpEDJkrqbMiz578sG7ow==
+    version "3.8.74"
+    resolved "https://registry.yarnpkg.com/vuesax/-/vuesax-3.8.74.tgz#30c7c2dc2556823be60c50e48e7e928e5d7f87ed"
+    integrity sha512-f7irLWqf0EucVTiut6v8HFzS1vHbGL7oHYNuYJUI0ODlx9h95/fvGymXPFqvluSfAG4HyyRtSy2kPX9MxPu7pQ==
     dependencies:
-      vue "^2.5.17"
+      chalk "^2.4.2"
+      vue "^2.6.9"
   
   vuex@^3.0.1:
     version "3.0.1"
