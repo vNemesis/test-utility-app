@@ -14,13 +14,13 @@
               <div class="col-md-6 mr-0 pr-0">
 
                 <div v-for="(issue, index) in splitCards(true)" :key="index">
-                  <div class="card w-100" style="height: 300px; border-color: black;">
-                    <div class="card-body">
+                  <div class="card w-100 border-dark" style="max-height: 375px; min-height: 375px;">
+                    <div class="card-body py-0 my-0" style="overflow-y: hidden;">
                       <user-template :projectData="projectData" :issue="issue"></user-template>
                     </div>
                   </div>
 
-                  <div v-if="(index % 5 === 4)">
+                  <div v-if="(index % cardsPerSheet === cardsPerSheet - 1)">
                     <br />
                     <br />
                     <br />
@@ -32,17 +32,13 @@
               <div class="col-md-6 ml-0 pl-0">
 
                 <div v-for="(issue, index) in splitCards(false)" :key="index">
-                  <div class="card w-100" style="height: 300px; border-color: black;">
-                    <div class="card-body">
-                      <!-- <h2 class="card-title" :class="cardColour(issue.type.id)">{{ issue.key }}</h2>
-                      <h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
-                      <h5 class="mt-2">Story Points: {{ issue.storyPoints }}</h5>
-                      <h3<span class="badge badge-secondary">{{ issue.epic }}</span></h3> -->
+                  <div class="card w-100 border-dark" style="max-height: 375px; min-height: 375px;">
+                    <div class="card-body py-0 my-0" style="overflow-y: hidden;">
                       <user-template :projectData="projectData" :issue="issue"></user-template>
                     </div>
                   </div>
 
-                  <div v-if="(index % 5 === 4)">
+                  <div v-if="(index % cardsPerSheet === cardsPerSheet - 1)">
                     <br />
                     <br />
                     <br />
@@ -62,18 +58,13 @@
 export default {
   props: ['issues', 'projectData'],
 
+  data () {
+    return {
+      cardsPerSheet: 4
+    }
+  },
+
   methods: {
-    cardColour (id) {
-      if (parseInt(id) === this.projectData.types.subTaskId || parseInt(id) === this.projectData.types.taskId) {
-        return 'text-primary'
-      } else if (parseInt(id) === this.projectData.types.storyId || parseInt(id) === this.projectData.types.improvementId || parseInt(id) === this.projectData.types.newFeatureId) {
-        return 'text-success'
-      } else if (parseInt(id) === this.projectData.types.bugId) {
-        return 'text-danger'
-      } else {
-        return 'text-info'
-      }
-    },
 
     splitCards (isLeftColumn) {
       let halfLength = Math.ceil(this.issues.length / 2)

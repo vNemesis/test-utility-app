@@ -1,6 +1,6 @@
 {
   "name": "test-plan-utility",
-  "version": "1.7.0-pre2",
+  "version": "1.7.0-pre3",
   "author": "HarmanU <uppalhrs@aston.ac.uk>",
   "description": "Electron Vue App for Rimilia Test Plans",
   "license": "",
@@ -56,6 +56,7 @@
     }
   },
   "dependencies": {
+    "@chenfengyuan/vue-qrcode": "^1.0.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.4",
     "@fortawesome/free-brands-svg-icons": "^5.8.2",
     "@fortawesome/free-solid-svg-icons": "^5.3.1",

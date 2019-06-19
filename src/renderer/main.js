@@ -31,6 +31,7 @@ import {
   faListOl,
   faArrowDown,
   faArrowUp,
+  faAngleDown,
   faEdit,
   faClone,
   faAlignLeft,
@@ -49,7 +50,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit,
-  faClone, faAlignLeft, faFileExport, faFileImport, faCopy, faPaste, faJira, faConfluence, faWindows)
+  faClone, faAlignLeft, faFileExport, faFileImport, faCopy, faPaste, faJira, faConfluence, faWindows, faAngleDown)
 
 // Load Plugins
 const remote = require('electron').remote
@@ -96,10 +97,13 @@ const defaultSettings = {
     jiraCardExport: {
       template: '',
       htmlTemplate: `
-      <h2 class="card-title" :class="cardColour(issue.type.id)">{{ issue.key }}</h2>
-      <h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
-      <h5 class="mt-2">Story Points: {{ issue.storyPoints }}</h5>
-      <h3><span class="badge badge-secondary">{{ issue.epic }}</span></h3>`,
+<div class="h-100 pl-2 border-left" style="border-width: 5px !important;" :class="borderColour(issue.type.id)">
+  <h2 class="mt-2 float-right">{{ issue.storyPoints }}</h2>
+  <h4 class="mt-2 float-left" :class="cardColour(issue.type.id)">{{ issue.type.name }}</h4>
+  <h1 style="font-size: 3.5em" class="card-title pt-5" :class="cardColour(issue.type.id)">{{ issue.key }}</h1>
+  <h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
+  <h3 style="position: absolute; bottom: 0px;"><span class="badge badge-secondary">{{ issue.epic }}</span></h3>
+</div>`,
       useHtml: true,
       projectKey: ''
     },
@@ -196,10 +200,13 @@ const store = new Vuex.Store({
       jiraCardExport: {
         template: '',
         htmlTemplate: `
-        <h2 class="card-title" :class="cardColour(issue.type.id)">{{ issue.key }}</h2>
-        <h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
-        <h5 class="mt-2">Story Points: {{ issue.storyPoints }}</h5>
-        <h3><span class="badge badge-secondary">{{ issue.epic }}</span></h3>`,
+        <div class="h-100 pl-2 border-left" style="border-width: 5px !important;" :class="borderColour(issue.type.id)">
+  <h2 class="mt-2 float-right">{{ issue.storyPoints }}</h2>
+  <h4 class="mt-2 float-left" :class="cardColour(issue.type.id)">{{ issue.type.name }}</h4>
+  <h1 style="font-size: 3.5em" class="card-title pt-5" :class="cardColour(issue.type.id)">{{ issue.key }}</h1>
+  <h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
+  <h3 style="position: absolute; bottom: 0px;"><span class="badge badge-secondary">{{ issue.epic }}</span></h3>
+</div>`,
         useHtml: true,
         projectKey: ''
       },

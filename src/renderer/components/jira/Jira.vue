@@ -58,26 +58,78 @@
     
         </div>
 
-        <div class="row mt-3 text-center">
-          <div class="col-md-2">
-            <h6 class="text-success">Stories: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.storyId).length }}</h6>
-          </div>
-          <div class="col-md-2">
-            <h6 class="text-success">Improvements: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.improvementId).length }}</h6>
-          </div>
-          <div class="col-md-2">
-            <h6 class="text-success">New Features: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.newFeatureId).length }}</h6>
-          </div>
-          <div class="col-md-2">
-            <h6 class="text-danger">Bugs: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.bugId).length }}</h6>
-          </div>
-          <div class="col-md-2">
-            <h6 class="text-info">Tasks: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.taskId).length }}</h6>
-          </div>
-          <div class="col-md-2">
+        <vs-row class="mt-3" vs-align="center">
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+            <h6 class="text-success" :class="(!project.types.useStory ? 'disable' : '')">Stories: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.storyId).length }}</h6>
+          </vs-col>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+            <h6 class="text-success" :class="(!project.types.useImprovement ? 'disable' : '')">Improvements: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.improvementId).length }}</h6>
+          </vs-col>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+            <h6 class="text-success" :class="(!project.types.useFeature ? 'disable' : '')">New Features: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.newFeatureId).length }}</h6>
+          </vs-col>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+            <h6 class="text-danger" :class="(!project.types.useBug ? 'disable' : '')">Bugs: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.bugId).length }}</h6>
+          </vs-col>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1">
+            <h6 class="text-info" :class="(!project.types.useTask ? 'disable' : '')">Tasks: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.taskId).length }}</h6>
+          </vs-col>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+            <h6 class="text-info" :class="(!project.types.useSubTask ? 'disable' : '')">Sub-Tasks: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.subTaskId).length }}</h6>
+          </vs-col>
+
+          <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1">
             <h6 >Total: {{ issues.length }}</h6>
-          </div>
-        </div>
+          </vs-col>
+
+        </vs-row>
+
+        <vs-collapse>
+          <vs-collapse-item>
+              <div slot="header" class="text-right mr-3">
+                Toggle Types
+              </div>
+              <vs-row class="mt-3" vs-align="center">
+
+                <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+                  <small>Toggle Stories</small>
+                  <vs-switch class="ml-2" v-model="project.types.useStory" ></vs-switch>
+                </vs-col>
+
+                <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+                  <small>Toggle Improvements</small>
+                  <vs-switch class="ml-2" v-model="project.types.useImprovement" ></vs-switch>
+                </vs-col>
+
+                <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+                  <small>Toggle New Features</small>
+                  <vs-switch class="ml-2" v-model="project.types.useFeature" ></vs-switch>
+                </vs-col>
+
+                <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+                  <small>Toggle Bugs</small>
+                  <vs-switch class="ml-2" v-model="project.types.useBug" ></vs-switch>
+                </vs-col>
+
+                <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1">
+                  <small>Toggle Tasks</small>
+                  <vs-switch class="ml-2" v-model="project.types.useTask" ></vs-switch>
+                </vs-col>
+
+                <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
+                  <small>Toggle Sub-tasks</small>
+                  <vs-switch class="ml-2" v-model="project.types.useSubTask" ></vs-switch>
+                </vs-col>
+
+              </vs-row>
+          </vs-collapse-item>
+        </vs-collapse>
 
         <div class="row mt-3">
         
@@ -120,7 +172,7 @@
               <!-- Editor -->
               <div class="col-md-6 border-right">
 
-                  <!-- Toolbar -->
+                  <!-- Toggle Type -->
                   <div class="row mb-3">
 
                     <div class="col-md-12">
@@ -130,26 +182,26 @@
                     </div>
 
                   </div>
-                    <!-- Toolbar -->
+                  <!-- Toggle Type -->
 
                   <!-- Vue Editor -->
                   <div v-if="!settings.jiraCardExport.useHtml">
-                  <div class="row mb-3">
+                    <div class="row mb-3">
 
-                    <div class="col-md-4">
-                      <vs-select
-                        label="Wildcards"
-                        v-model="template.editor.selectedWildcard"
-                        class="w-100">
-                        <vs-select-item :key="index" :value="item" :text="index" v-for="(item, index) in template.editor.wildcards" />
-                      </vs-select>
-                    </div>
+                      <div class="col-md-4">
+                        <vs-select
+                          label="Wildcards"
+                          v-model="template.editor.selectedWildcard"
+                          class="w-100">
+                          <vs-select-item :key="index" :value="item" :text="index" v-for="(item, index) in template.editor.wildcards" />
+                        </vs-select>
+                      </div>
 
-                    <div class="col-md-4">
-                      <vs-button color="primary" type="filled" class="w-100 mt-4" @click="insertWildcard()">Insert Wildcard</vs-button>  
-                    </div>
+                      <div class="col-md-4">
+                        <vs-button color="primary" type="filled" class="w-100 mt-4" @click="insertWildcard()">Insert Wildcard</vs-button>  
+                      </div>
 
-                  </div>                  
+                    </div>                  
                     <vue-editor
                     :class="settings.jiraCardExport.useHtml ? 'disable-section' : ''"
                       v-model="settings.jiraCardExport.template"
@@ -170,14 +222,52 @@
                     <div class="row">
 
                       <!-- Toolbar -->
-                      <div class="col-md-6 offset-md-6 text-right mb-2">
+                      <div class="col-md-6 mb-2">
+
+                        <div class="btn-toolbar" role="toolbar" ref="toolbar">
+
+                          <!-- Group 1 -->
+                          <div class="btn-group btn-group-sm mr-2" role="group" aria-label="First group">
+                            <!-- Headings -->
+                            <vs-dropdown vs-trigger-click>
+                              <button type="button" class="btn btn-info border-right-flat">Style <font-awesome-icon icon="angle-down" size="sm" class="ml-1"/></button>
+                              <vs-dropdown-menu>
+                                  <vs-dropdown-item v-for="(style, key) in template.htmlEditor.styles" v-bind:key="key" @click="insertTagAroundSelection(style)">
+                                  {{key}}
+                                  </vs-dropdown-item>
+                              </vs-dropdown-menu>
+                            </vs-dropdown>
+                            <!-- Headings -->
+
+                            <button type="button" class="btn btn-info" @click="insertTagAroundSelection('b')"><strong>B</strong></button>
+                            <button type="button" class="btn btn-info" @click="insertTagAroundSelection('i')"><i>I</i></button>
+                            <button type="button" class="btn btn-info" @click="insertAtCaret(`<ul>\n\t<li>List item</li>\n</ul>`)"><font-awesome-icon icon="list-ul" size="lg"/></button>
+                            <button type="button" class="btn btn-info" @click="insertAtCaret('<ol>\n\t<li>List item</li>\n</ol>')"><font-awesome-icon icon="list-ol" size="lg"/></button>
+
+                            <!-- More Text Effects -->
+                            <vs-dropdown vs-trigger-click>
+                              <button type="button" class="btn btn-info border-left-flat"><font-awesome-icon icon="ellipsis-h" size="lg"/></button>
+                              <vs-dropdown-menu class="border-black">
+                                  <vs-dropdown-item v-for="(effect, key) in template.htmlEditor.effects" v-bind:key="key" @click="insertAroundSelection(effect, key)" v-html="key">
+                                  </vs-dropdown-item>
+                              </vs-dropdown-menu>
+                            </vs-dropdown>
+                            <!-- More Text Effects -->
+                          </div>
+                          <!-- Group 1 -->
+
+                        </div>
+
+                      </div>
+
+                      <div class="col-md-6 text-right mb-2">
                         <vs-button color="primary" type="flat" class="py-0 my-0" @click="restoreHtmlTemplate()">Restore Standard Template</vs-button>  
                       </div>
                       <!-- Toolbar -->
 
                     </div>
 
-                    <vs-textarea class="w-100" rows="9" v-model="settings.jiraCardExport.htmlTemplate" @input="isTyping = true" />
+                    <textarea class="w-100 form-control border-dark" rows="9" ref="htmlTextbox" v-model="settings.jiraCardExport.htmlTemplate" @input="isTyping = true" ></textarea>
 
                   </div>
                   <!-- HTML Editor -->
@@ -186,9 +276,10 @@
 
               <div class="col-md-6">
                 <h2>Preview</h2>
-                <div class="card w-100" style="max-height: 300px; min-height: 300px border-color: black;">
-                  <div class="card-body" v-html="templateToDisplay">
-                  </div>
+                <p class="text-danger">This is the card size. Anything outside the border will not be included in the preview</p>
+                <div class="card w-100 border-dark" style="max-height: 350px; min-height: 350px;">
+                    <div class="card-body py-0 my-0" v-html="templateToDisplay">
+                    </div>
                 </div>
               </div>
 
@@ -205,6 +296,7 @@ import axios from 'axios'
 import templateComp from './cardTemplate'
 import Vue from 'vue'
 import _ from 'lodash'
+// import $ from 'jquery'
 
 export default {
   name: 'jira-card-export',
@@ -249,6 +341,21 @@ export default {
             }
           },
           activeTab: 0
+        },
+        htmlEditor: {
+          styles: {
+            'Heading 1': 'h1',
+            'Heading 2': 'h2',
+            'Heading 3': 'h3',
+            'Heading 4': 'h4',
+            'Heading 5': 'h5',
+            'Heading 6': 'h6',
+            'Paragraph': 'p',
+            'Preformatted': 'pre'
+          },
+          effects: {
+            '<small>Small</small>': 'small'
+          }
         }
       },
       export: {
@@ -259,11 +366,17 @@ export default {
         id: 0,
         types: {
           subTaskId: 0,
+          useSubTask: true,
           taskId: 0,
+          useTask: true,
           storyId: 0,
+          useStory: true,
           bugId: 0,
+          useBug: true,
           improvementId: 0,
-          newFeatureId: 0
+          useImprovement: true,
+          newFeatureId: 0,
+          useFeature: true
         },
         priorities: [
           { id: 2, name: 'Critical' },
@@ -416,11 +529,13 @@ export default {
     },
 
     restoreHtmlTemplate () {
-      let defualtTemplate = `<h5 class="mt-2">Story Points: {{ issue.storyPoints }}</h5>
-<h5 class="mt-2" :class="cardColour(issue.type.id)">{{ issue.type.name }}</h5>
-<h2 class="card-title" :class="cardColour(issue.type.id)">{{ issue.key }}</h2>
-<h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
-<h3><span class="badge badge-secondary">{{ issue.epic }}</span></h3>`
+      let defualtTemplate = `<div class="h-100 pl-2 border-left" style="border-width: 5px !important;" :class="borderColour(issue.type.id)">
+  <h2 class="mt-2 float-right">{{ issue.storyPoints }}</h2>
+  <h4 class="mt-2 float-left" :class="cardColour(issue.type.id)">{{ issue.type.name }}</h4>
+  <h1 style="font-size: 3.5em" class="card-title pt-5" :class="cardColour(issue.type.id)">{{ issue.key }}</h1>
+  <h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
+  <h3 style="position: absolute; bottom: 0px;"><span class="badge badge-secondary">{{ issue.epic }}</span></h3>
+</div>`
 
       if (this.settings.jiraCardExport.htmlTemplate !== defualtTemplate) {
         this.isTyping = true
@@ -619,6 +734,17 @@ export default {
             } else {
               return 'text-info'
             }
+          },
+          borderColour (id) {
+            if (parseInt(id) === this.projectData.types.subTaskId || parseInt(id) === this.projectData.types.taskId) {
+              return 'border-primary'
+            } else if (parseInt(id) === this.projectData.types.storyId || parseInt(id) === this.projectData.types.improvementId || parseInt(id) === this.projectData.types.newFeatureId) {
+              return 'border-success'
+            } else if (parseInt(id) === this.projectData.types.bugId) {
+              return 'border-danger'
+            } else {
+              return 'border-info'
+            }
           }
         }
       })
@@ -630,10 +756,50 @@ export default {
         }
       })
 
+      let filteredIssues = []
+
+      // FIlter issues to not include in print
+      issuesToPrint.forEach(issue => {
+        switch (parseInt(issue.type.id)) {
+          case this.project.types.subTaskId:
+            if (this.project.types.useSubTask) {
+              filteredIssues.push(issue)
+            }
+            break
+          case this.project.types.taskId:
+            if (this.project.types.useTask) {
+              filteredIssues.push(issue)
+            }
+            break
+          case this.project.types.storyId:
+            if (this.project.types.useStory) {
+              filteredIssues.push(issue)
+            }
+            break
+          case this.project.types.bugId:
+            if (this.project.types.useBug) {
+              filteredIssues.push(issue)
+            }
+            break
+          case this.project.types.improvementId:
+            if (this.project.types.useImprovement) {
+              filteredIssues.push(issue)
+            }
+            break
+          case this.project.types.newFeatureId:
+            if (this.project.types.useFeature) {
+              filteredIssues.push(issue)
+            }
+            break
+          default:
+            break
+        }
+      })
+
       var templateTing = new Vue({
         ...templateComp,
         parent: this,
-        propsData: { issues: issuesToPrint, projectData: this.project }
+        propsData: { issues: filteredIssues, projectData: this.project }
       }).$mount()
 
       this.$root.exportToPdf(templateTing.$el.innerHTML)
@@ -661,6 +827,52 @@ export default {
           time: 8000
         })
       }
+    },
+
+    // Editor HTML
+    insertTagAroundSelection (formatting, name = 'tag') {
+      // Get textbox element
+      var element = this.$refs.htmlTextbox
+      // Get selection start index
+      var caretPos = element.selectionStart
+      // Get Selection end index
+      var caretEnd = element.selectionEnd
+      // Get Current text value
+      var textAreaTxt = this.$refs.htmlTextbox.value
+
+      // Set the value
+      let selectedText = textAreaTxt.substring(caretPos, caretEnd)
+
+      if (selectedText === '') {
+        this.$refs.htmlTextbox.value = `${textAreaTxt.substring(0, caretPos)}<${formatting}>${name}</${formatting}>${textAreaTxt.substring(caretEnd)}`
+      } else {
+        this.$refs.htmlTextbox.value = `${textAreaTxt.substring(0, caretPos)}<${formatting}>${selectedText}</${formatting}>${textAreaTxt.substring(caretEnd)}`
+      }
+
+      element.selectionStart = caretPos + formatting.length
+      element.selectionEnd = caretPos + formatting.length
+
+      let evt = document.createEvent('HTMLEvents')
+      evt.initEvent('input', false, true)
+      element.dispatchEvent(evt)
+    },
+
+    insertAtCaret (formatting) {
+      if (this.settings.editor.autoLine) {
+        formatting = '\n' + formatting
+      }
+      var element = this.$refs.htmlTextbox
+      var caretPos = element.selectionStart
+      var caretEnd = element.selectionEnd
+      var textAreaTxt = this.$refs.htmlTextbox.value
+      this.$refs.htmlTextbox.value = textAreaTxt.substring(0, caretPos) + formatting + textAreaTxt.substring(caretEnd)
+
+      element.selectionStart = caretPos + formatting.length
+      element.selectionEnd = caretPos + formatting.length
+
+      let evt = document.createEvent('HTMLEvents')
+      evt.initEvent('input', false, true)
+      element.dispatchEvent(evt)
     }
   }
 }
@@ -691,4 +903,9 @@ export default {
   pointer-events: none;
   opacity: 0.4;
 }
+
+.disable {
+  opacity: 0.4;
+}
+    /* box-shadow: 0 5px 25px 0 rgba(0,0,0,.4) */
 </style>
