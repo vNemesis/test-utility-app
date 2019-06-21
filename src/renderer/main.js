@@ -6,6 +6,7 @@ import 'es6-promise/auto'
 import VuePaginate from 'vue-paginate'
 import VueShortKey from 'vue-shortkey'
 import VueEditor from 'vue2-editor'
+import VueQrcode from '@chenfengyuan/vue-qrcode'
 
 import axios from 'axios'
 
@@ -176,6 +177,7 @@ Vue.use(Vuex)
 Vue.use(VueHighlightJS)
 Vue.use(VuePaginate)
 Vue.use(VueShortKey)
+Vue.component(VueQrcode.name, VueQrcode)
 
 // Vue Components
 Vue.component('font-awesome-icon', FontAwesomeIcon)

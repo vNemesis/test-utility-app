@@ -3,7 +3,6 @@
   <div id="results-div" class="row mt-3 mx-3">
     <div class="col-md-12 text-center">
 
-
         <div class="row">
         
             <div class="col-md-9">
@@ -246,12 +245,14 @@
 
                             <!-- More Text Effects -->
                             <vs-dropdown vs-trigger-click>
-                              <button type="button" class="btn btn-info border-left-flat"><font-awesome-icon icon="ellipsis-h" size="lg"/></button>
+                              <button type="button" class="btn btn-info border-left-flat" title="Wildcards"><font-awesome-icon icon="ellipsis-h" size="lg"/></button>
                               <vs-dropdown-menu class="border-black">
-                                  <vs-dropdown-item v-for="(effect, key) in template.htmlEditor.effects" v-bind:key="key" @click="insertAroundSelection(effect, key)" v-html="key">
+                                  <vs-dropdown-item v-for="(effect, key) in template.editor.wildcards" v-bind:key="key" @click="insertAtCaret(effect)">
+                                    {{ key }}
                                   </vs-dropdown-item>
                               </vs-dropdown-menu>
                             </vs-dropdown>
+
                             <!-- More Text Effects -->
                           </div>
                           <!-- Group 1 -->
@@ -296,6 +297,7 @@ import axios from 'axios'
 import templateComp from './cardTemplate'
 import Vue from 'vue'
 import _ from 'lodash'
+import VueQrcode from '@chenfengyuan/vue-qrcode'
 // import $ from 'jquery'
 
 export default {
@@ -330,7 +332,9 @@ export default {
             Epic: '{{ issue.epic }}',
             'Story Points': '{{ issue.storyPoints }}',
             'Issue Type': '{{ issue.type.name }}',
-            'Color Code': '<span :class="cardColour(issue.type.id)">Enter Text Here</span>'
+            'Color Code': '<span :class="cardColour(issue.type.id)">Enter Text Here</span>',
+            'Jira URL': '{{ issue.url }}',
+            'QR Code': '<qrcode class="float-right" :value="issue.url" :options="{ width: 100 }" tag="img"></qrcode>'
           },
           options: {
             modules: {
@@ -446,6 +450,11 @@ export default {
       html = html.replace('{{ issue.title }}', 'Example Ticket Title - A very intresting story. Tickets longer than 100 characters will be truncated')
       html = html.replace('{{ issue.storyPoints }}', '5')
       html = html.replace('{{ issue.epic }}', 'An Epic Quest')
+      html = html.replace('{{ issue.url }}', 'https://rimilia.atlassian.net/browse/XXX-1234')
+
+      // QR code
+      // let width = html.match(/:options=" width: (.*) "/)
+      html = html.replace(/<qrcode(.*)<\/qrcode>/, '<div class="float-right" style=" width: 100px; height: 100px; outline: 1px solid black;"></div>')
 
       return html
     }
@@ -648,7 +657,8 @@ export default {
                 },
                 title: issue.fields.summary,
                 storyPoints: (issue.fields.customfield_10004 === undefined || issue.fields.customfield_10004 === null) ? 0 : issue.fields.customfield_10004,
-                epic: (issue.fields.customfield_10400 === undefined || issue.fields.customfield_10400 === null) ? 'No Epic Link' : issue.fields.customfield_10400
+                epic: (issue.fields.customfield_10400 === undefined || issue.fields.customfield_10400 === null) ? 'No Epic Link' : issue.fields.customfield_10400,
+                url: `https://rimilia.atlassian.net/browse/${issue.key}`
               }
             )
 
@@ -795,6 +805,8 @@ export default {
             break
         }
       })
+
+      Vue.component(VueQrcode.name, VueQrcode)
 
       var templateTing = new Vue({
         ...templateComp,
