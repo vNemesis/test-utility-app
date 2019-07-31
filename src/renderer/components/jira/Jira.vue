@@ -65,7 +65,7 @@
 
               <div class="col-md-2 mt-3">
                 <button type="button" class="btn btn-primary w-100" @click="exportIssuesToPdf(issuesToPrintSelection)" :disabled="!canExport">{{ exportText }}</button>
-                <small class="text-danger" v-if="!canExport">Please previw the results before exporting</small>
+                <small class="text-danger" v-if="!canExport">Please fetch the results before exporting</small>
               </div>
 
               <div class="col-md-2 mt-3 offset-md-4">
@@ -861,6 +861,13 @@ export default {
       issuesToPrint.forEach(issue => {
         if (issue.title.length > 100) {
           issue.title = `${issue.title.substring(0, 99)}...`
+        }
+      })
+
+      // Truncate epics
+      issuesToPrint.forEach(issue => {
+        if (issue.epic.length > 42) {
+          issue.epic = `${issue.epic.substring(0, 41)}...`
         }
       })
 
