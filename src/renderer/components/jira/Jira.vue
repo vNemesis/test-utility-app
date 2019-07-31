@@ -5,13 +5,33 @@
 
         <div class="row">
         
-            <div class="col-md-9">
+            <div class="col-md-11">
               <vs-input label-placeholder="Jira Query" class="w-100" v-model="queryString" :danger="queryString === ''" danger-text="Please provide the Jira Query in URL form" />
-              <small @click="jsqlInfoPopup = true" class="text-info float-right">Not sure where to find it? click here</small>
                 <vs-popup title="Find Jira Query URL" :active.sync="jsqlInfoPopup" class="info-popup">
                   <div class="row">
                     
+                    <div class="col-md-12 col-sm-6">
+                      <h4>Write Query</h4>
+
+                      <p>You can write the jira query yourself if you wish following a similar structure to Jira's advanced search:</p>
+                      <p>Here is an example of a query:</p>
+                      <vs-card>
+                          <pre style="white-space: pre-line;">
+                            assignee=user.name+AND+status="Done"
+                          </pre>
+                      </vs-card>
+                      <p> Write the query how you normally would but make sure to replace any whitespace characters with a <b>+</b> symbol.</p>
+                      <p class="text-danger"><b>Note!:</b> Some values may need there raw data form, for example Sprints are search by there data id not name</p>
+                    </div>
+
+                  </div>
+
+                  <hr />
+
+                  <div class="row">
+                    
                     <div class="col-md-6 col-sm-3">
+                      <h4>Add via URL</h4>
                       <p>To get the correct link format follow these steps:</p>
                       <ol class="ml-4">
                         <li>Naviagte to the advanced search in Jira</li>
@@ -28,13 +48,10 @@
               </vs-popup>
             </div>
 
-            <div class="col-md-2">
-              <vs-input label-placeholder="Project" class="w-100" v-model="projectKey" :danger="projectKey === ''"
-              danger-text="Please enter the Key for the project this will be used for. This will be used to fetch the ID for issue types etc. If you have multiple projects pick the most used one"/>
-            </div>
-
-            <div class="col-md-1 mt-3"> 
-              <button type="button" class="btn btn-primary w-100" @click="saveProjectKey" :disabled="projectKey == settings.jiraCardExport.projectKey">Save</button>
+            <div class="col-md-1">
+              <div @click="jsqlInfoPopup = true" class="text-info" style="margin-top: 20px; cursor: pointer;">
+                <font-awesome-icon class="float-left" :icon="['fas', 'info-circle']" size="2x"/>
+              </div>
             </div>
         
         </div>
@@ -47,17 +64,23 @@
               </div>
 
               <div class="col-md-2 mt-3">
-                <button type="button" class="btn btn-primary w-100" @click="exportIssuesToPdf(issues)" :disabled="!canExport">Export</button>
+                <button type="button" class="btn btn-primary w-100" @click="exportIssuesToPdf(issuesToPrintSelection)" :disabled="!canExport">{{ exportText }}</button>
                 <small class="text-danger" v-if="!canExport">Please previw the results before exporting</small>
               </div>
 
-              <div class="col-md-2 offset-md-6 mt-3">
+              <div class="col-md-2 mt-3 offset-md-4">
+                <vs-input placeholder="Porject Key i.e. ABC" class="float-left" style="width: 80%" v-model="projectKey" :danger="projectKey === ''"
+                danger-text="Please enter the Key for the project this will be used for. This will be used to fetch the ID for issue types etc. If you have multiple projects pick the most used one"/>
+                <font-awesome-icon @click="saveProjectKey" class="float-left ml-2 mt-1 text-primary" :icon="['fas', 'save']" size="2x"/>
+              </div>
+
+              <div class="col-md-2 mt-3">
                 <button type="button" class="btn btn-dark w-100" @click="openEditor">Edit template</button>
               </div>
     
         </div>
 
-        <vs-row class="mt-3" vs-align="center">
+        <vs-row class="mt-5" vs-align="center">
 
           <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
             <h6 class="text-success" :class="(!project.types.useStory ? 'disable' : '')">Stories: {{ issues.filter(issue => parseInt(issue.type.id) === project.types.storyId).length }}</h6>
@@ -92,37 +115,37 @@
         <vs-collapse>
           <vs-collapse-item>
               <div slot="header" class="text-right mr-3">
-                Toggle Types
+                Filter Types
               </div>
               <vs-row class="mt-3" vs-align="center">
 
                 <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
-                  <small>Toggle Stories</small>
+                  <small>Include Stories</small>
                   <vs-switch class="ml-2" v-model="project.types.useStory" ></vs-switch>
                 </vs-col>
 
                 <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
-                  <small>Toggle Improvements</small>
+                  <small>Include Improvements</small>
                   <vs-switch class="ml-2" v-model="project.types.useImprovement" ></vs-switch>
                 </vs-col>
 
                 <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
-                  <small>Toggle New Features</small>
+                  <small>Include New Features</small>
                   <vs-switch class="ml-2" v-model="project.types.useFeature" ></vs-switch>
                 </vs-col>
 
                 <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
-                  <small>Toggle Bugs</small>
+                  <small>Include Bugs</small>
                   <vs-switch class="ml-2" v-model="project.types.useBug" ></vs-switch>
                 </vs-col>
 
                 <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1">
-                  <small>Toggle Tasks</small>
+                  <small>Include Tasks</small>
                   <vs-switch class="ml-2" v-model="project.types.useTask" ></vs-switch>
                 </vs-col>
 
                 <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="2">
-                  <small>Toggle Sub-tasks</small>
+                  <small>Include Sub-tasks</small>
                   <vs-switch class="ml-2" v-model="project.types.useSubTask" ></vs-switch>
                 </vs-col>
 
@@ -133,9 +156,7 @@
         <div class="row mt-3">
         
             <div class="col-md-12">
-              <!-- <textarea class="form-control" cols="30" rows="10" readonly v-model="log"></textarea> -->
-
-              <div class="table-responsive">
+              <!-- <div class="table-responsive">
                 <table class="table vs-con-loading__container">
                   <thead>
                     <tr>
@@ -156,7 +177,65 @@
                     </tr>
                   </tbody>
                 </table>
-              </div>
+              </div> -->
+
+              <p class="text-info text-left">
+                <font-awesome-icon :icon="['fas', 'info-circle']" size="lg" style="cursor: pointer;" @click="showTableHint = !showTableHint"/>
+                <span v-if="!showTableHint">
+                    How does this filtering work?
+                </span>
+                <span v-if="showTableHint">
+                  By default all issues will be printed according to the types selected above, you can further filter the selection by selecting individual issues below.
+                </span>
+              </p>
+
+              <vs-table
+                multiple
+                v-model="selectedIssues"
+                :data="issues"
+                class="mt-4">
+                <template slot="thead">
+                  <vs-th style="width: 10%">
+                    Key
+                  </vs-th>
+                  <vs-th style="width: 10%">
+                    Type
+                  </vs-th>
+                  <vs-th style="width: 60%">
+                    Title
+                  </vs-th>
+                  <vs-th style="width: 10%">
+                    Epic
+                  </vs-th>
+                  <vs-th style="width: 10%">
+                    Story Points
+                  </vs-th>
+                </template>
+
+                <template slot-scope="{data}">
+                  <vs-tr :data="issue" :key="index" v-for="(issue, index) in data" class="text-left" >
+                    <vs-td :data="data[index].key">
+                      {{data[index].key}}
+                    </vs-td>
+
+                    <vs-td :class="cardColour(issue.type.id)" :data="data[index].type.name">
+                      {{data[index].type.name}}
+                    </vs-td>
+
+                    <vs-td :data="data[index].title">
+                      {{data[index].title}}
+                    </vs-td>
+
+                    <vs-td :data="data[index].epic">
+                      {{data[index].epic}}
+                    </vs-td>
+
+                    <vs-td :data="data[index].storyPoints">
+                      {{data[index].storyPoints}}
+                    </vs-td>
+                  </vs-tr>
+                </template>
+              </vs-table>
             </div>
 
         
@@ -298,7 +377,6 @@ import templateComp from './cardTemplate'
 import Vue from 'vue'
 import _ from 'lodash'
 import VueQrcode from '@chenfengyuan/vue-qrcode'
-// import $ from 'jquery'
 
 export default {
   name: 'jira-card-export',
@@ -310,6 +388,8 @@ export default {
       queryString: '',
       projectKey: '',
       jsqlInfoPopup: false,
+      showTableHint: false,
+      selectedIssues: [],
       template: {
         popupActive: false,
         editor: {
@@ -419,7 +499,11 @@ export default {
       return btoa(`${this.username}:${this.password}`)
     },
     jsql () {
-      return this.queryString.substring(this.queryString.indexOf('jqlQuery=') + 9)
+      if (this.queryString.includes('jqlQuery=')) {
+        return this.queryString.substring(this.queryString.indexOf('jqlQuery=') + 9)
+      } else {
+        return this.queryString
+      }
     },
     canExport () {
       return this.export.issuesLoaded === true && this.export.epicNamesLoaded === true
@@ -457,6 +541,20 @@ export default {
       html = html.replace(/<qrcode(.*)<\/qrcode>/, '<div class="float-right" style=" width: 100px; height: 100px; outline: 1px solid black;"></div>')
 
       return html
+    },
+    issuesToPrintSelection () {
+      if (this.selectedIssues.length !== 0) {
+        return this.selectedIssues
+      } else {
+        return this.issues
+      }
+    },
+    exportText () {
+      if (this.issuesToPrintSelection.length === 0) {
+        return 'Export'
+      } else {
+        return `Export ${this.issuesToPrintSelection.length} ticket${this.issuesToPrintSelection.length > 1 ? 's' : ''}`
+      }
     }
   },
 
@@ -554,7 +652,7 @@ export default {
 
     // Get AZCI project metadata
     apiGetJiraProjectData (auth, project) {
-      return axios.get(`https://rimilia.atlassian.net/rest/api/3/issue/createmeta?projectKeys=${project}`,
+      return axios.get(`https://${this.settings.api.jiraDomain}/rest/api/3/issue/createmeta?projectKeys=${project}`,
         {
           headers: {
             Authorization: `Basic ${auth}`,
@@ -590,7 +688,7 @@ export default {
 
     // Get Jira Priorities
     apiGetJiraPriorities (auth) {
-      return axios.get('https://rimilia.atlassian.net/rest/api/3/priority',
+      return axios.get(`https://${this.settings.api.jiraDomain}/rest/api/3/priority`,
         {
           headers: {
             Authorization: `Basic ${auth}`,
@@ -633,7 +731,7 @@ export default {
         container: this.$refs.resultsTable
       })
       // Fetch all Issues for the given query
-      axios.get(`https://rimilia.atlassian.net/rest/api/latest/search?maxResults=100&jql=${this.jsql}`,
+      axios.get(`https://${this.settings.api.jiraDomain}/rest/api/latest/search?maxResults=100&jql=${this.jsql}`,
         {
           headers: {
             Authorization: `Basic ${this.auth}`,
@@ -677,7 +775,7 @@ export default {
               }
               continue
             }
-            axios.get(`https://rimilia.atlassian.net/rest/api/2/issue/${issue.epic}`,
+            axios.get(`https://${this.settings.api.jiraDomain}/rest/api/2/issue/${issue.epic}`,
               {
                 headers: {
                   Authorization: `Basic ${this.auth}`,
@@ -707,7 +805,7 @@ export default {
           if (this.issues.length === 0) {
             this.$vs.notify({
               title: 'No Issues found',
-              text: 'No Issues were found from the given query',
+              text: 'No Issues were found from the given query. Please check the query syntax is correct',
               color: 'danger',
               position: this.settings.notifPos,
               time: 8000

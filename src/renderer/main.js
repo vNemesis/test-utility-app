@@ -39,7 +39,8 @@ import {
   faFileExport,
   faFileImport,
   faCopy,
-  faPaste
+  faPaste,
+  faInfoCircle, faSave
 } from '@fortawesome/free-solid-svg-icons'
 
 import {
@@ -51,7 +52,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit,
-  faClone, faAlignLeft, faFileExport, faFileImport, faCopy, faPaste, faJira, faConfluence, faWindows, faAngleDown)
+  faClone, faAlignLeft, faFileExport, faFileImport, faCopy, faPaste, faJira, faConfluence, faWindows, faAngleDown, faInfoCircle, faSave)
 
 // Load Plugins
 const remote = require('electron').remote
@@ -111,7 +112,8 @@ const defaultSettings = {
     api: {
       vstsPAT: '',
       jiraUsername: '',
-      jiraToken: ''
+      jiraToken: '',
+      jiraDomain: ''
     },
     notifPos: 'bottom-right',
     theme: {
@@ -215,7 +217,8 @@ const store = new Vuex.Store({
       api: {
         vstsPAT: '',
         jiraUsername: '',
-        jiraToken: ''
+        jiraToken: '',
+        jiraDomain: ''
       },
       notifPos: 'bottom-right',
       theme: {

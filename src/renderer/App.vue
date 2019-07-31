@@ -178,7 +178,7 @@
               cancelled = true
             }
           } else if (path === '/jira') {
-            if (this.settings.api.jiraUsername !== '' && this.settings.api.jiraToken !== '') {
+            if (this.settings.api.jiraUsername !== '' && this.settings.api.jiraToken !== '' && this.settings.api.jiraDomain !== '') {
               this.$router.push({ path: path })
             } else {
               this.$vs.notify({

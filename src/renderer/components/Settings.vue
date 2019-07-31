@@ -12,7 +12,7 @@
           <div class="col-sm-8">
 
             <!-- General Settings -->
-            <vs-divider color="dark"><h3>General</h3></vs-divider>
+            <vs-divider color="dark"><h4>General</h4></vs-divider>
             <div class="row">
               <div class="col-sm-12">
 
@@ -33,6 +33,8 @@
                 </div>
                 <!-- Notification Position and Open on export-->
 
+                <vs-divider color="dark" class="mt-5"><h4>Jira API</h4></vs-divider>
+
                 <!-- Jira Username and Token -->
                 <div class="row justify-content-center mt-2">
                   <div class="col-sm-6">
@@ -45,6 +47,17 @@
                   </div>
                 </div>
                 <!-- Jira Username and Token-->
+
+                <!-- Jira Domain -->
+                <div class="row justify-content-center mt-2">
+                  <div class="col-sm-12">
+                    <vs-input id="jiraDomain" placeholder="company.atlassian.net" v-model="settings.api.jiraDomain" label="Jira API Domain" @input="isTyping = true" class="w-100"/>
+                    <small class="text-info mt-1">This will be the domain for your jira instance, for example: <i>company.atlassian.net</i></small>
+                  </div>
+                </div>
+                <!-- Jira Domain-->
+
+                <vs-divider color="dark" class="mt-5"><h4>Azure Devops API</h4></vs-divider>
 
                 <!-- VSTS PAT -->
                 <div class="row justify-content-center mt-2">
@@ -62,7 +75,7 @@
             <!-- General Settings -->
 
             <!-- Theme Settings -->
-            <vs-divider color="dark"><h3 class="mt-3">Theme</h3></vs-divider>    
+            <vs-divider color="dark" class="mt-5"><h4>Theme</h4></vs-divider>    
             <div class="row">
               <div class="col-sm-12">
 
