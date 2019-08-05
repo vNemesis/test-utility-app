@@ -69,7 +69,7 @@
               </div>
 
               <div class="col-md-2 mt-3 offset-md-4">
-                <vs-input placeholder="Porject Key i.e. ABC" class="float-left" style="width: 80%" v-model="projectKey" :danger="projectKey === ''"
+                <vs-input placeholder="Project Key i.e. ABC" class="float-left" style="width: 80%" v-model="projectKey" :danger="projectKey === ''"
                 danger-text="Please enter the Key for the project this will be used for. This will be used to fetch the ID for issue types etc. If you have multiple projects pick the most used one"/>
                 <font-awesome-icon @click="saveProjectKey" class="float-left ml-2 mt-1 text-primary" :icon="['fas', 'save']" size="2x"/>
               </div>
