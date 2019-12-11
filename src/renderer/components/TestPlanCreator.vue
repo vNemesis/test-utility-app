@@ -352,7 +352,9 @@ export default {
       testItems: [],
       appOptions: [
         {text: 'Cash', value: 'Cash'},
-        {text: 'Collect', value: 'Collect'}
+        {text: 'Collect', value: 'Collect'},
+        {text: 'Insights', value: 'Insights'},
+        {text: 'Resolve', value: 'Collect'}
       ],
       // Validation
       validation: {
