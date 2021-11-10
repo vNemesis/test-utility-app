@@ -72,7 +72,7 @@
     "element-ui": "^2.5.4",
     "es6-promise": "^4.2.5",
     "handsontable": "^10.0.0",
-    "highlight.js": "^9.13.1",
+    "highlight.js": "^10.4.1",
     "jquery": "^3.5.0",
     "lodash": "^4.17.21",
     "material-icons": "^0.2.3",
