@@ -4,6 +4,9 @@ import Vuex from 'vuex'
 import VueHighlightJS from 'vue-highlight.js'
 import 'es6-promise/auto'
 import VuePaginate from 'vue-paginate'
+import VueShortKey from 'vue-shortkey'
+import VueEditor from 'vue2-editor'
+import VueQrcode from '@chenfengyuan/vue-qrcode'
 
 import axios from 'axios'
 
@@ -18,12 +21,41 @@ import 'highlight.js/styles/default.css'
 
 // Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone, faAlignLeft, faFileExport, faFileImport, faCopy, faPaste } from '@fortawesome/free-solid-svg-icons'
+import {
+  faBook,
+  faBug,
+  faPlus,
+  faTrash,
+  faHome,
+  faEllipsisH,
+  faListUl,
+  faListOl,
+  faArrowDown,
+  faArrowUp,
+  faAngleDown,
+  faEdit,
+  faClone,
+  faAlignLeft,
+  faFileExport,
+  faFileImport,
+  faCopy,
+  faPaste,
+  faInfoCircle, faSave
+} from '@fortawesome/free-solid-svg-icons'
+
+import {
+  faJira,
+  faConfluence,
+  faWindows
+} from '@fortawesome/free-brands-svg-icons'
+
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit, faClone, faAlignLeft, faFileExport, faFileImport, faCopy, faPaste)
+
+library.add(faBook, faBug, faPlus, faTrash, faHome, faEllipsisH, faListUl, faListOl, faArrowDown, faArrowUp, faEdit,
+  faClone, faAlignLeft, faFileExport, faFileImport, faCopy, faPaste, faJira, faConfluence, faWindows, faAngleDown, faInfoCircle, faSave)
 
 // Load Plugins
-const {dialog, shell, app} = require('electron').remote
+const remote = require('electron').remote
 const { clipboard } = require('electron')
 var log = require('electron-log/main')
 var fs = require('fs')
@@ -42,7 +74,7 @@ Vue.http = Vue.prototype.$http = axios
 Vue.config.productionTip = false
 
 // Will create log file if it doesn't exist
-fs.writeFile(`${app.getPath('userData')}/log.log`, '', { flag: 'wx' }, function (err) {
+fs.writeFile(`${remote.app.getPath('userData')}/log.log`, '', { flag: 'wx' }, function (err) {
   if (err) {
   }
 }
@@ -55,7 +87,8 @@ const defaultSettings = {
   settings: {
     editor: {
       autoLine: false,
-      showEditor: false
+      showEditor: false,
+      showGherkinPreview: false
     },
     planCreator: {
       defaultAssignee: '',
@@ -63,14 +96,40 @@ const defaultSettings = {
       jiraNewLine: false,
       jiraNewLineAmount: 50
     },
+    jiraCardExport: {
+      template: '',
+      htmlTemplate: `
+<div class="h-100 pl-2 border-left" style="border-width: 5px !important;" :class="borderColour(issue.type.id)">
+  <h2 class="mt-2 float-right">{{ issue.storyPoints }}</h2>
+  <h4 class="mt-2 float-left" :class="cardColour(issue.type.id)">{{ issue.type.name }}</h4>
+  <h1 style="font-size: 3.5em" class="card-title pt-5" :class="cardColour(issue.type.id)">{{ issue.key }}</h1>
+  <h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
+  <h3 style="position: absolute; bottom: 0px;"><span class="badge badge-secondary">{{ issue.epic }}</span></h3>
+</div>`,
+      useHtml: true,
+      projectKey: ''
+    },
+    api: {
+      vstsPAT: '',
+      jiraUsername: '',
+      jiraToken: '',
+      jiraDomain: ''
+    },
     notifPos: 'bottom-right',
     theme: {
       primary: '#1f74ff',
       darkMode: false
-    }
+    },
+    allowDevTools: false,
+    autoOpenOnExport: true
   },
   quickLinks: [
-    { id: 1, text: 'Example Website Bookmark', url: 'www.google.co.uk', colour: '#51d5ef' },
+    {
+      id: 1,
+      text: 'Example Website Bookmark',
+      url: 'www.google.co.uk',
+      colour: '#51d5ef'
+    },
     { id: 2, text: 'Example Local Bookmark', url: 'c://', colour: '#51d5ef' }
   ]
 }
@@ -101,6 +160,11 @@ const testPlanStore = new EStore({
   name: 'testPlans'
 })
 
+// Open dev tools if the option is enabled
+if (appStore.get('settings.allowDevTools') === true) {
+  remote.getCurrentWindow().toggleDevTools()
+}
+
 // Vue Plugins
 Vue.use(Vuesax, {
   theme: {
@@ -110,13 +174,17 @@ Vue.use(Vuesax, {
   }
 })
 
+Vue.use(VueEditor)
 Vue.use(Vuex)
 Vue.use(VueHighlightJS)
 Vue.use(VuePaginate)
+Vue.use(VueShortKey)
+Vue.component(VueQrcode.name, VueQrcode)
 
 // Vue Components
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.component('test-item', './components/TestItem.vue')
+Vue.component('payment-item', './components/FileCreator/PaymentItem.vue')
 Vue.component('quick-links', './components/LandingPage/QuickLinks.vue')
 
 const store = new Vuex.Store({
@@ -124,7 +192,8 @@ const store = new Vuex.Store({
     settings: {
       editor: {
         autoLine: false,
-        showEditor: false
+        showEditor: false,
+        showGherkinPreview: false
       },
       planCreator: {
         defaultAssignee: '',
@@ -132,11 +201,31 @@ const store = new Vuex.Store({
         jiraNewLine: false,
         jiraNewLineAmount: 50
       },
+      jiraCardExport: {
+        template: '',
+        htmlTemplate: `
+        <div class="h-100 pl-2 border-left" style="border-width: 5px !important;" :class="borderColour(issue.type.id)">
+  <h2 class="mt-2 float-right">{{ issue.storyPoints }}</h2>
+  <h4 class="mt-2 float-left" :class="cardColour(issue.type.id)">{{ issue.type.name }}</h4>
+  <h1 style="font-size: 3.5em" class="card-title pt-5" :class="cardColour(issue.type.id)">{{ issue.key }}</h1>
+  <h3 class="card-subtitle mb-2 text-muted">{{ issue.title }}</h3>
+  <h3 style="position: absolute; bottom: 0px;"><span class="badge badge-secondary">{{ issue.epic }}</span></h3>
+</div>`,
+        useHtml: true,
+        projectKey: ''
+      },
+      api: {
+        vstsPAT: '',
+        jiraUsername: '',
+        jiraToken: '',
+        jiraDomain: ''
+      },
       notifPos: 'bottom-right',
       theme: {
         primary: '#1f74ff',
         darkMode: false
-      }
+      },
+      autoOpenOnExport: true
     },
     changingConfig: false,
     changingQuickLinks: false,
@@ -181,8 +270,8 @@ console.warn = function () {
 store.state.settings = appStore.get('settings')
 store.state.quickLinks = appStore.get('quickLinks')
 
-if ((fs.statSync(`${app.getPath('userData')}/log.log`).size / 1000000.0) > 4) {
-  fs.truncate(`${app.getPath('userData')}/log.log`, 0)
+if ((fs.statSync(`${remote.app.getPath('userData')}/log.log`).size / 1000000.0) > 4) {
+  fs.truncate(`${remote.app.getPath('userData')}/log.log`, 0)
 }
 
 /* eslint-disable no-new */
@@ -205,77 +294,13 @@ new Vue({
     deleteTestPlan (key) {
       return testPlanStore.delete(key)
     },
-    /**
-     * Will begin the download of a file
-     * @param {string} filename name of file
-     * @param {string} content content of file
-     */
-    exportFile (filename, content, extensionName, extension) {
-      dialog.showSaveDialog({
-        filters: [{
-          name: extensionName,
-          extensions: [extension]
-        }],
-        defaultPath: filename
-      }, (fileName) => {
-        if (fileName === undefined) {
-          return
-        }
-
-        // fileName is a string that contains the path and filename created in the save file dialog.
-        fs.writeFile(fileName, content, (err) => {
-          if (err) {
-            this.$vs.notify({
-              title: 'Error!',
-              text: `An error ocurred creating the file: ${err.message}`,
-              color: 'danger',
-              icon: 'error_outline',
-              position: appStore.settings.notifPos,
-              time: 4000
-            })
-          } else {
-            this.$vs.notify({
-              title: 'File Exported!',
-              text: `File '${filename}' was exported successfully`,
-              color: 'success',
-              icon: 'save',
-              position: appStore.settings.notifPos,
-              time: 10000
-            })
-            setTimeout(shell.showItemInFolder(fileName), 3000)
-          }
-        })
-      })
-    },
     openConfig () {
       appStore.openInEditor()
     },
     resetSettings () {
-      appStore.store = {
-        settings: {
-          editor: {
-            autoLine: false,
-            showEditor: false
-          },
-          planCreator: {
-            defaultAssignee: '',
-            defaultPlanExportDir: '',
-            jiraNewLine: false,
-            jiraNewLineAmount: ''
-          },
-          notifPos: 'bottom-right',
-          theme: {
-            primary: '#1f74ff',
-            darkMode: false
-          }
-        },
-        quickLinks: [
-          { text: 'Example Website Bookmark', url: 'www.google.co.uk' },
-          { text: 'Example Local Bookmark', url: 'c://' }
-        ]
-      }
-      app.relaunch()
-      app.exit(0)
+      appStore.store = _.cloneDeep(defaultSettings)
+      remote.app.relaunch()
+      remote.app.exit(0)
     },
     refreshTheme () {
       this.$vs.theme({
@@ -300,6 +325,86 @@ new Vue({
         time: 4000
       })
       return clipboard.readText()
+    },
+    exportToPdf (html) {
+      let win = new remote.BrowserWindow({
+        width: 1280,
+        height: 720
+      })
+      win.loadURL(`data:text/html;charset=UTF-8,${html}`)
+
+      win.webContents.on('did-finish-load', () => {
+        win.webContents.insertCSS('div { page-break-before: avoid; }')
+        win.webContents.printToPDF({
+          marginsType: 1
+        }, (err, data) => {
+          if (err) {
+            this.$vs.notify({
+              title: 'An unknown error occured',
+              color: 'danger',
+              position: this.$store.state.settings.notifPos,
+              time: 4000
+            })
+            return
+          }
+
+          this.exportFile(`Jira Tickets - ${new Date(Date.now()).toISOString().substring(0, 10)}.pdf`, data, 'PDF File', 'pdf')
+        })
+      })
+    },
+    /**
+     * Will begin the download of a file
+     * @param {string} filename name of file
+     * @param {string} content content of file
+     */
+    exportFile (filename, content, extensionName, extension) {
+      let path = remote.dialog.showSaveDialog({
+        title: `Export ${extension} file`,
+        filters: [{
+          name: extensionName,
+          extensions: [extension]
+        }],
+        defaultPath: filename,
+        buttonLabel: 'Export'
+      })
+
+      if (!path) {
+        return
+      }
+
+      // fileName is a string that contains the path and filename created in the save file dialog.
+      fs.writeFile(path, content, (err) => {
+        if (err && err.code === 'EBUSY') {
+          this.$vs.notify({
+            title: 'Error!',
+            text: 'File is locaked or in use. please ensure the file is not open in another program and try again.',
+            color: 'danger',
+            position: this.$store.state.settings.notifPos,
+            time: 4000,
+            click: () => { remote.shell.showItemInFolder(err.path) }
+          })
+        } else if (err) {
+          this.$vs.notify({
+            title: 'Error!',
+            text: `An error ocurred creating the file: ${err.message}`,
+            color: 'danger',
+            position: this.$store.state.settings.notifPos,
+            time: 4000
+          })
+        } else {
+          this.$vs.notify({
+            title: 'File Exported!',
+            text: `File was exported successfully`,
+            color: 'success',
+            position: this.$store.state.settings.notifPos,
+            time: 10000,
+            click: () => { remote.shell.showItemInFolder(path) }
+          })
+          if (this.$store.state.settings.autoOpenOnExport) {
+            setTimeout(remote.shell.showItemInFolder(path), 3000)
+          }
+        }
+      })
     }
   }
 }).$mount('#app')

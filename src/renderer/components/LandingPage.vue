@@ -20,8 +20,6 @@
       <h1 class="mt-3 title">Latest Releases</h1>
       <hr>
       <div id="div-with-loading" class="vs-con-loading__container text-left">
-        <h4>Latest Build Status: <img src="https://ci.appveyor.com/api/projects/status/da9tomaqs4tf119f?svg=true"/></h4>
-        <br>
         <div v-for="(release, index) in releases" v-bind:key="index">
           <h3>Version: {{ release.version }}</h3>
           <p v-html="release.body"></p>
@@ -94,6 +92,12 @@
           })
           .catch(Response => {
             log.info(Response.data)
+            let release = {}
+            release.body = converter.makeHtml('<p class="text-danger">An Netwrok error occured, please contact admin</p>')
+            release.version = 'Error'
+            release.url = 'www.shockwaveinteractive.co.uk'
+            this.releases.push(release)
+            this.$vs.loading.close('#div-with-loading > .con-vs-loading')
           })
       },
       checkOutdated () {

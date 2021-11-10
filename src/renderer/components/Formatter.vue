@@ -2,7 +2,6 @@
 <div>
   <div class="row mt-5">
     <div class="col-md-12 text-center">
-      <h1>Formatter</h1>
 
       <vs-row>
 
@@ -105,9 +104,16 @@ export default {
       inputDelimiter: '',
       seperateWithSpace: false,
       quoteTypes: {
-        None: '',
-        Single: '\'',
-        Double: '"'
+        None: { char: '', wrap: false, trailing: false },
+        Single: { char: '\'', wrap: true, trailing: false },
+        Double: { char: '"', wrap: true, trailing: false },
+        Pipe: { char: '|', wrap: true, trailing: false },
+        'Leading Single': { char: '\'', wrap: false, trailing: false },
+        'Leading Double': { char: '"', wrap: false, trailing: false },
+        'Leading Pipe': { char: '|', wrap: false, trailing: false },
+        'Trailing Single': { char: '\'', wrap: false, trailing: true },
+        'Trailing Double': { char: '"', wrap: false, trailing: true },
+        'Trailing Pipe': { char: '|', wrap: false, trailing: true }
       },
       delimiter: {
         Comma: ',',
@@ -120,7 +126,9 @@ export default {
         'Comma Seperated List': {delimiter: ',', list: true},
         'Whitespace Seperated': {delimiter: ' ', list: false},
         'Tab Seperated': {delimiter: '\t', list: false},
-        'New Line Seperated': {delimiter: '\n', list: true}
+        'New Line Seperated': {delimiter: '\n', list: false},
+        'Pipe Seperated': {delimiter: '|', list: false},
+        'Jira Table': {delimiter: 'jira-Table', list: false}
       },
       wrappers: {
         'No Wrapping': 'none',
@@ -128,7 +136,8 @@ export default {
         '{ }': 'curly',
         '[ ]': 'square',
         '" "': 'doublequote',
-        '\' \'': 'singlequote'
+        '\' \'': 'singlequote',
+        '| |': 'pipe'
       }
     }
   },
@@ -144,20 +153,26 @@ export default {
       this.Seperate(this.conversionType.list, this.conversionType.delimiter)
     },
     Seperate (list, delimiter) {
-      let values = this.input.split(this.inputDelimiter)
-      let result = ''
-
-      if (this.quote !== '') {
-        values = values.map(i => `${this.quote}${i}${this.quote}`)
-      }
-
-      if (list) {
-        result = values.join(`${delimiter}\n`)
+      if (this.conversionType.delimiter === 'jira-table') {
       } else {
-        result = values.join(this.seperateWithSpace ? `${delimiter} ` : delimiter)
+        let values = this.input.split(this.inputDelimiter)
+        let result = ''
+        if (this.quote.char !== '') {
+          if (this.quote.wrap) {
+            values = values.map(i => `${this.quote.char}${i}${this.quote.char}`)
+          } else if (this.quote.trailing) {
+            values = values.map(i => `${i}${this.quote.char}`)
+          } else {
+            values = values.map(i => `${this.quote.char}${i}`)
+          }
+        }
+        if (list) {
+          result = values.join(`${delimiter}\n`)
+        } else {
+          result = values.join(this.seperateWithSpace ? `${delimiter} ` : delimiter)
+        }
+        this.output = this.wrap(result)
       }
-
-      this.output = this.wrap(result)
     },
     wrap (content) {
       switch (this.wrapper) {
@@ -173,6 +188,8 @@ export default {
           return `" ${content} "`
         case 'singlequote':
           return `' ${content} '`
+        case 'pipe':
+          return `| ${content} |`
       }
     },
     copy () {

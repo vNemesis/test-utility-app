@@ -13,6 +13,7 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 require('electron-context-menu')({
+  showInspectElement: false
 })
 
 let mainWindow
@@ -29,7 +30,10 @@ function createWindow () {
     useContentSize: true,
     width: 1500,
     minHeight: 650,
-    minWidth: 1200
+    minWidth: 1200,
+    webPreferences: {
+      webSecurity: false
+    }
   })
 
   mainWindow.loadURL(winURL)

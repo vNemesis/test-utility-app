@@ -8,34 +8,74 @@
       <!-- General Tab -->
       <vs-tab vs-label="General">
 
-        <div class="row">
-          <div class="col-sm-12">
+        <div class="row justify-content-center mt-3">
+          <div class="col-sm-8">
 
             <!-- General Settings -->
-            <h3 class="mt-3">General</h3>
+            <vs-divider color="dark"><h4>General</h4></vs-divider>
             <div class="row">
-              <div class="col-sm-6">
+              <div class="col-sm-12">
 
-                <!-- Notification Position -->
+                <!-- Notification Position and open on export -->
                 <div class="row justify-content-center mt-2">
-                  <div class="col-sm-12">
+                  <div class="col-sm-6">
                     <vs-select label="Notification Position" class="w-100" v-model="settings.notifPos" @input="checkNotifPosChanged()">
                       <vs-select-item :key="index" :value="item" :text="index" v-for="(item,index) in notifPosOptions" />
                     </vs-select>
                   </div>
+                  <div class="col-sm-6">
+                    <p class="mt-3">Toggle Auto-Open File Location On Export</p>
+                    <vs-switch id="autoOpenOnExport" v-model="settings.autoOpenOnExport" @input="isTyping = true">
+                        <span slot="on">On</span>
+                        <span slot="off">Off</span>
+                    </vs-switch>
+                  </div>
                 </div>
-                <!-- Notification Position -->
+                <!-- Notification Position and Open on export-->
 
-                <div class="col-sm-6">
+                <vs-divider color="dark" class="mt-5"><h4>Jira API</h4></vs-divider>
 
+                <!-- Jira Username and Token -->
+                <div class="row justify-content-center mt-2">
+                  <div class="col-sm-6">
+                    <vs-input id="jiraUsername" v-model="settings.api.jiraUsername" label="Jira Username" @input="isTyping = true" class="w-100"/>
+                  </div>
+                  <div class="col-sm-6">
+                    <vs-input id="jiraToken" v-model="settings.api.jiraToken" label="Jira API Token" @input="isTyping = true" class="w-100"/>
+                    <small class="text-info mt-1 float-right" @click="$electron.shell.openExternal('https://id.atlassian.com/manage/api-tokens')">Don't have one? click here</small>
+                    <small class="text-danger">Token is stored as plain text, use at own risk!</small>
+                  </div>
                 </div>
+                <!-- Jira Username and Token-->
+
+                <!-- Jira Domain -->
+                <div class="row justify-content-center mt-2">
+                  <div class="col-sm-12">
+                    <vs-input id="jiraDomain" placeholder="company.atlassian.net" v-model="settings.api.jiraDomain" label="Jira API Domain" @input="isTyping = true" class="w-100"/>
+                    <small class="text-info mt-1">This will be the domain for your jira instance, for example: <i>company.atlassian.net</i></small>
+                  </div>
+                </div>
+                <!-- Jira Domain-->
+
+                <vs-divider color="dark" class="mt-5"><h4>Azure Devops API</h4></vs-divider>
+
+                <!-- VSTS PAT -->
+                <div class="row justify-content-center mt-2">
+                  <div class="col-sm-6">
+                    <vs-input id="vstsPAT" v-model="settings.api.vstsPAT" label="VSTS Personal Access Token" @input="isTyping = true" class="w-100"/>
+                    <small class="text-danger">Token is stored as plain text, use at own risk!</small>
+                  </div>
+                  <div class="col-sm-6">
+                  </div>
+                </div>
+                <!-- VSTS PAT-->
 
               </div>
             </div>
             <!-- General Settings -->
 
             <!-- Theme Settings -->
-            <h3 class="mt-4">Theme</h3>      
+            <vs-divider color="dark" class="mt-5"><h4>Theme</h4></vs-divider>    
             <div class="row">
               <div class="col-sm-12">
 
@@ -48,6 +88,7 @@
                   <vs-col vs-type="flex" vs-justify="flex-start" vs-align="center" vs-w="3">
                     <vs-input label="HEX" placeholder="#1f74ff" v-model="settings.theme.primary" @input="isTyping = true"
                     :danger="this.validationErrors.themePrimary" danger-text="Incorrect Format"/>
+                    <vs-button type="flat" color="primary" @click="settings.theme.primary = '#1f74ff'; isTyping = true" style="margin-top: 30px;" class="ml-2">Reset</vs-button>
                   </vs-col>
                 </vs-row>
 
@@ -70,26 +111,30 @@
       <!-- Test Plan Creator Tab -->
       <vs-tab vs-label="Test Plan Creator">
         <!-- Test Plan Creator Settings -->
-        <div class="row mt-5">
-          <div class="col-sm-12">
+        <div class="row justify-content-center mt-3">
+          <div class="col-sm-8">
+
+            <vs-divider color="dark"><h3>General</h3></vs-divider>
 
             <!-- Other Settings -->
-            <div class="row justify-content-center">
-              <div class="col-sm-8">
+            <div class="row">
+              <div class="col-sm-12">
 
-                  <!-- Default Assignee -->
+                  <!-- Default Assignee & Jira Username -->
                   <div class="row">
-                    <div class="col-sm-12">
-                      <vs-input id="autoNewLine" v-model="settings.planCreator.defaultAssignee" label="Default Assignee" @input="isTyping = true" class="w-100"/>
+                    <div class="col-sm-6">
+                      <vs-input id="defualtAssignee" v-model="settings.planCreator.defaultAssignee" label="Default Assignee" @input="isTyping = true" class="w-100"/>
+                    </div>
+                    <div class="col-sm-6">
                     </div>
                   </div>
-                  <!-- Default Assignee -->
+                  <!-- Default Assignee & Jira Username -->
 
                   <!-- defaultPlanExportDir -->
                   <div class="row mt-4">
                     <div class="col-sm-12">
-                      <vs-input id="autoNewLine" v-model="settings.planCreator.defaultPlanExportDir" label="Default Export Location"
-                      @input="isTyping = true" class="w-100" description-text="Set a defualt location for your test plan exports"/>
+                      <vs-input id="exportLocation" v-model="settings.planCreator.defaultPlanExportDir" label="Default Export Location"
+                      @input="isTyping = true" class="w-100" description-text="Set a defualt location for your file and testplan exports"/>
                     </div>
                   </div>
                   <!-- defaultPlanExportDir -->
@@ -100,7 +145,7 @@
 
             <!-- Toggles -->
             <div class="row justify-content-center mt-3">
-              <div class="col-sm-8">
+              <div class="col-sm-12">
                 <vs-list>
 
                   <vs-list-header title="Editor"></vs-list-header>
@@ -120,6 +165,13 @@
                       </vs-switch>
                     </vs-list-item>
                   </span>
+
+                  <vs-list-item title="Show Preview" subtitle="Show Gherkin preview bar when editing Gherkin">
+                    <vs-switch id="showEditor" v-model="settings.editor.showGherkinPreview" @input="isTyping = true">
+                      <span slot="on">Yes</span>
+                      <span slot="off">No</span>
+                    </vs-switch>
+                  </vs-list-item>
 
                   <vs-list-header title="Generators"></vs-list-header>
 
@@ -156,19 +208,9 @@
       <!-- Misc Tab -->
       <vs-tab vs-label="Misc">
         <!-- Info -->
-        <div class="row justify-content-center">
-          <div class="col-sm-12">
-            <h1 class="mt-3">Info</h1>
-            <p>Installed Version: {{ appVersion }}</p>
-            <p>Latest Version: <span id="span-with-loading" class="vs-con-loading__container">{{ latestRelease }}</span></p>
-            <vs-button ref="getLatestButton" @click="getLatestRelease" type="line" color="primary">Check for Update</vs-button>
-            <vs-button v-if="releaseFound" @click="openUrl(releaseUrl)" type="line" >Release Page</vs-button>
-          </div>
-        </div>
-
         <div class="row">
           <div class="col-sm-12">
-            <h1 class="mt-3">Log</h1>
+            <h3 class="mt-3">Log</h3>
             <vs-button type="line" @click="openLog()">Open Log File</vs-button>
             <!-- <vs-button type="line" color="danger" @click="resetSettings()">Reset Settings</vs-button> -->
           </div>
@@ -176,7 +218,7 @@
 
         <div class="row">
           <div class="col-sm-12">
-            <h1 class="mt-3">Advanced</h1>
+            <h3 class="mt-3">Advanced</h3>
             <vs-button type="line" @click="openConfig()">Open Config File</vs-button>
             <vs-button type="line" color="danger" @click="resetSettings()">Reset Settings</vs-button>
           </div>
@@ -230,18 +272,13 @@
 
 <script>
   import _ from 'lodash'
-  import axios from 'axios'
   const { app } = require('electron').remote
-  var log = require('electron-log')
   var fs = require('fs')
   export default {
     name: 'settings',
 
     data: function () {
       return {
-        latestRelease: '',
-        releaseFound: false,
-        releaseUrl: '',
         notifPosOptions: {
           'Top left': 'top-left',
           'Top middle': 'top-center',
@@ -304,9 +341,6 @@
     },
 
     methods: {
-      openUrl (link) {
-        this.$electron.shell.openExternal(link)
-      },
       openLog () {
         this.logPopup.loading = true
 
@@ -359,26 +393,6 @@
           })
         })
         this.logPopup.active = false
-      },
-      getLatestRelease () {
-        this.$vs.loading({
-          color: '#000',
-          container: '#span-with-loading',
-          scale: 0.45
-        })
-        axios({
-          method: 'get',
-          url: 'https://api.github.com/repos/HarmanU/test-utility-app/releases/latest'
-        })
-          .then(Response => {
-            this.latestRelease = Response.data.tag_name
-            this.releaseUrl = Response.data.html_url
-            this.releaseFound = true
-            this.$vs.loading.close('#span-with-loading > .con-vs-loading')
-          })
-          .catch(Response => {
-            log.info(Response.data)
-          })
       },
       checkNotifPosChanged () {
         if (this.settings.notifPos !== this.oldNotifPos) {

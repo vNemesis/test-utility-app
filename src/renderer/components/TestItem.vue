@@ -62,18 +62,18 @@
     <!-- Gherkin -->
     <td class="align-middle">
 
-      <div class="btn-toolbar" role="toolbar" ref="toolbar" v-if="gherkinToolbar">
+      <div class="btn-toolbar" role="toolbar" ref="toolbar" v-if="toggleGherkin">
         <div class="btn-group btn-group-sm mr-2" role="group" aria-label="First group">
           <button type="button" class="btn btn-info" @click="$emit('show-preview', { syntax: 'gherkin', code: testdata.gherkin})">Preview</button>
         </div>
 
         <div class="btn-group btn-group-sm" role="group" aria-label="Third group">
-          <button type="button" class="btn btn-danger" @click="gherkinToolbar = false">X</button>
+          <button type="button" class="btn btn-danger" @click="toggleGherkin = false">X</button>
         </div>
       </div>
 
       <vs-tooltip text="Only paste Gherkin code. Formatting for Jira is done Automatically">
-        <textarea v-model="testdata.gherkin" class="form-control" style="height: 100px;" placeholder="Gherkin code for test" @focus="gherkinToolbar = true"></textarea>
+        <textarea v-model="testdata.gherkin" class="form-control" style="height: 100px;" placeholder="Gherkin code for test" @focus="toggleGherkin = true"></textarea>
       </vs-tooltip>
 
     </td>
@@ -81,13 +81,13 @@
 
     <td class="align-middle">
       <vs-select label="Priority" v-model="testdata.priority" class="w-100">
-        <vs-select-item :key="index" :value="item" :text="item" v-for="(item,index) in priorities" />
+        <vs-select-item :key="index" :value="item.id" :text="item.name" v-for="(item,index) in priorities" />
       </vs-select>
     </td>
     <td class="align-middle">
       <vs-dropdown vs-custom-content vs-trigger-click>
 
-        <font-awesome-icon icon="ellipsis-h" size="lg" />
+        <font-awesome-icon icon="ellipsis-h" size="lg" class="more-button"/>
 
         <vs-dropdown-menu style="width: 17.5%;">
 
@@ -118,20 +118,14 @@
   export default {
     name: 'test-item',
 
-    props: ['testdata', 'totalNumberOfTestItems', 'order'],
+    props: ['testdata', 'totalNumberOfTestItems', 'order', 'priorities'],
 
     data: function () {
       return {
-        gherkinToolbar: false,
+        gherkinState: false,
         types: {
           API: 'API',
           UI: 'UI'
-        },
-        priorities: {
-          Trivial: 'Trivial',
-          Minor: 'Minor',
-          Major: 'Major',
-          Critical: 'Critical'
         },
         editorState: false,
         editor: {
@@ -158,12 +152,27 @@
     computed: {
       toggleEditor: {
         get () {
-          if (this.$store.state.settings.editor.showEditor) {
+          if (this.settings.editor.showEditor) {
             return this.editorState
           }
         },
         set (value) {
           this.editorState = value
+        }
+      },
+      toggleGherkin: {
+        get () {
+          if (this.settings.editor.showGherkinPreview) {
+            return this.gherkinState
+          }
+        },
+        set (value) {
+          this.gherkinState = value
+        }
+      },
+      settings: {
+        get () {
+          return this.$store.state.settings
         }
       },
       canMoveUp () {
@@ -225,7 +234,6 @@
           title: 'Copied to clipboard',
           text: 'Sub-task Description has been copied to your clipboard',
           color: 'success',
-          // icon: 'publish',
           position: this.$store.state.settings.notifPos,
           time: 4000
         })
@@ -258,5 +266,9 @@
   color: white;
   border-radius: 5px;
   padding: 4px;
+}
+
+.more-button:hover {
+  color: grey;
 }
 </style>

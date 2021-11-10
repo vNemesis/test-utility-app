@@ -88,7 +88,7 @@
 
         <vs-col vs-type="flex" vs-justify="center" vs-align="center" vs-w="1" >
           <vs-tooltip text="Add Link">
-            <vs-button color="success" type="filled" @click="addLink(newLink.text, newLink.url, newLink.colour);" class="mt-3"><font-awesome-icon icon="plus" size="lg" /></vs-button>
+            <vs-button color="success" type="filled" @click="addLink(newLink.text, newLink.url, newLink.colour)" v-shortkey="['enter']" @shortkey="addLink(newLink.text, newLink.url, newLink.colour)" class="mt-3"><font-awesome-icon icon="plus" size="lg" /></vs-button>
           </vs-tooltip>
         </vs-col>
 

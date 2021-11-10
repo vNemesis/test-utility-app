@@ -1,8 +1,12 @@
 <template>
   <div id="app" :class="this.$store.state.settings.theme.darkMode === true ? 'dark-mode' : ''">
+    <span v-shortkey="['ctrl', 'meta']" @shortkey="active = !active"></span>
+    <vs-alert :title="`Development Build - v${version}`" :active="isDevelopmentBuild" color="danger">
+      Development build, somethings may be broken or not finished!
+    </vs-alert>
     <!-- Side Menu -->
     <div id="parentx" :class="this.$store.state.settings.theme.darkMode === true ? 'dark-mode-side-menu' : ''">
-      <vs-sidebar ref="sidemenu" parent="#parentx" default-index="1"  color="primary" class="sidebarx" spacer v-model="active">
+      <vs-sidebar ref="sidemenu" parent="body" default-index="1"  color="primary" class="sidebarx" spacer v-model="active">
 
         <div class="header-sidebar" slot="header">
           <h4>{{name}}</h4>
@@ -21,10 +25,22 @@
         </vs-sidebar-item>
 
         <vs-sidebar-item index="3" icon="text_format" @click="navigate('/formatter')">
-          Formatter
+          Text Formatter
         </vs-sidebar-item>
 
-        <vs-sidebar-item index="4" icon="settings" @click="navigate('/settings')">
+        <vs-sidebar-item index="4" icon="create" @click="navigate('/filecreator')">
+          File Creator <small class="ml-1 mb-2 text-primary">Beta</small>
+        </vs-sidebar-item>
+
+        <vs-sidebar-item index="5" icon="donut_large" @click="navigate('/citests')">
+          CI Test Analyser <small class="ml-1 mb-2 text-primary">Beta</small>
+        </vs-sidebar-item>
+
+        <vs-sidebar-item index="6" @click="navigate('/jira')" class="custom-icon">
+          <font-awesome-icon :icon="['fab', 'jira']" size="lg" class="mr-2"/> Jira Card Exporter
+        </vs-sidebar-item>
+
+        <vs-sidebar-item index="7" icon="settings" @click="navigate('/settings')">
           Settings
         </vs-sidebar-item>
 
@@ -36,16 +52,24 @@
     <!-- Side Menu -->
 
     <vs-navbar type="gradient" v-model="activeItem" class="nabarx">
-      <vs-button @click="onOpenMenu" type="flat" vs-radius="50%"  icon="menu">Menu</vs-button>
 
-      <vs-spacer></vs-spacer>
+      <div slot="title">
+        <vs-tooltip class="float-left ml-2" text="Tooltip position Right" position="right" >
+          <vs-switch style="margin-top: 12px;" v-model="active">
+            <span slot="on">Close menu</span>
+            <span slot="off">Open Menu</span>
+          </vs-switch>
+        </vs-tooltip>
+        <small class="float-left ml-2" style="margin-top: 12px;">Ctrl + <font-awesome-icon :icon="['fab', 'windows']"/></small>
+        <h5 class="mt-2 ml-3 float-left">| {{ pageLoadedName }}</h5>
+      </div>
 
       <vs-navbar-item index="1">
-        <a @click="onOpenUrl('https://rimilia.atlassian.net/projects/AZCI/issues?filter=myopenissues')" class="nav-bar-link"><font-awesome-icon icon="book" size="lg"/> Jira</a>
+        <a @click="onOpenUrl('https://rimilia.atlassian.net')" class="nav-bar-link"><font-awesome-icon :icon="['fab', 'jira']" size="lg"/> Jira</a>
       </vs-navbar-item>
 
       <vs-navbar-item index="2">
-        <a @click="onOpenUrl('https://rimilia.atlassian.net/wiki/spaces/AZURE/pages/454426652')" class="nav-bar-link"><font-awesome-icon icon="book" size="lg"/> CI Subspace</a>
+        <a @click="onOpenUrl('https://rimilia.atlassian.net/wiki/spaces')" class="nav-bar-link"><font-awesome-icon :icon="['fab', 'confluence']" size="lg"/> CI Subspace</a>
       </vs-navbar-item>
 
       |
@@ -74,12 +98,15 @@
 </template>
 
 <script>
+  import axios from 'axios'
   export default {
     name: 'test-plan-utility',
     data: () => ({
       activeItem: 4,
       name: 'Test Plan Utility',
-      active: false
+      active: false,
+      pageLoadedName: 'Home',
+      isDevelopmentBuild: false
     }),
 
     computed: {
@@ -88,8 +115,17 @@
       },
       darkModeWatcher: {
         get () {
-          return this.$store.state.settings.theme.darkMode
+          return this.settings.theme.darkMode
         }
+      },
+      settings () {
+        return this.$store.state.settings
+      },
+      changingConfig () {
+        return this.$store.state.changingConfig
+      },
+      changingQuickLinks () {
+        return this.$store.state.changingQuickLinks
       }
     },
 
@@ -101,15 +137,175 @@
         this.$electron.shell.openExternal(link)
       },
       navigate (path) {
+        let cancelled = false
+
+        if ((this.changingConfig || this.changingQuickLinks) && this.$route.path !== '/jira') {
+          alert('Please wait until any unsaved changes are complete before navigating to a different page')
+          this.resetNavIndex()
+          return
+        }
+
         if (this.$route.path === '/testplancreator') {
           if (confirm('Any unsaved changes will be lost. Please export your test plan if you wish to save it.')) {
             this.$router.push({ path: path })
           } else {
+            cancelled = true
             this.$refs.sidemenu.currentIndex = 2
           }
+        } else if (this.$route.path === '/filecreator') {
+          if (confirm('Any unsaved changes will be lost. Please export your file config and data if you wish to save it.')) {
+            this.$router.push({ path: path })
+          } else {
+            cancelled = true
+            this.$refs.sidemenu.currentIndex = 4
+          }
         } else {
-          this.$router.push({ path: path })
+          if (this.$route.path === '/jira') {
+            this.$store.commit('setChangeConfig', false)
+          }
+          if (path === '/citests') {
+            if (this.settings.api.vstsPAT !== '') {
+              this.$router.push({ path: path })
+            } else {
+              this.$vs.notify({
+                title: 'Error!',
+                text: `Please enter your VSTS Personal Access Token with READ Permissions in the Settings Screen`,
+                color: 'danger',
+                icon: 'error_outline',
+                position: this.settings.notifPos,
+                time: 15000
+              })
+              cancelled = true
+            }
+          } else if (path === '/jira') {
+            if (this.settings.api.jiraUsername !== '' && this.settings.api.jiraToken !== '' && this.settings.api.jiraDomain !== '') {
+              this.$router.push({ path: path })
+            } else {
+              this.$vs.notify({
+                title: 'Error!',
+                text: `Please enter your Jira details in the Settings Screen`,
+                color: 'danger',
+                icon: 'error_outline',
+                position: this.settings.notifPos,
+                time: 15000
+              })
+              cancelled = true
+            }
+          } else {
+            this.$router.push({ path: path })
+          }
         }
+
+        if (!cancelled) {
+          switch (path) {
+            case '/':
+              this.pageLoadedName = 'Home'
+              break
+            case '/testplancreator':
+              this.pageLoadedName = 'Test Plan Creator'
+              break
+            case '/formatter':
+              this.pageLoadedName = 'Text Formatter'
+              break
+            case '/filecreator':
+              this.pageLoadedName = 'File Creator'
+              break
+            case '/citests':
+              this.pageLoadedName = 'CI Test Analyser'
+              break
+            case '/jira':
+              this.pageLoadedName = 'Jira Card Exporter'
+              break
+            case '/settings':
+              this.pageLoadedName = 'Settings'
+              break
+            default:
+              break
+          }
+        } else {
+          this.resetNavIndex()
+        }
+
+        document.getElementsByClassName('vs-sidebar--background').item(0).click()
+      },
+
+      // Resets the navigation active link if the request to hcnage page failed
+      resetNavIndex () {
+        switch (this.$route.path) {
+          case '/':
+            this.$refs.sidemenu.currentIndex = 1
+            this.pageLoadedName = 'Home'
+            break
+          case '/testplancreator':
+            this.$refs.sidemenu.currentIndex = 2
+            this.pageLoadedName = 'Test Plan Creator'
+            break
+          case '/formatter':
+            this.$refs.sidemenu.currentIndex = 3
+            this.pageLoadedName = 'Text Formatter'
+            break
+          case '/filecreator':
+            this.$refs.sidemenu.currentIndex = 4
+            this.pageLoadedName = 'File Creator'
+            break
+          case '/citests':
+            this.$refs.sidemenu.currentIndex = 5
+            this.pageLoadedName = 'CI Test Analyser'
+            break
+          case '/jira':
+            this.$refs.sidemenu.currentIndex = 6
+            this.pageLoadedName = 'Jira Card Exporter'
+            break
+          case '/settings':
+            this.$refs.sidemenu.currentIndex = 7
+            this.pageLoadedName = 'Settings'
+            break
+          default:
+            break
+        }
+      },
+      getLatestRelease () {
+        axios({
+          method: 'get',
+          url: 'https://api.github.com/repos/HarmanU/test-utility-app/releases/latest'
+        })
+          .then(Response => {
+            this.checkDevBuild(Response.data.tag_name)
+          })
+          .catch(Response => {
+            this.checkDevBuild('v.0.0.1')
+          })
+      },
+      checkDevBuild (releaseTag) {
+        let appVersion = window.require('electron').remote.app.getVersion().replace(/\./g, '')
+        let releaseVersion = releaseTag.substring(1).replace(/\./g, '')
+        if (releaseVersion.includes('pre')) {
+          this.isDevelopmentBuild = true
+        } else {
+          this.isDevelopmentBuild = releaseVersion < appVersion
+        }
+      },
+      checkLicense () {
+        axios({
+          method: 'get',
+          url: 'http://portal.shockwaveinteractive.co.uk/api/license/check',
+          auth: {
+            username: 'testuser@shockwaveinteractive.co.uk',
+            password: 'password'
+          }
+        })
+          .then(Response => {
+            if (Response.data.type === 'success') {
+              // alert('successfully authenticated license')
+              console.log(Response.data.message)
+            } else {
+              // alert('unsuccessfully authenticated license')
+            }
+          })
+          .catch(Response => {
+            // alert(Response)
+            console.log(Response)
+          })
       }
     },
 
@@ -132,11 +328,17 @@
       } else {
         document.getElementsByTagName('html').item(0).className -= ' dark-mode'
       }
+      this.getLatestRelease()
+      this.checkLicense()
     }
   }
 </script>
 
 <style>
+.custom-icon > a {
+  padding-left: 1px !important;
+}
+
 .text-dark {
   color: #212529 !important;
 }
@@ -180,6 +382,14 @@ a:not(.text-danger):hover.nav-bar-link {
 .dark-mode li:not(.activeChild).vs-tabs--li > button {
   color: rgb(245, 245, 245) !important;
   border-color: rgba(255,255,255,0.3) !important;
+}
+
+/* Background for dividers */
+.dark-mode .vs-divider--text,
+.dark-mode .vs-divider-border {
+  color: rgb(245, 245, 245) !important;
+  background-color: #212529 !important;
+  border-color: rgba(245, 245, 245, 0.3) !important;
 }
 
 /** Popups */
